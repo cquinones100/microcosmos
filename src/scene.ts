@@ -1,23 +1,26 @@
 import * as THREE from "three";
-import { Shape } from "./organism";
+import { OrganismShape } from "./organism";
 
 class Scene {
   scene: THREE.Scene;
-  camera: THREE.PerspectiveCamera;
+  camera: THREE.OrthographicCamera;
   renderer: THREE.WebGLRenderer;
-  cube?: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
   cameraPosition: THREE.Vector3;
 
   constructor() {
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
+    this.camera = new THREE.OrthographicCamera(
+      window.innerWidth / - 2,
+      window.innerWidth / 2,
+      window.innerHeight / 2,
+      window.innerHeight / - 2,
+      1,
+      1000 
     );
+
+    this.camera.zoom = 10;
     this.renderer = new THREE.WebGLRenderer;
-    this.renderer.setSize( window.innerWidth, window.innerHeight );
+    this.renderer.setSize(window.innerWidth * 0.9, window.innerHeight * 0.9);
     this.cameraPosition = this.camera.position;
     document.body.appendChild(this.renderer.domElement);
   }
@@ -26,7 +29,35 @@ class Scene {
     this.scene.add(args)
   }
 
-  animate(shape: Shape, cb: { (shape: Shape): void; }) {
+  size(value: number) {
+    return this.camera.zoom * value;
+  }
+
+  getLeft() {
+    return this.camera.left;
+  }
+
+  getRight() {
+    return this.camera.right;
+  }
+
+  getTop() {
+    return this.camera.top;
+  }
+
+  getBottom() {
+    return this.camera.bottom;
+  }
+
+  getHeight() {
+    return this.camera.top - this.camera.bottom;
+  }
+
+  getWidth() {
+    return this.camera.right - this.camera.left;
+  }
+
+  animate(shape: OrganismShape, cb: { (shape: OrganismShape): void; }) {
     const renderer = this.renderer;
     const scene = this.scene;
     const camera = this.camera;
