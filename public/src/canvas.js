@@ -11,9 +11,9 @@ var Canvas = /** @class */ (function () {
                 shape: "sphere",
                 scene: scene,
                 organismName: 'E. Coli',
-                speed: 5,
+                speed: 1,
                 width: 1,
-                height: scene.getHeight(),
+                height: 1,
                 positionX: 0,
                 positionY: 0
             });
@@ -61,7 +61,32 @@ var Canvas = /** @class */ (function () {
             scene.addBoundary(rightBoundary);
             scene.addBoundary(topBoundary);
             scene.addBoundary(bottomBoundary);
+            scene.addBoundary(organism);
             organism.action();
+            var otherOrganism = new Organism({
+                shape: "sphere",
+                scene: scene,
+                organismName: 'E. Coli2',
+                speed: 2,
+                width: 5,
+                height: 5,
+                positionX: -100,
+                positionY: -100
+            });
+            var squareOrganism = new Organism({
+                shape: "square",
+                scene: scene,
+                organismName: 'E. Coli3',
+                speed: 0.4,
+                width: 10,
+                height: 10,
+                positionX: -200,
+                positionY: -200
+            });
+            otherOrganism.action();
+            squareOrganism.action();
+            scene.addBoundary(otherOrganism);
+            scene.addBoundary(squareOrganism);
         }, false);
     };
     return Canvas;

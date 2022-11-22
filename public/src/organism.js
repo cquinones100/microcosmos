@@ -11,6 +11,8 @@ var Organism = /** @class */ (function () {
         this.positionX = positionX;
         this.positionY = positionY;
         this.speed = speed;
+        this.organismName = organismName;
+        this.color = [Math.random(), Math.random(), Math.random()];
         switch (shape) {
             case "square":
                 this.shape = this.getCube();
@@ -38,11 +40,12 @@ var Organism = /** @class */ (function () {
         return this.buildOrganism(geometry);
     };
     Organism.prototype.getSphere = function () {
-        var geometry = new THREE.SphereGeometry(this.scene.size(1), 64, 32);
+        var geometry = new THREE.SphereGeometry(this.scene.size(this.height), 64, 32);
         return this.buildOrganism(geometry);
     };
     Organism.prototype.buildOrganism = function (geometry) {
-        var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+        var _a = this.color, r = _a[0], g = _a[1], b = _a[2];
+        var material = new THREE.MeshBasicMaterial({ color: new THREE.Color(r, g, b) });
         var shape = new THREE.Mesh(geometry, material);
         shape.position.setX(this.positionX);
         shape.position.setY(this.positionY);

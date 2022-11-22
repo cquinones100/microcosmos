@@ -5,11 +5,15 @@ var Intersection = /** @class */ (function () {
         this.shapeB = shapeB;
     }
     Intersection.prototype.collided = function () {
+        if (this.shapeA === this.shapeB)
+            return false;
         var firstBB = new THREE.Box3().setFromObject(this.shapeA.shape);
         var secondBB = new THREE.Box3().setFromObject(this.shapeB.shape);
         return firstBB.intersectsBox(secondBB);
     };
     Intersection.prototype.bounce = function () {
+        if (!this.smaller())
+            return;
         if (this.movingLeft()) {
             if (this.movingUp()) {
                 this.negateDirection('y');
@@ -44,6 +48,9 @@ var Intersection = /** @class */ (function () {
     };
     Intersection.prototype.movingUp = function () {
         return this.getYDirection() > 0;
+    };
+    Intersection.prototype.smaller = function () {
+        return this.shapeA.height * this.shapeA.width < this.shapeB.height * this.shapeB.width;
     };
     return Intersection;
 }());

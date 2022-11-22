@@ -1,8 +1,7 @@
 import * as THREE from "three";
-import Boundary from "./boundary";
 import Organism from "./organism";
 
-type IntersectionShape = Organism | Boundary;
+type IntersectionShape = Organism;
 
 class Intersection {
   shapeA: IntersectionShape;
@@ -14,6 +13,8 @@ class Intersection {
   }
 
   collided() {
+    if (this.shapeA === this.shapeB) return false;
+
     const firstBB = new THREE.Box3().setFromObject(this.shapeA.shape);
     const secondBB = new THREE.Box3().setFromObject(this.shapeB.shape);
 
@@ -21,6 +22,7 @@ class Intersection {
   }
 
   bounce() {
+    if (!this.smaller()) return;
     if (this.movingLeft()) {
       if (this.movingUp()) {
         this.negateDirection('y');
@@ -58,6 +60,10 @@ class Intersection {
 
   movingUp() {
     return this.getYDirection() > 0;
+  }
+
+  smaller() {
+    return this.shapeA.height * this.shapeA.width < this.shapeB.height * this.shapeB.width;
   }
 }
 

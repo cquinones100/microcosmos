@@ -16,6 +16,8 @@ class Organism {
   height: number;
   positionX: number;
   positionY: number;
+  organismName: string;
+  color: number[];
 
   constructor({
     shape,
@@ -44,6 +46,8 @@ class Organism {
     this.positionX = positionX;
     this.positionY = positionY;
     this.speed = speed;
+    this.organismName = organismName;
+    this.color = [Math.random(), Math.random(), Math.random()];
 
     switch (shape) {
       case "square":
@@ -77,13 +81,14 @@ class Organism {
   }
 
   private getSphere() {
-    const geometry = new THREE.SphereGeometry(this.scene.size(1), 64, 32);
+    const geometry = new THREE.SphereGeometry(this.scene.size(this.height), 64, 32);
 
     return this.buildOrganism(geometry);
   }
 
   private buildOrganism(geometry: THREE.BoxGeometry | THREE.SphereGeometry) {
-    const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+    const [r, g, b] = this.color;
+    const material = new THREE.MeshBasicMaterial( { color: new THREE.Color(r, g, b)  } );
     const shape = new THREE.Mesh(geometry, material);
     shape.position.setX(this.positionX);
     shape.position.setY(this.positionY);
