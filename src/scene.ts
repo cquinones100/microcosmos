@@ -1,11 +1,12 @@
 import * as THREE from "three";
-import { OrganismShape } from "./organism";
+import Organism from "./organism";
 
 class Scene {
   scene: THREE.Scene;
   camera: THREE.OrthographicCamera;
   renderer: THREE.WebGLRenderer;
   cameraPosition: THREE.Vector3;
+  boundaries: Organism[];
 
   constructor() {
     this.scene = new THREE.Scene();
@@ -22,6 +23,8 @@ class Scene {
     this.renderer = new THREE.WebGLRenderer;
     this.renderer.setSize(window.innerWidth * 0.9, window.innerHeight * 0.9);
     this.cameraPosition = this.camera.position;
+
+    this.boundaries = [];
     document.body.appendChild(this.renderer.domElement);
   }
 
@@ -57,20 +60,30 @@ class Scene {
     return this.camera.right - this.camera.left;
   }
 
-  animate(shape: OrganismShape, cb: { (shape: OrganismShape): void; }) {
+  animate(shape: Organism, cb: { (shape: Organism, scene: Scene): void; }) {
     const renderer = this.renderer;
-    const scene = this.scene;
+    const scene = this;
     const camera = this.camera;
 
     function animate() {
       requestAnimationFrame(animate);
 
-      cb(shape);
+      cb(shape, scene);
 
-      renderer.render(scene, camera);
+      renderer.render(scene.scene, camera);
     }
 
     animate();
+  }
+
+  setCameraPosition({ z }: { z: number | null }) {
+    if (z) {
+      this.cameraPosition.z = this.size(z);
+    }
+  }
+
+  addBoundary(boundary: Organism) {
+    this.boundaries.push(boundary);
   }
 }
 

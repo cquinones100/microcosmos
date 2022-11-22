@@ -7,6 +7,7 @@ var Scene = /** @class */ (function () {
         this.renderer = new THREE.WebGLRenderer;
         this.renderer.setSize(window.innerWidth * 0.9, window.innerHeight * 0.9);
         this.cameraPosition = this.camera.position;
+        this.boundaries = [];
         document.body.appendChild(this.renderer.domElement);
     }
     Scene.prototype.add = function (args) {
@@ -35,14 +36,23 @@ var Scene = /** @class */ (function () {
     };
     Scene.prototype.animate = function (shape, cb) {
         var renderer = this.renderer;
-        var scene = this.scene;
+        var scene = this;
         var camera = this.camera;
         function animate() {
             requestAnimationFrame(animate);
-            cb(shape);
-            renderer.render(scene, camera);
+            cb(shape, scene);
+            renderer.render(scene.scene, camera);
         }
         animate();
+    };
+    Scene.prototype.setCameraPosition = function (_a) {
+        var z = _a.z;
+        if (z) {
+            this.cameraPosition.z = this.size(z);
+        }
+    };
+    Scene.prototype.addBoundary = function (boundary) {
+        this.boundaries.push(boundary);
     };
     return Scene;
 }());

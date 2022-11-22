@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import Intersection from "./intersection";
 import Scene from "./scene";
 
 type OrganismShapeName = "square" | "triangle" | "sphere";
@@ -8,9 +9,41 @@ export type OrganismShape = THREE.Mesh<THREE.BoxGeometry | THREE.SphereGeometry,
 class Organism {
   scene: Scene;
   shape: OrganismShape;
+  xDirection: number;
+  yDirection: number;
+  speed: number;
+  width: number;
+  height: number;
+  positionX: number;
+  positionY: number;
 
-  constructor(shape: OrganismShapeName, scene: Scene) {
+  constructor({
+    shape,
+    scene,
+    organismName,
+    speed,
+    width,
+    height,
+    positionX,
+    positionY
+  }: {
+    shape: OrganismShapeName,
+    scene: Scene,
+    organismName: string,
+    speed: number,
+    width: number,
+    height: number,
+    positionX: number,
+    positionY: number
+  }) {
     this.scene = scene;
+    this.xDirection = speed;
+    this.yDirection = speed;
+    this.width = width;
+    this.height = height;
+    this.positionX = positionX;
+    this.positionY = positionY;
+    this.speed = speed;
 
     switch (shape) {
       case "square":
@@ -26,60 +59,38 @@ class Organism {
   }
 
   action() {
-    const camera = this.scene.camera;
-    let xDirection = 0.05;
-    let yDirection = 0.02;
+    this.scene.animate(this, function (organism: Organism, scene: Scene) {
+      const intersection = scene.boundaries.map(boundary => new Intersection(organism, boundary))
+        .find(intersection => intersection.collided());
 
-    this.scene.animate(this.shape, function (shape: OrganismShape) {
-      const frustum = new THREE.Frustum();
-      const matrix = new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-      frustum.setFromProjectionMatrix(matrix);
+      if (intersection) intersection.bounce();
 
-      if (!frustum.containsPoint(shape.position)) {
-        console.log(shape.position);
-        console.log(frustum);
-        console.log('Out of view')
-
-        // function bounceLeft() {
-        //   shape.position.setX(shape.position.x + direction * -1);
-        //   shape.position.setY(shape.position.y + direction);
-        // }
-
-        // function bounceDown() {
-        //   shape.position.setX(shape.position.x + direction);
-        //   shape.position.setY(shape.position.y + direction * -1);
-        // }
-
-
-        xDirection *= -1;
-        yDirection *= -1;
-      }
-
-      shape.position.setX(shape.position.x + xDirection);
-      shape.position.setY(shape.position.y + yDirection);
+      organism.shape.position.setX(organism.shape.position.x + organism.xDirection);
+      organism.shape.position.setY(organism.shape.position.y + organism.yDirection);
     });
   }
 
   private getCube() {
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    this.scene.add(cube);
+    const geometry = new THREE.BoxGeometry(this.scene.size(this.width), this.scene.size(this.height), 1);
 
-    this.scene.cameraPosition.z = 5;
-
-    return cube;
+    return this.buildOrganism(geometry);
   }
 
   private getSphere() {
     const geometry = new THREE.SphereGeometry(this.scene.size(1), 64, 32);
+
+    return this.buildOrganism(geometry);
+  }
+
+  private buildOrganism(geometry: THREE.BoxGeometry | THREE.SphereGeometry) {
     const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-    const sphere = new THREE.Mesh( geometry, material );
-    this.scene.add( sphere );
+    const shape = new THREE.Mesh(geometry, material);
+    shape.position.setX(this.positionX);
+    shape.position.setY(this.positionY);
 
-    this.scene.cameraPosition.z = 5;
+    this.scene.add(shape);
 
-    return sphere;
+    return shape;
   }
 }
 
