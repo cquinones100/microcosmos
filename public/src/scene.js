@@ -9,7 +9,9 @@ var Scene = /** @class */ (function () {
         this.renderer = new THREE.WebGLRenderer;
         this.renderer.setSize(window.innerWidth * 0.9, window.innerHeight * 0.9);
         this.cameraPosition = this.camera.position;
+        this.zoom = 1;
         this.boundaries = [];
+        this.organisms = [];
         document.body.appendChild(this.renderer.domElement);
     }
     Scene.prototype.add = function (args) {
@@ -71,9 +73,14 @@ var Scene = /** @class */ (function () {
                 positionY: Math.random() * 200 * Math.round(Math.random()) ? 1 : -1
             });
             this.addBoundary(organism);
+            this.organisms.push(organism);
             organism.action();
             currentAmount += 1;
         }
+    };
+    Scene.prototype.setZoom = function (value) {
+        this.camera.zoom += value;
+        this.organisms.forEach(function (organism) { return organism.zoom(); });
     };
     return Scene;
 }());

@@ -8,6 +8,8 @@ class Scene {
   renderer: THREE.WebGLRenderer;
   cameraPosition: THREE.Vector3;
   boundaries: Organism[];
+  organisms: Organism[];
+  zoom: number;
 
   constructor() {
     this.scene = new THREE.Scene();
@@ -24,8 +26,10 @@ class Scene {
     this.renderer = new THREE.WebGLRenderer;
     this.renderer.setSize(window.innerWidth * 0.9, window.innerHeight * 0.9);
     this.cameraPosition = this.camera.position;
+    this.zoom = 1;
 
     this.boundaries = [];
+    this.organisms = [];
     document.body.appendChild(this.renderer.domElement);
   }
 
@@ -104,10 +108,17 @@ class Scene {
       });
 
       this.addBoundary(organism);
+      this.organisms.push(organism);
       organism.action();
 
       currentAmount += 1;
     }
+  }
+
+  setZoom(value: number) {
+    this.camera.zoom += value;
+
+    this.organisms.forEach(organism => organism.zoom());
   }
 }
 

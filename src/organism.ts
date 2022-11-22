@@ -18,6 +18,7 @@ class Organism {
   positionY: number;
   organismName: string;
   color: number[];
+  shapeName: string;
 
   constructor({
     shape,
@@ -48,6 +49,7 @@ class Organism {
     this.speed = speed;
     this.organismName = organismName;
     this.color = [Math.random(), Math.random(), Math.random()];
+    this.shapeName = shape;
 
     switch (shape) {
       case "square":
@@ -72,6 +74,22 @@ class Organism {
       organism.shape.position.setX(organism.shape.position.x + organism.xDirection);
       organism.shape.position.setY(organism.shape.position.y + organism.yDirection);
     });
+  }
+
+  zoom() {
+    this.shape.geometry.dispose()
+
+    switch (this.shapeName) {
+      case "square":
+        this.shape = this.getCube();
+        break;
+      case "sphere":
+        this.shape = this.getSphere();
+        break;
+      default: {
+        this.shape = this.getCube();
+      }
+    }
   }
 
   private getCube() {

@@ -13,6 +13,7 @@ var Organism = /** @class */ (function () {
         this.speed = speed;
         this.organismName = organismName;
         this.color = [Math.random(), Math.random(), Math.random()];
+        this.shapeName = shape;
         switch (shape) {
             case "square":
                 this.shape = this.getCube();
@@ -34,6 +35,20 @@ var Organism = /** @class */ (function () {
             organism.shape.position.setX(organism.shape.position.x + organism.xDirection);
             organism.shape.position.setY(organism.shape.position.y + organism.yDirection);
         });
+    };
+    Organism.prototype.zoom = function () {
+        this.shape.geometry.dispose();
+        switch (this.shapeName) {
+            case "square":
+                this.shape = this.getCube();
+                break;
+            case "sphere":
+                this.shape = this.getSphere();
+                break;
+            default: {
+                this.shape = this.getCube();
+            }
+        }
     };
     Organism.prototype.getCube = function () {
         var geometry = new THREE.BoxGeometry(this.scene.size(this.width), this.scene.size(this.height), 1);

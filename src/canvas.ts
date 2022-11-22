@@ -57,6 +57,12 @@ class Canvas {
       scene.addBoundary(bottomBoundary);
 
       scene.createOrganism(20);
+      
+      if (document) { 
+        document.addEventListener('wheel', (event) => {
+          scene.setZoom(event.deltaY);
+        });
+      }
     }, false);
   }
 
