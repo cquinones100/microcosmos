@@ -23,6 +23,7 @@ class Intersection {
 
   bounce() {
     if (!this.smaller()) return;
+
     if (this.movingLeft()) {
       if (this.movingUp()) {
         this.negateDirection('y');
@@ -38,7 +39,7 @@ class Intersection {
     }
   }
 
-  negateDirection(direction: "y" | "x") {
+  negateDirection(direction: "y" | "x", value?: number) {
     this.shapeA[`${direction}Direction`] *= -1;
   }
 

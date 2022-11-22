@@ -7,25 +7,14 @@ class Canvas {
       const scene = new Scene();
       scene.cameraPosition.z = 100;
 
-      const organism = new Organism({
-        shape: "sphere",
-        scene: scene,
-        organismName: 'E. Coli',
-        speed: 1,
-        width: 1,
-        height: 1,
-        positionX: 0,
-        positionY: 0
-      });
-
       const leftBoundary = new Organism({
         shape: "square",
         organismName: "Left Boundary",
         speed: 0,
         width: 1,
-        height: scene.getHeight(),
+        height: this.worldScale(scene.getHeight()),
         scene: scene,
-        positionX: scene.getLeft() + 1,
+        positionX: this.worldScale(scene.getLeft() + 1),
         positionY: 0
       });
 
@@ -34,9 +23,9 @@ class Canvas {
         organismName: "Right Boundary",
         speed: 0,
         width: 1,
-        height: scene.getHeight(),
+        height: this.worldScale(scene.getHeight()),
         scene: scene,
-        positionX: scene.getRight() - 1,
+        positionX: this.worldScale(scene.getRight() - 1),
         positionY: 0
       });
 
@@ -44,61 +33,36 @@ class Canvas {
         shape: "square",
         organismName: "Right Boundary",
         speed: 0,
-        width: scene.getWidth(),
+        width: this.worldScale(scene.getWidth()),
         height: 1,
         scene: scene,
         positionX: 0,
-        positionY: scene.getTop()
+        positionY: this.worldScale(scene.getTop())
       });
 
       const bottomBoundary = new Organism({
         shape: "square",
         organismName: "Right Boundary",
         speed: 0,
-        width: scene.getWidth(),
+        width: this.worldScale(scene.getWidth()),
         height: 1,
         scene: scene,
         positionX: 0,
-        positionY: scene.getBottom()
+        positionY: this.worldScale(scene.getBottom())
       });
 
       scene.addBoundary(leftBoundary);
       scene.addBoundary(rightBoundary);
       scene.addBoundary(topBoundary);
       scene.addBoundary(bottomBoundary);
-      scene.addBoundary(organism);
 
-      organism.action();
-
-      const otherOrganism = new Organism({
-        shape: "sphere",
-        scene: scene,
-        organismName: 'E. Coli2',
-        speed: 2,
-        width: 5,
-        height: 5,
-        positionX: -100,
-        positionY: -100
-      });
-
-      const squareOrganism = new Organism({
-        shape: "square",
-        scene: scene,
-        organismName: 'E. Coli3',
-        speed: 0.4,
-        width: 10,
-        height: 10,
-        positionX: -200,
-        positionY: -200
-      });
-
-      otherOrganism.action();
-      squareOrganism.action();
-      scene.addBoundary(otherOrganism);
-      scene.addBoundary(squareOrganism);
+      scene.createOrganism(20);
     }, false);
   }
 
+  private worldScale(value: number) {
+    return value * 2;
+  }
 }
 
 export default Canvas;

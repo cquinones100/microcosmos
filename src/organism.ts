@@ -2,7 +2,7 @@ import * as THREE from "three";
 import Intersection from "./intersection";
 import Scene from "./scene";
 
-type OrganismShapeName = "square" | "triangle" | "sphere";
+export type OrganismShapeName = "square" | "triangle" | "sphere";
 
 export type OrganismShape = THREE.Mesh<THREE.BoxGeometry | THREE.SphereGeometry, THREE.MeshBasicMaterial>;
 

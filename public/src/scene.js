@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import Organism from "./organism";
+import { faker } from '@faker-js/faker';
 var Scene = /** @class */ (function () {
     function Scene() {
         this.scene = new THREE.Scene();
@@ -53,6 +55,25 @@ var Scene = /** @class */ (function () {
     };
     Scene.prototype.addBoundary = function (boundary) {
         this.boundaries.push(boundary);
+    };
+    Scene.prototype.createOrganism = function (amount) {
+        var currentAmount = 0;
+        while (currentAmount < amount) {
+            var index = Math.round(Math.random() * 2);
+            var organism = new Organism({
+                shape: ['square', 'sphere'][index],
+                scene: this,
+                organismName: faker.lorem.slug(),
+                speed: Math.random() * 4,
+                width: Math.random() * 2,
+                height: Math.random() * 2,
+                positionX: Math.random() * 200 * Math.round(Math.random()) ? 1 : -1,
+                positionY: Math.random() * 200 * Math.round(Math.random()) ? 1 : -1
+            });
+            this.addBoundary(organism);
+            organism.action();
+            currentAmount += 1;
+        }
     };
     return Scene;
 }());

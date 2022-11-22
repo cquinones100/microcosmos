@@ -31,7 +31,7 @@ var Intersection = /** @class */ (function () {
             }
         }
     };
-    Intersection.prototype.negateDirection = function (direction) {
+    Intersection.prototype.negateDirection = function (direction, value) {
         this.shapeA["".concat(direction, "Direction")] *= -1;
     };
     Intersection.prototype.getXDirection = function () {
