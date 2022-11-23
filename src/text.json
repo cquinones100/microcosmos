@@ -1,0 +1,28 @@
+{
+  "intro": [
+    "This is your first organism. It won't be your last, nor will it be yours forever",
+    "Your organism thrives and dies based on its environment",
+    "Your organism is entirely dependent on the environment for its survival. It generates energy by consuming the chemical compounds present in your environment",
+    "Your organism uses the energy generated to perform vital life functions including reproduction",
+    "Every organism is driven towards reproduction",
+    "You have complete control to adjust the environment to improve this organism's potential for reproduction, and thus, its survivability",
+    "Or not, the choice is yours"
+  ],
+  "otherOrganismsAppear": {
+    "mutation": [
+      "Your organism has mutated over generations and some members of the population can be classified as a whole new organism"
+    ],
+    "environment": [
+      "Your environmental changes have resulted in organic compounds forming a new organism"
+    ],
+    "regardless": [
+      "Your organisms will now compete for resources",
+      "The environment can be changed to favor one organism over the other"
+    ]
+  },
+  "aSymbioticRelationShipAppears": [
+    "Two or more organisms have formed a network of mutually beneficial behaviors",
+    "This moment is the product of changes to the environment, generations of mutations and luck",
+    "Any of these factors could impact the success of this symbiosis"
+  ]
+}
