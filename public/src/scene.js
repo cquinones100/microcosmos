@@ -1,86 +1,89 @@
 import * as THREE from "three";
-import Organism from "./organism";
-import { faker } from '@faker-js/faker';
+import NewOrganism from "./newOrganism";
+var BOUNDARY = 5;
 var Scene = /** @class */ (function () {
     function Scene() {
         this.scene = new THREE.Scene();
-        this.camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, 1, 1000);
-        this.camera.zoom = 10;
+        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000);
         this.renderer = new THREE.WebGLRenderer;
-        this.renderer.setSize(window.innerWidth * 0.9, window.innerHeight * 0.9);
-        this.cameraPosition = this.camera.position;
-        this.zoom = 1;
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.boundaries = [];
         this.organisms = [];
+        console.log(window.innerWidth / window.innerHeight);
         document.body.appendChild(this.renderer.domElement);
     }
-    Scene.prototype.add = function (args) {
-        this.scene.add(args);
+    Scene.prototype.draw = function () {
+        var topBoundary = new NewOrganism({
+            height: 100,
+            width: 0.1,
+            depth: 0.25,
+            y: BOUNDARY - 1.5,
+            scene: this
+        });
+        this.scene.add(topBoundary.shape);
+        this.boundaries.push(topBoundary);
+        var rightBoundary = new NewOrganism({
+            height: 0.1,
+            width: 100,
+            depth: 0.25,
+            x: BOUNDARY,
+            scene: this
+        });
+        this.scene.add(rightBoundary.shape);
+        this.boundaries.push(rightBoundary);
+        var bottomBoundary = new NewOrganism({
+            height: 100,
+            width: 0.1,
+            depth: 0.25,
+            y: BOUNDARY * -1 + 1,
+            scene: this
+        });
+        this.scene.add(bottomBoundary.shape);
+        this.boundaries.push(bottomBoundary);
+        var leftBoundary = new NewOrganism({
+            height: 0.1,
+            width: 100,
+            depth: 0.25,
+            x: BOUNDARY * -1,
+            scene: this
+        });
+        this.scene.add(leftBoundary.shape);
+        this.boundaries.push(leftBoundary);
+        this.createOrganism(150);
+        this.camera.position.z = 5;
     };
-    Scene.prototype.size = function (value) {
-        return this.camera.zoom * value;
+    Scene.prototype.add = function (organism) {
+        this.organisms.push(organism);
+        this.scene.add(organism.shape);
     };
-    Scene.prototype.getLeft = function () {
-        return this.camera.left;
-    };
-    Scene.prototype.getRight = function () {
-        return this.camera.right;
-    };
-    Scene.prototype.getTop = function () {
-        return this.camera.top;
-    };
-    Scene.prototype.getBottom = function () {
-        return this.camera.bottom;
-    };
-    Scene.prototype.getHeight = function () {
-        return this.camera.top - this.camera.bottom;
-    };
-    Scene.prototype.getWidth = function () {
-        return this.camera.right - this.camera.left;
-    };
-    Scene.prototype.animate = function (shape, cb) {
+    Scene.prototype.animate = function () {
         var renderer = this.renderer;
         var scene = this;
         var camera = this.camera;
         function animate() {
             requestAnimationFrame(animate);
-            cb(shape, scene);
+            scene.organisms.forEach(function (organism) { return organism.animate(); });
             renderer.render(scene.scene, camera);
         }
         animate();
     };
-    Scene.prototype.setCameraPosition = function (_a) {
-        var z = _a.z;
-        if (z) {
-            this.cameraPosition.z = this.size(z);
-        }
-    };
-    Scene.prototype.addBoundary = function (boundary) {
-        this.boundaries.push(boundary);
-    };
     Scene.prototype.createOrganism = function (amount) {
         var currentAmount = 0;
         while (currentAmount < amount) {
-            var index = Math.round(Math.random() * 2);
-            var organism = new Organism({
-                shape: ['square', 'sphere'][index],
+            var negatableRandom = function (max) { return Math.round(Math.random()) ? Math.random() * max : Math.random() * max * -1; };
+            var organism = new NewOrganism({
+                height: Math.random() * 0.1,
+                width: Math.random() * 0.1,
+                depth: Math.random() * 0.1,
                 scene: this,
-                organismName: faker.lorem.slug(),
-                speed: Math.random() * 4,
-                width: Math.random() * 2,
-                height: Math.random() * 2,
-                positionX: Math.random() * 200 * Math.round(Math.random()) ? 1 : -1,
-                positionY: Math.random() * 200 * Math.round(Math.random()) ? 1 : -1
+                x: negatableRandom(3),
+                y: negatableRandom(3),
+                shapeType: ["square", "sphere", "other"][Math.round(Math.random() * 2)],
+                speed: Math.random(),
             });
-            this.addBoundary(organism);
-            this.organisms.push(organism);
-            organism.action();
+            this.add(organism);
             currentAmount += 1;
         }
-    };
-    Scene.prototype.setZoom = function (value) {
-        this.camera.zoom += value;
-        this.organisms.forEach(function (organism) { return organism.zoom(); });
     };
     return Scene;
 }());

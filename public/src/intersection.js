@@ -50,7 +50,7 @@ var Intersection = /** @class */ (function () {
         return this.getYDirection() > 0;
     };
     Intersection.prototype.smaller = function () {
-        return this.shapeA.height * this.shapeA.width < this.shapeB.height * this.shapeB.width;
+        return this.shapeA.height * this.shapeA.width <= this.shapeB.height * this.shapeB.width;
     };
     return Intersection;
 }());

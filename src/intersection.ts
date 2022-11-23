@@ -1,11 +1,11 @@
 import * as THREE from "three";
-import Organism from "./organism";
+import NewOrganism from "./newOrganism";
 
-type IntersectionShape = Organism;
+type IntersectionShape = NewOrganism;
 
 class Intersection {
-  shapeA: IntersectionShape;
-  shapeB: IntersectionShape;
+  private shapeA: IntersectionShape;
+  private shapeB: IntersectionShape;
 
   constructor(shapeA: IntersectionShape, shapeB: IntersectionShape) {
     this.shapeA = shapeA;
@@ -39,32 +39,32 @@ class Intersection {
     }
   }
 
-  negateDirection(direction: "y" | "x", value?: number) {
+  private negateDirection(direction: "y" | "x", value?: number) {
     this.shapeA[`${direction}Direction`] *= -1;
   }
 
-  getXDirection() {
+  private getXDirection() {
     return this.shapeA.xDirection;
   }
 
-  getYDirection() {
+  private getYDirection() {
     return this.shapeA.yDirection;
   }
 
-  movingLeft() {
+  private movingLeft() {
     return this.getXDirection() < 0;
   }
 
-  movingRight() {
+  private movingRight() {
     return this.getXDirection() > 0;
   }
 
-  movingUp() {
+  private movingUp() {
     return this.getYDirection() > 0;
   }
 
-  smaller() {
-    return this.shapeA.height * this.shapeA.width < this.shapeB.height * this.shapeB.width;
+  private smaller() {
+    return this.shapeA.height * this.shapeA.width <= this.shapeB.height * this.shapeB.width;
   }
 }
 

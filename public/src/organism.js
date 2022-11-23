@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import Intersection from "./intersection";
 var Organism = /** @class */ (function () {
     function Organism(_a) {
         var shape = _a.shape, scene = _a.scene, organismName = _a.organismName, speed = _a.speed, width = _a.width, height = _a.height, positionX = _a.positionX, positionY = _a.positionY;
@@ -26,30 +25,15 @@ var Organism = /** @class */ (function () {
             }
         }
     }
-    Organism.prototype.action = function () {
-        this.scene.animate(this, function (organism, scene) {
-            var intersection = scene.boundaries.map(function (boundary) { return new Intersection(organism, boundary); })
-                .find(function (intersection) { return intersection.collided(); });
-            if (intersection)
-                intersection.bounce();
-            organism.shape.position.setX(organism.shape.position.x + organism.xDirection);
-            organism.shape.position.setY(organism.shape.position.y + organism.yDirection);
-        });
-    };
-    Organism.prototype.zoom = function () {
-        this.shape.geometry.dispose();
-        switch (this.shapeName) {
-            case "square":
-                this.shape = this.getCube();
-                break;
-            case "sphere":
-                this.shape = this.getSphere();
-                break;
-            default: {
-                this.shape = this.getCube();
-            }
-        }
-    };
+    // action() {
+    //   this.scene.animate(this, function (organism: Organism, scene: Scene) {
+    //     const intersection = scene.boundaries.map(boundary => new Intersection(organism, boundary))
+    //       .find(intersection => intersection.collided());
+    //     if (intersection) intersection.bounce();
+    //     organism.shape.position.setX(organism.shape.position.x + organism.xDirection);
+    //     organism.shape.position.setY(organism.shape.position.y + organism.yDirection);
+    //   });
+    // }
     Organism.prototype.getCube = function () {
         var geometry = new THREE.BoxGeometry(this.scene.size(this.width), this.scene.size(this.height), 1);
         return this.buildOrganism(geometry);
@@ -64,7 +48,7 @@ var Organism = /** @class */ (function () {
         var shape = new THREE.Mesh(geometry, material);
         shape.position.setX(this.positionX);
         shape.position.setY(this.positionY);
-        this.scene.add(shape);
+        // this.scene.add(shape);
         return shape;
     };
     return Organism;

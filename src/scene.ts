@@ -1,71 +1,89 @@
 import * as THREE from "three";
-import Organism, { OrganismShapeName } from "./organism";
-import { faker } from '@faker-js/faker';
+import NewOrganism, { OrganismProps } from "./newOrganism";
+
+const BOUNDARY = 5;
 
 class Scene {
   scene: THREE.Scene;
-  camera: THREE.OrthographicCamera;
+  camera: THREE.PerspectiveCamera;
   renderer: THREE.WebGLRenderer;
-  cameraPosition: THREE.Vector3;
-  boundaries: Organism[];
-  organisms: Organism[];
-  zoom: number;
+  boundaries: NewOrganism[];
+  organisms: NewOrganism[];
 
   constructor() {
     this.scene = new THREE.Scene();
-    this.camera = new THREE.OrthographicCamera(
-      window.innerWidth / - 2,
-      window.innerWidth / 2,
-      window.innerHeight / 2,
-      window.innerHeight / - 2,
-      1,
-      1000 
+    this.camera = new THREE.PerspectiveCamera(
+      50,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      2000
     );
 
-    this.camera.zoom = 10;
     this.renderer = new THREE.WebGLRenderer;
-    this.renderer.setSize(window.innerWidth * 0.9, window.innerHeight * 0.9);
-    this.cameraPosition = this.camera.position;
-    this.zoom = 1;
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
 
     this.boundaries = [];
     this.organisms = [];
+
+    console.log(window.innerWidth / window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
   }
 
-  add(args: THREE.Object3D<THREE.Event> | THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>) {
-    this.scene.add(args)
+  draw() {
+    const topBoundary = new NewOrganism({
+      height: 100,
+      width: 0.1,
+      depth: 0.25,
+      y: BOUNDARY - 1.5,
+      scene: this
+    });
+
+    this.scene.add(topBoundary.shape);
+    this.boundaries.push(topBoundary);
+    
+    const rightBoundary = new NewOrganism({
+      height: 0.1,
+      width: 100,
+      depth: 0.25,
+      x: BOUNDARY,
+      scene: this
+    });
+
+    this.scene.add(rightBoundary.shape);
+    this.boundaries.push(rightBoundary);
+
+    const bottomBoundary = new NewOrganism({
+      height: 100,
+      width: 0.1,
+      depth: 0.25,
+      y: BOUNDARY * -1 + 1,
+      scene: this
+    });
+
+    this.scene.add(bottomBoundary.shape);
+    this.boundaries.push(bottomBoundary);
+
+    const leftBoundary = new NewOrganism({
+      height: 0.1,
+      width: 100,
+      depth: 0.25,
+      x: BOUNDARY * -1,
+      scene: this
+    });
+
+    this.scene.add(leftBoundary.shape);
+    this.boundaries.push(leftBoundary);
+
+    this.createOrganism(150);
+    this.camera.position.z = 5;
   }
 
-  size(value: number) {
-    return this.camera.zoom * value;
+  add(organism: NewOrganism) {
+    this.organisms.push(organism);
+    this.scene.add(organism.shape);
   }
 
-  getLeft() {
-    return this.camera.left;
-  }
-
-  getRight() {
-    return this.camera.right;
-  }
-
-  getTop() {
-    return this.camera.top;
-  }
-
-  getBottom() {
-    return this.camera.bottom;
-  }
-
-  getHeight() {
-    return this.camera.top - this.camera.bottom;
-  }
-
-  getWidth() {
-    return this.camera.right - this.camera.left;
-  }
-
-  animate(shape: Organism, cb: { (shape: Organism, scene: Scene): void; }) {
+  animate() {
     const renderer = this.renderer;
     const scene = this;
     const camera = this.camera;
@@ -73,7 +91,7 @@ class Scene {
     function animate() {
       requestAnimationFrame(animate);
 
-      cb(shape, scene);
+      scene.organisms.forEach(organism => organism.animate());
 
       renderer.render(scene.scene, camera);
     }
@@ -81,44 +99,27 @@ class Scene {
     animate();
   }
 
-  setCameraPosition({ z }: { z: number | null }) {
-    if (z) {
-      this.cameraPosition.z = this.size(z);
-    }
-  }
-
-  addBoundary(boundary: Organism) {
-    this.boundaries.push(boundary);
-  }
-
   createOrganism(amount: number) {
     let currentAmount = 0;
 
     while (currentAmount < amount) {
-      const index = Math.round(Math.random() * 2);
-      const organism = new Organism({
-        shape: ['square', 'sphere'][index] as OrganismShapeName,
+      const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
+
+      const organism = new NewOrganism({
+        height: Math.random() * 0.1,
+        width: Math.random() * 0.1,
+        depth: Math.random() * 0.1,
         scene: this,
-        organismName: faker.lorem.slug(),
-        speed: Math.random() * 4,
-        width: Math.random() * 2,
-        height: Math.random() * 2,
-        positionX: Math.random() * 200 * Math.round(Math.random()) ? 1 : -1,
-        positionY: Math.random() * 200 * Math.round(Math.random()) ? 1 : -1
+        x: negatableRandom(3),
+        y: negatableRandom(3),
+        shapeType: ["square", "sphere", "other"][Math.round(Math.random() * 2)] as OrganismProps["shapeType"],
+        speed: Math.random(),
       });
 
-      this.addBoundary(organism);
-      this.organisms.push(organism);
-      organism.action();
+      this.add(organism);
 
       currentAmount += 1;
     }
-  }
-
-  setZoom(value: number) {
-    this.camera.zoom += value;
-
-    this.organisms.forEach(organism => organism.zoom());
   }
 }
 
