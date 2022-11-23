@@ -112,9 +112,13 @@ class Scene {
         scene: this,
         x: negatableRandom(3),
         y: negatableRandom(3),
+        xDirection: negatableRandom(0.01),
+        yDirection: negatableRandom(0.01),
         shapeType: ["square", "sphere", "other"][Math.round(Math.random() * 2)] as OrganismProps["shapeType"],
-        speed: Math.random(),
+        speed: Math.random() * 0.6,
       });
+
+      console.log(organism.xDirection, organism.yDirection);
 
       this.add(organism);
 
