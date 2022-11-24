@@ -1,5 +1,9 @@
 import * as THREE from "three";
+import MovementGene from "./genes/movementGene";
+import SeeksEnergy from "./genes/seeksEnergy";
+import GeneticCode from "./geneticCode";
 import NewOrganism, { OrganismProps } from "./newOrganism";
+import RealOrganism, { Chemical } from "./realOrganism";
 
 const BOUNDARY = 5;
 
@@ -8,7 +12,7 @@ class Scene {
   camera: THREE.PerspectiveCamera;
   renderer: THREE.WebGLRenderer;
   boundaries: NewOrganism[];
-  organisms: NewOrganism[];
+  organisms: RealOrganism[];
 
   constructor() {
     this.scene = new THREE.Scene();
@@ -25,7 +29,6 @@ class Scene {
     this.boundaries = [];
     this.organisms = [];
 
-    console.log(window.innerWidth / window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
   }
 
@@ -35,7 +38,8 @@ class Scene {
       width: 0.1,
       depth: 0.25,
       y: BOUNDARY - 1.5,
-      scene: this
+      scene: this,
+      geneticCode: new GeneticCode()
     });
 
     this.scene.add(topBoundary.shape);
@@ -46,7 +50,8 @@ class Scene {
       width: 100,
       depth: 0.25,
       x: BOUNDARY,
-      scene: this
+      scene: this,
+      geneticCode: new GeneticCode()
     });
 
     this.scene.add(rightBoundary.shape);
@@ -57,7 +62,8 @@ class Scene {
       width: 0.1,
       depth: 0.25,
       y: BOUNDARY * -1 + 1,
-      scene: this
+      scene: this,
+      geneticCode: new GeneticCode()
     });
 
     this.scene.add(bottomBoundary.shape);
@@ -68,17 +74,18 @@ class Scene {
       width: 100,
       depth: 0.25,
       x: BOUNDARY * -1,
-      scene: this
+      scene: this,
+      geneticCode: new GeneticCode()
     });
 
     this.scene.add(leftBoundary.shape);
     this.boundaries.push(leftBoundary);
 
-    this.createOrganism(150);
+    this.createOrganism(1);
     this.camera.position.z = 5;
   }
 
-  add(organism: NewOrganism) {
+  add(organism: RealOrganism) {
     this.organisms.push(organism);
     this.scene.add(organism.shape);
   }
@@ -104,23 +111,36 @@ class Scene {
 
     while (currentAmount < amount) {
       const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
+      const ifOne = <T>(oneValue: T, noneOneValue: T): T => {
+        if (amount === 1) {
+          return oneValue;
+        } else {
+          return noneOneValue;
+        }
+      }
 
       const organism = new NewOrganism({
-        height: Math.random() * 0.1,
-        width: Math.random() * 0.1,
-        depth: Math.random() * 0.1,
+        height: ifOne(1, Math.random() * 0.1),
+        width: ifOne(1, Math.random() * 0.1),
+        depth: ifOne(1, Math.random() * 0.1),
         scene: this,
-        x: negatableRandom(3),
-        y: negatableRandom(3),
+        x: ifOne(0, negatableRandom(3)),
+        y: ifOne(0, negatableRandom(3)),
         xDirection: negatableRandom(0.01),
         yDirection: negatableRandom(0.01),
-        shapeType: ["square", "sphere", "other"][Math.round(Math.random() * 2)] as OrganismProps["shapeType"],
-        speed: Math.random() * 0.6,
+        shapeType: ifOne("sphere", ["square", "sphere", "other"][Math.round(Math.random() * 2)] as OrganismProps["shapeType"]),
+        speed: ifOne(0.01, Math.random() * 2),
+        geneticCode: new GeneticCode([new MovementGene(), new SeeksEnergy()]),
       });
 
-      console.log(organism.xDirection, organism.yDirection);
+      const realOrganism = new RealOrganism({
+        energySources: [new Chemical()],
+        obj: organism,
+        geneticCode: organism.geneticCode,
+        scene: this,
+      })
 
-      this.add(organism);
+      this.add(realOrganism);
 
       currentAmount += 1;
     }

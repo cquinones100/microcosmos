@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import NewOrganism from "./newOrganism";
+import RealOrganism from "./realOrganism";
 
 type IntersectionShape = NewOrganism;
 

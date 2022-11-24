@@ -1,3 +1,3 @@
 import Canvas from './canvas';
-var canvas = new Canvas();
+const canvas = new Canvas();
 canvas.draw();

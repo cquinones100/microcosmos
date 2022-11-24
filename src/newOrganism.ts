@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import Intersection from "./intersection";
+import GeneticCode from "./geneticCode";
 import Scene from "./scene";
 
 export type OrganismProps = {
@@ -14,6 +14,7 @@ export type OrganismProps = {
   xDirection?: number;
   yDirection?: number;
   shapeType?: "square" | "sphere" | "other";
+  geneticCode: GeneticCode;
 }
 
 class NewOrganism {
@@ -27,6 +28,8 @@ class NewOrganism {
   scene: Scene;
   xDirection: number;
   yDirection: number;
+  geneticCode: GeneticCode;
+  speed: number;
 
   constructor({
     height,
@@ -39,7 +42,8 @@ class NewOrganism {
     speed = 1,
     xDirection = 0.01,
     yDirection = 0.01,
-    shapeType = "square"
+    shapeType = "square",
+    geneticCode
   }: OrganismProps ) {
     this.height = height;
     this.width = width;
@@ -48,6 +52,8 @@ class NewOrganism {
     this.y = y;
     this.color = [Math.random(), Math.random(), Math.random()];
     this.scene = scene;
+    this.geneticCode = geneticCode;
+    this.speed = speed;
     this.xDirection = xDirection * speed;
     this.yDirection = yDirection * speed;
 
@@ -71,15 +77,9 @@ class NewOrganism {
     if (y) this.shape.position.y = y;
   }
 
-  animate() {
+  move() {
     this.shape.position.x += this.xDirection;
     this.shape.position.y += this.yDirection;
-
-    [...this.scene.organisms, ...this.scene.boundaries].forEach(boundary => {
-      const intersection = new Intersection(this, boundary);
-
-      if (intersection.collided()) intersection.bounce();
-    });
   }
 }
 

@@ -1,17 +1,17 @@
 import * as THREE from "three";
-var Intersection = /** @class */ (function () {
-    function Intersection(shapeA, shapeB) {
+class Intersection {
+    constructor(shapeA, shapeB) {
         this.shapeA = shapeA;
         this.shapeB = shapeB;
     }
-    Intersection.prototype.collided = function () {
+    collided() {
         if (this.shapeA === this.shapeB)
             return false;
-        var firstBB = new THREE.Box3().setFromObject(this.shapeA.shape);
-        var secondBB = new THREE.Box3().setFromObject(this.shapeB.shape);
+        const firstBB = new THREE.Box3().setFromObject(this.shapeA.shape);
+        const secondBB = new THREE.Box3().setFromObject(this.shapeB.shape);
         return firstBB.intersectsBox(secondBB);
-    };
-    Intersection.prototype.bounce = function () {
+    }
+    bounce() {
         if (!this.smaller())
             return;
         if (this.movingLeft()) {
@@ -30,28 +30,27 @@ var Intersection = /** @class */ (function () {
                 this.negateDirection('y');
             }
         }
-    };
-    Intersection.prototype.negateDirection = function (direction, value) {
-        this.shapeA["".concat(direction, "Direction")] *= -1;
-    };
-    Intersection.prototype.getXDirection = function () {
+    }
+    negateDirection(direction, value) {
+        this.shapeA[`${direction}Direction`] *= -1;
+    }
+    getXDirection() {
         return this.shapeA.xDirection;
-    };
-    Intersection.prototype.getYDirection = function () {
+    }
+    getYDirection() {
         return this.shapeA.yDirection;
-    };
-    Intersection.prototype.movingLeft = function () {
+    }
+    movingLeft() {
         return this.getXDirection() < 0;
-    };
-    Intersection.prototype.movingRight = function () {
+    }
+    movingRight() {
         return this.getXDirection() > 0;
-    };
-    Intersection.prototype.movingUp = function () {
+    }
+    movingUp() {
         return this.getYDirection() > 0;
-    };
-    Intersection.prototype.smaller = function () {
+    }
+    smaller() {
         return this.shapeA.height * this.shapeA.width <= this.shapeB.height * this.shapeB.width;
-    };
-    return Intersection;
-}());
+    }
+}
 export default Intersection;
