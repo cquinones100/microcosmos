@@ -8,7 +8,7 @@ export class Chemical {}
 
 class Organic {}
 
-type RealOrganismProps = {
+export type RealOrganismProps = {
   energySources: (Chemical | Organic)[];
   obj: NewOrganism;
   geneticCode: GeneticCode;
@@ -71,6 +71,19 @@ class RealOrganism {
 
   removeBehavior(behavior: Behavior) {
     this.behaviors.delete(behavior);
+  }
+
+  duplicate() {
+    this.scene.createOrganism({
+      ...this.obj,
+      ...this,
+      energySources: this.energySource,
+      geneticCode: this.geneticCode.duplicate(),
+      x: this.shape.position.x,
+      y: this.shape.position.y,
+      color: this.obj.color,
+      shapeType: this.obj.shapeType,
+    });
   }
 }
 

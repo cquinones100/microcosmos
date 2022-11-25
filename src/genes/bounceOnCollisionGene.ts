@@ -18,6 +18,10 @@ class BounceOnCollisionGene extends Gene {
 
   increase(organism: RealOrganism) {}
 
+  duplicate(): Gene {
+    return new BounceOnCollisionGene();
+  }
+
   private organisms(organism: RealOrganism) {
     return organism.scene.organisms.map(({ obj }: { obj: NewOrganism }) => obj);
   }

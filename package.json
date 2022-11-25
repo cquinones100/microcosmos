@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "@types/stats": "^0.16.30",
+    "@types/stats.js": "^0.17.0",
     "@types/three": "^0.146.0",
+    "stats.js": "^0.17.0",
     "three": "^0.146.0",
     "watch-http-server": "^0.7.6"
   },

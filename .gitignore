@@ -3,3 +3,5 @@ dist
 public/dist
 public/src
 public/*js
+
+.idea/

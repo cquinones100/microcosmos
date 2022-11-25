@@ -2,6 +2,8 @@ import * as THREE from "three";
 import GeneticCode from "./geneticCode";
 import Scene from "./scene";
 
+type ShapeType = "square" | "sphere" | "other";
+
 export type OrganismProps = {
   height: number;
   width: number;
@@ -13,7 +15,7 @@ export type OrganismProps = {
   speed?: number;
   xDirection?: number;
   yDirection?: number;
-  shapeType?: "square" | "sphere" | "other";
+  shapeType?: ShapeType;
   geneticCode: GeneticCode;
 }
 
@@ -30,6 +32,7 @@ class NewOrganism {
   yDirection: number;
   geneticCode: GeneticCode;
   speed: number;
+  shapeType: ShapeType;
 
   constructor({
     height,
@@ -50,12 +53,13 @@ class NewOrganism {
     this.depth = depth;
     this.x = x;
     this.y = y;
-    this.color = [Math.random(), Math.random(), Math.random()];
+    this.color = color || [Math.random(), Math.random(), Math.random()];
     this.scene = scene;
     this.geneticCode = geneticCode;
     this.speed = speed;
     this.xDirection = xDirection * speed;
     this.yDirection = yDirection * speed;
+    this.shapeType = shapeType;
 
     let geometry: THREE.BoxGeometry | THREE.SphereGeometry;
 

@@ -16,6 +16,10 @@ class MovementGene extends Gene {
   }
 
   increase(organism: RealOrganism) {}
+
+  duplicate() {
+    return new MovementGene();
+  }
 }
 
 export default MovementGene;

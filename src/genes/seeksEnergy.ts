@@ -14,8 +14,6 @@ class SeeksEnergy extends Gene {
 
     const isMovement = current instanceof Movement;
 
-    console.log(isMovement);
-
     while (current && !(isMovement)) {
       current = iterator.next().value;
     }
@@ -27,7 +25,11 @@ class SeeksEnergy extends Gene {
     }
   }
 
-  increase(organism: RealOrganism) {}
+  increase() {}
+
+  duplicate(): Gene {
+    return new SeeksEnergy();
+  }
 }
 
 export default SeeksEnergy;

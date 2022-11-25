@@ -6,6 +6,9 @@ class MovementSpeedGene extends Gene {
 
   resolve(organism: RealOrganism) {}
   increase(organism: RealOrganism) {}
+  duplicate(): Gene {
+    return new MovementSpeedGene();
+  }
 }
 
 export default MovementSpeedGene;

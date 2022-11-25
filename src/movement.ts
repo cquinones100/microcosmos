@@ -1,7 +1,7 @@
 import Behavior from "./behavior";
 import RealOrganism from "./realOrganism";
 
-const DEFAULT_SPEED = 0.01;
+const DEFAULT_SPEED = 0.001;
 
 type MovementProps = {
   obj: RealOrganism,
