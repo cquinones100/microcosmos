@@ -12,7 +12,7 @@ class Reproduction extends Behavior {
     super(args);
     this.timePassed = 0;
     this.cycles = 0;
-    this.interval = 1000;
+    this.interval = 500;
     this.maxCycles = 2;
   }
 
@@ -36,9 +36,11 @@ class Reproduction extends Behavior {
     const { x, y } = obj.getAbsolutePosition();
 
     const conditionalMutation = (gene: Gene) => {
-      const shouldMutate = Math.random() < 0.99 ? false : true;
+      const shouldMutate = Math.random() > 1 - 0.99 ? false : true;
 
-      if (shouldMutate) gene.mutate();
+      if (shouldMutate) {
+        gene.mutate();
+      }
     }
 
     const organism = obj.scene.createOrganism({
@@ -47,6 +49,9 @@ class Reproduction extends Behavior {
     });
 
     const geneticCode = obj.geneticCode.duplicate(organism);
+
+    organism.energy = obj.energy / 2;
+    obj.energy = obj.energy / 2;
 
     organism.geneticCode = geneticCode;
 

@@ -26,11 +26,23 @@ class Reproduces extends Gene {
   }
 
   mutate() {
+    [this.mutateIntervals, this.mutateMaxCycles][Math.round(Math.random())].bind(this)();
+  }
+
+  private mutateMaxCycles() {
     const magnitude = Math.random() * 10;
 
     this.reproduction.maxCycles = magnitude;
 
     console.log("mutating reproduction.maxCycles: ", this.reproduction.maxCycles);
+  }
+
+  private mutateIntervals() {
+    const intervalMagnitude = Math.random() * 1000;
+
+    this.reproduction.interval = intervalMagnitude;
+
+    console.log("mutating reproduction.interval: ", this.reproduction.interval);
   }
 }
 
