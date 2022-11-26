@@ -5,8 +5,6 @@ class Canvas {
     window.addEventListener("load", () => {
       const scene = new Scene();
       scene.draw();
-
-      scene.animate();
     }, false);
   }
 }

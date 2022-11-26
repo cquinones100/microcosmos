@@ -1,3 +1,4 @@
+import { Graphics } from "pixi.js";
 import Behavior from "./behavior";
 import GeneticCode from "./geneticCode";
 import Movement from "./movement";
@@ -9,36 +10,32 @@ export class Chemical {}
 class Organic {}
 
 export type RealOrganismProps = {
-  energySources: (Chemical | Organic)[];
-  obj: NewOrganism;
+  energySources?: (Chemical | Organic)[];
   geneticCode: GeneticCode;
   scene: Scene;
+  shape: Graphics;
 }
 
 class RealOrganism {
   energySource: RealOrganismProps["energySources"];
-  obj: RealOrganismProps["obj"];
   geneticCode: RealOrganismProps["geneticCode"];
   scene: Scene;
-  shape: THREE.Mesh<THREE.BoxGeometry | THREE.SphereGeometry, THREE.MeshBasicMaterial>;
-  width: number;
-  height: number;
+  shape: RealOrganismProps["shape"];
   movement?: Movement;
   behaviors: Set<Behavior>;
 
-  constructor({ energySources, obj, geneticCode, scene }: RealOrganismProps) {
+  constructor({ energySources = [new Chemical()], geneticCode, scene, shape }: RealOrganismProps) {
     this.energySource = energySources;
-    this.obj = obj
     this.geneticCode = geneticCode;
     this.scene = scene
-    this.shape = obj.shape;
-    this.width = obj.width;
-    this.height = obj.height;
+    this.shape = shape;
     this.behaviors = new Set<Behavior>();
   }
 
   animate() {
+    console.log("animating");
     this.geneticCode.animate(this);
+
     this.behaviors.forEach(behavior => behavior.call());
   }
 
@@ -74,16 +71,7 @@ class RealOrganism {
   }
 
   duplicate() {
-    this.scene.createOrganism({
-      ...this.obj,
-      ...this,
-      energySources: this.energySource,
-      geneticCode: this.geneticCode.duplicate(),
-      x: this.shape.position.x,
-      y: this.shape.position.y,
-      color: this.obj.color,
-      shapeType: this.obj.shapeType,
-    });
+    this.scene.createOrganism();
   }
 }
 

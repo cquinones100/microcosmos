@@ -18,10 +18,12 @@ class SeeksEnergy extends Gene {
       current = iterator.next().value;
     }
 
+    const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
+
     if (current) {
       if (current.speed === 0) current.speed = Movement.DEFAULT_SPEED;
-      if (current.xDirection === 0) current.xDirection = [1,-1][Math.round(Math.random())];
-      if (current.yDirection === 0) current.yDirection = [1,-1][Math.round(Math.random())];
+      if (current.xDirection === 0) current.xDirection = negatableRandom(1);
+      if (current.yDirection === 0) current.yDirection = negatableRandom(1);
     }
   }
 
