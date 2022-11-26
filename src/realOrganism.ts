@@ -39,9 +39,9 @@ class RealOrganism {
   animate() {
     if (!this.geneticCode) return;
 
-    // this.energy -= 0.05;
+    this.energy -= 0.1;
 
-    // if (this.energy <= 0) return this.die();
+    if (this.energy <= 0) return this.die();
 
     this.geneticCode.animate();
 
@@ -92,13 +92,12 @@ class RealOrganism {
   }
 
   private die() {
-    console.log('dying!');
     this.geneticCode = undefined;
     this.shape.destroy();
     this.scene.remove(this);
   }
 
-  handleIntersection(x: number, y: number) {
+  handleIntersection(x?: number, y?: number) {
     const { x: thisX, y: thisY } = this.getAbsolutePosition();
     const { width, height } = this.shape;
     const { width: sceneWidth, height: sceneHeight } = this.scene.getBounds();
@@ -107,19 +106,19 @@ class RealOrganism {
 
     const theX = (thisX || x);
 
-    if ((thisX || x) <= 0) {
+    if ((x || thisX) <= 0) {
       const { x } = this.getPosition();
 
       this.shape.position.x = x + width;
-    } else if ((thisY || y) <= 0) {
+    } else if ((y || thisY) <= 0) {
       const { y } = this.getPosition();
 
       this.shape.position.y = y + height;
-    } else if ((thisX || x) >= sceneWidth) {
+    } else if ((x || thisX) >= sceneWidth) {
       const { x } = this.getPosition();
 
       this.shape.position.x = x - width;
-    } else if ((thisY || y) >= sceneHeight) {
+    } else if ((y || thisY) >= sceneHeight) {
       const { y } = this.getPosition();
 
       this.shape.position.y = y - height;

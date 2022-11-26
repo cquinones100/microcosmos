@@ -1,6 +1,8 @@
+import Behavior from "../behavior";
 import Gene from "../gene";
 import Movement from "../movement";
 import RealOrganism from "../realOrganism";
+import Reproduction from "../reproduction";
 
 class MovementGene extends Gene {
   movement: Movement;
@@ -22,13 +24,31 @@ class MovementGene extends Gene {
   increase() {}
 
   mutate() {
-    console.log("mutating!");
+    console.log("mutating movement!");
 
     if (this.movement) {
       const increaseOrDecrease = [1,-1][Math.round(Math.random())];
       const magnitude = Math.random() * 10;
 
       this.movement.speed -= Math.max(this.movement.speed * increaseOrDecrease * magnitude, 0);
+
+      this.movement.speed = Math.max(this.movement.speed, 5);
+
+      const iterator = this.organism.behaviors.values();
+
+      let current = iterator.next().value;
+
+      const isBehavior = (current: Behavior) => current instanceof Reproduction;
+
+      while (current && !(isBehavior(current))) {
+        current = iterator.next().value;
+      }
+
+      if (current) {
+        current.interval = current.interval / this.movement.speed;
+
+        console.log(current.interval);
+      }
     }
   }
 

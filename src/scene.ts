@@ -5,6 +5,7 @@ import SeeksEnergy from "./genes/seeksEnergy";
 import GeneticCode from "./geneticCode";
 import RealOrganism from "./realOrganism";
 import Stats from 'stats.js'
+import Reproduction from "./reproduction";
 
 const BOUNDARY = 5;
 
@@ -63,6 +64,7 @@ class Scene {
     organism.geneticCode = new GeneticCode([
       new MovementGene(organism),
       new SeeksEnergy(organism),
+      new Reproduces(organism)
     ])
 
     this.add(organism);

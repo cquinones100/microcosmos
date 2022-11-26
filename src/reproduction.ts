@@ -6,11 +6,15 @@ class Reproduction implements Behavior {
   obj: RealOrganism;
   timePassed: number;
   cycles: number;
+  interval: number;
+  maxCycles: number;
 
   constructor({ obj }: { obj: RealOrganism }) {
     this.obj = obj;
     this.timePassed = 0;
     this.cycles = 0;
+    this.interval = 100;
+    this.maxCycles = 2;
   }
 
   call() {
@@ -20,11 +24,11 @@ class Reproduction implements Behavior {
       this.duplicate(this.obj);
 
       this.cycles += 1;
-    } 
+    }
   }
 
   private shouldReproduce() {
-    return this.timePassed % 100 === 0 && this.cycles < 2;
+    return this.timePassed % this.interval === 0 && this.cycles < this.maxCycles;
   }
 
   private duplicate(obj: RealOrganism) {
@@ -47,6 +51,7 @@ class Reproduction implements Behavior {
 
     organism.geneticCode = geneticCode;
 
+    organism.geneticCode.forEach(gene => gene.resolve());
     organism.geneticCode.forEach(conditionalMutation)
   }
 }

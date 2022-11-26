@@ -3,15 +3,19 @@ import RealOrganism from "../realOrganism";
 import Reproduction from "../reproduction";
 
 class Reproduces extends Gene {
-  reproduction?: Reproduction;
+  reproduction: Reproduction;
+
+  constructor(organism: RealOrganism) {
+    super(organism);
+
+    this.reproduction = new Reproduction({ obj: this.organism });
+  }
 
   animate() {
     this.resolve();
   }
 
   resolve() {
-    this.reproduction ||= new Reproduction({ obj: this.organism });
-
     this.organism.setBehavior(this.reproduction);
   }
 
@@ -21,7 +25,13 @@ class Reproduces extends Gene {
     return new Reproduces(newOrganism);
   }
 
-  mutate() {}
+  mutate() {
+    console.log("mutating reproduction!")
+    const increaseOrDecrease = [1,-1][Math.round(Math.random())];
+    const magnitude = Math.random() * 10;
+
+    this.reproduction.cycles -= Math.max(this.reproduction!.cycles * increaseOrDecrease * magnitude, 0);
+  }
 }
 
 export default Reproduces;
