@@ -1,4 +1,4 @@
-import Behavior from "./behavior";
+import Behavior, { BehaviorProps } from "./behavior";
 import RealOrganism from "./realOrganism";
 
 const DEFAULT_SPEED = 1;
@@ -6,35 +6,45 @@ const DEFAULT_SPEED = 1;
 type MovementProps = {
   obj: RealOrganism,
   speed?: number,
+  defaultSpeed?: number,
   xDirection?: 1 | 0 | -1,
-  yDirection?: 1 | 0 | -1
+  yDirection?: 1 | 0 | -1,
+  energy?: number,
 }
 
-class Movement implements Behavior {
-  public static DEFAULT_SPEED = DEFAULT_SPEED;
-
-  obj?: RealOrganism;
+class Movement extends Behavior {
   speed: number;
-  xDirection: number;
-  yDirection: number;
+  defaultSpeed: number;
+  xDirection: MovementProps["xDirection"];
+  yDirection: MovementProps["yDirection"];
 
-  constructor({ obj, speed = DEFAULT_SPEED, xDirection = 0, yDirection = 0 }: MovementProps) {
-    this.obj = obj;
+  constructor({
+    speed = DEFAULT_SPEED,
+    defaultSpeed = DEFAULT_SPEED,
+    xDirection = 0,
+    yDirection = 0,
+    ...args
+  }: BehaviorProps & MovementProps) {
+    super(args);
+
+    this.defaultSpeed = speed;
     this.speed = speed;
     this.xDirection = xDirection;
     this.yDirection = yDirection;
   }
 
-  call({ x: explicitX = null, y: explicitY = null } = {}): void {
+  call({ x: explicitX, y: explicitY }: { x?: number, y?: number } = {}): void {
     if (!this.obj) return;
 
     const { x: objX, y: objY } = this.obj.getPosition();
 
+    const { xDirection, yDirection } = this.getDirection();
+
     const x = 
-      explicitX !== null ? explicitX : objX + this.xDirection * this.speed
+      explicitX !== undefined ? explicitX : objX + xDirection * this.speed;
 
     const y = 
-      explicitY !== null ? explicitY : objY + this.yDirection * this.speed
+      explicitY !== undefined ? explicitY : objY + yDirection * this.speed;
 
     this.obj.setPosition({ x, y });
   }
@@ -43,6 +53,15 @@ class Movement implements Behavior {
     const { speed } = this;
 
     return new Movement({ obj: organism, speed });
+  }
+
+  getDirection() {
+    const { xDirection, yDirection } = this;
+
+    return {
+      xDirection: xDirection!,
+      yDirection: yDirection!
+    }
   }
 }
 

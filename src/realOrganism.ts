@@ -1,10 +1,7 @@
 import { Graphics } from "pixi.js";
 import Behavior from "./behavior";
-import Gene from "./gene";
-import BounceOnCollisionGene from "./genes/bounceOnCollisionGene";
 import GeneticCode from "./geneticCode";
 import Movement from "./movement";
-import NewOrganism from "./newOrganism";
 import Scene from "./scene";
 
 export class Chemical {}
@@ -39,13 +36,11 @@ class RealOrganism {
   animate() {
     if (!this.geneticCode) return;
 
-    this.energy -= 0.1;
-
     if (this.energy <= 0) return this.die();
 
     this.geneticCode.animate();
 
-    this.behaviors.forEach(behavior => behavior.call());
+    this.behaviors.forEach(behavior => this.act(behavior));
 
     this.handleIntersection();
   }
@@ -92,6 +87,7 @@ class RealOrganism {
   }
 
   private die() {
+    console.log("dying!");
     this.geneticCode = undefined;
     this.shape.destroy();
     this.scene.remove(this);
@@ -103,8 +99,6 @@ class RealOrganism {
     const { width: sceneWidth, height: sceneHeight } = this.scene.getBounds();
 
     if (thisX === undefined || thisY === undefined) return;
-
-    const theX = (thisX || x);
 
     if ((x || thisX) <= 0) {
       const { x } = this.getPosition();
@@ -137,6 +131,12 @@ class RealOrganism {
     }
 
     if (current) current.speed = value;
+  }
+
+  act(behavior: Behavior) {
+    this.energy -= behavior.getEnergy();
+
+    behavior.call();
   }
 }
 

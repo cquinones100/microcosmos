@@ -21,7 +21,7 @@ class SeeksEnergy extends Gene {
     const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
 
     if (current) {
-      if (current.speed === 0) current.speed = Movement.DEFAULT_SPEED;
+      if (current.speed === 0) current.speed = current.defaultSpeed;
       if (current.xDirection === 0) current.xDirection = negatableRandom(1);
       if (current.yDirection === 0) current.yDirection = negatableRandom(1);
     }

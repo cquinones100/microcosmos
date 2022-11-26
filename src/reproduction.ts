@@ -1,19 +1,18 @@
-import Behavior from "./behavior";
+import Behavior, { BehaviorProps } from "./behavior";
 import Gene from "./gene";
 import RealOrganism from "./realOrganism";
 
-class Reproduction implements Behavior {
-  obj: RealOrganism;
+class Reproduction extends Behavior {
   timePassed: number;
   cycles: number;
   interval: number;
   maxCycles: number;
 
-  constructor({ obj }: { obj: RealOrganism }) {
-    this.obj = obj;
+  constructor(args: BehaviorProps) {
+    super(args);
     this.timePassed = 0;
     this.cycles = 0;
-    this.interval = 100;
+    this.interval = 1000;
     this.maxCycles = 2;
   }
 
@@ -37,7 +36,7 @@ class Reproduction implements Behavior {
     const { x, y } = obj.getAbsolutePosition();
 
     const conditionalMutation = (gene: Gene) => {
-      const shouldMutate = Math.random() < 0.95 ? false : true;
+      const shouldMutate = Math.random() < 0.99 ? false : true;
 
       if (shouldMutate) gene.mutate();
     }
