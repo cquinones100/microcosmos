@@ -12,11 +12,11 @@ export const MUTATION_FACTOR = 1;
 
 class Scene {
   app: PIXI.Application;
-  organisms: RealOrganism[];
+  organisms: Set<RealOrganism>;
 
   constructor() {
     this.app = new PIXI.Application();
-    this.organisms = [];
+    this.organisms = new Set<RealOrganism>();
   }
 
   draw() {
@@ -27,13 +27,13 @@ class Scene {
     document.body.appendChild(this.app.view as unknown as Node);
     this.createOrganism({ x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
 
-    let organismsCount = this.organisms.length;
+    let organismsCount = this.organisms.size;
 
     this.app.ticker.add(() => {
       stats.begin();
 
-      if (this.organisms.length !== organismsCount) {
-        organismsCount = this.organisms.length;
+      if (this.organisms.size !== organismsCount) {
+        organismsCount = this.organisms.size;
 
         console.log("Number of organisms: ", organismsCount);
       }
@@ -63,7 +63,6 @@ class Scene {
     organism.geneticCode = new GeneticCode([
       new MovementGene(organism),
       new SeeksEnergy(organism),
-      new Reproduces(organism)
     ])
 
     this.add(organism);
@@ -72,8 +71,18 @@ class Scene {
   }
 
   add(organism: RealOrganism) {
-    this.organisms.push(organism);
+    this.organisms.add(organism);
     this.app.stage.addChild(organism.shape);
+  }
+
+  remove(organism: RealOrganism) {
+    this.organisms.delete(organism);
+  }
+
+  getBounds() {
+    const { width, height } = this.app.screen;
+
+    return { width, height };
   }
 }
 
