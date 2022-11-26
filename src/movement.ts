@@ -13,7 +13,7 @@ type MovementProps = {
 class Movement implements Behavior {
   public static DEFAULT_SPEED = DEFAULT_SPEED;
 
-  obj: RealOrganism;
+  obj?: RealOrganism;
   speed: number;
   xDirection: number;
   yDirection: number;
@@ -26,12 +26,23 @@ class Movement implements Behavior {
   }
 
   call({ x: explicitX = null, y: explicitY = null } = {}): void {
+    if (!this.obj) return;
+
     const { x: objX, y: objY } = this.obj.getPosition();
 
-    const x = explicitX !== null ? explicitX : objX + this.xDirection * this.speed;
-    const y = explicitY !== null ? explicitY : objY + this.yDirection * this.speed;
- 
+    const x = 
+      explicitX !== null ? explicitX : objX + this.xDirection * this.speed
+
+    const y = 
+      explicitY !== null ? explicitY : objY + this.yDirection * this.speed
+
     this.obj.setPosition({ x, y });
+  }
+
+  duplicate(organism: RealOrganism) {
+    const { speed } = this;
+
+    return new Movement({ obj: organism, speed });
   }
 }
 

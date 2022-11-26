@@ -9,8 +9,8 @@ class GeneticCode {
     this.genes = genes || [];
   }
 
-  animate(organism: RealOrganism) {
-    this.forEach((gene: Gene) => gene.animate(organism));
+  animate() {
+    this.forEach((gene: Gene) => gene.animate());
   }
 
   forEach(cb: { (gene: Gene): void; (value: Gene, index: number, array: Gene[]): void; }) {
@@ -21,9 +21,9 @@ class GeneticCode {
     return this.genes.map(cb);
   }
 
-  duplicate(): GeneticCode {
+  duplicate(organism: RealOrganism): GeneticCode {
     return new GeneticCode(this.map(gene => {
-      return gene.duplicate();
+      return gene.duplicate(organism);
     }));
   }
 }

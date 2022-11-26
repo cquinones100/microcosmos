@@ -5,7 +5,7 @@ import RealOrganism from "../realOrganism";
 
 class BounceOnCollisionGene extends Gene {
   // defines behavior of the organism
-  animate(organism: RealOrganism): void {
+  animate(): void {
     // [...this.organisms(organism), ...organism.scene.boundaries].forEach(boundary => {
     //   const intersection = new Intersection(organism.obj, boundary);
 
@@ -14,13 +14,15 @@ class BounceOnCollisionGene extends Gene {
   }
 
   // changes properties of the organism
-  resolve(organism: RealOrganism) {}
+  resolve() {}
 
-  increase(organism: RealOrganism) {}
+  increase() {}
 
-  duplicate(): Gene {
-    return new BounceOnCollisionGene();
+  duplicate(newOrganism: RealOrganism): Gene {
+    return new BounceOnCollisionGene(newOrganism);
   }
+
+  mutate() {}
 
   private organisms(organism: RealOrganism) {
     // return organism.scene.organisms.map(({ obj }: { obj: NewOrganism }) => obj);

@@ -1,5 +1,6 @@
 import { Graphics } from "pixi.js";
 import Behavior from "./behavior";
+import Gene from "./gene";
 import GeneticCode from "./geneticCode";
 import Movement from "./movement";
 import NewOrganism from "./newOrganism";
@@ -11,14 +12,14 @@ class Organic {}
 
 export type RealOrganismProps = {
   energySources?: (Chemical | Organic)[];
-  geneticCode: GeneticCode;
+  geneticCode?: GeneticCode;
   scene: Scene;
   shape: Graphics;
 }
 
 class RealOrganism {
   energySource: RealOrganismProps["energySources"];
-  geneticCode: RealOrganismProps["geneticCode"];
+  geneticCode?: RealOrganismProps["geneticCode"];
   scene: Scene;
   shape: RealOrganismProps["shape"];
   movement?: Movement;
@@ -33,21 +34,26 @@ class RealOrganism {
   }
 
   animate() {
-    console.log("animating");
-    this.geneticCode.animate(this);
+    if (!this.geneticCode) return false;
+
+    this.geneticCode.animate();
 
     this.behaviors.forEach(behavior => behavior.call());
   }
 
   resolveGeneticCode() {
+    if (!this.geneticCode) return false;
+
     this.geneticCode.forEach(gene => {
-      gene.resolve(this);
+      gene.resolve();
     });
   }
 
   resolveBehavior() {
+    if (!this.geneticCode) return false;
+
     this.geneticCode.forEach(gene => {
-      gene.animate(this);
+      gene.animate();
     });
   }
 
@@ -62,16 +68,18 @@ class RealOrganism {
     return { x,  y };
   }
 
+  getAbsolutePosition() {
+    const { x, y } = this.shape.getBounds();
+
+    return { x,  y };
+  }
+
   setBehavior(behavior: Behavior) {
     this.behaviors.add(behavior);
   }
 
   removeBehavior(behavior: Behavior) {
     this.behaviors.delete(behavior);
-  }
-
-  duplicate() {
-    this.scene.createOrganism();
   }
 }
 

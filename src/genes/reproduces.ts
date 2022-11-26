@@ -5,21 +5,23 @@ import Reproduction from "../reproduction";
 class Reproduces extends Gene {
   reproduction?: Reproduction;
 
-  animate(organism: RealOrganism) {
-    this.resolve(organism);
+  animate() {
+    this.resolve();
   }
 
-  resolve(organism: RealOrganism) {
-    this.reproduction ||= new Reproduction({ obj: organism });
+  resolve() {
+    this.reproduction ||= new Reproduction({ obj: this.organism });
 
-    organism.setBehavior(this.reproduction);
+    this.organism.setBehavior(this.reproduction);
   }
 
-  increase(organism: RealOrganism) {}
+  increase() {}
 
-  duplicate() {
-    return new Reproduces();
+  duplicate(newOrganism: RealOrganism) {
+    return new Reproduces(newOrganism);
   }
+
+  mutate() {}
 }
 
 export default Reproduces;

@@ -1,10 +1,16 @@
 import RealOrganism from "./realOrganism";
 
 abstract class Gene {
-  abstract animate(organism: RealOrganism): void;
-  abstract resolve(organism: RealOrganism): void;
-  abstract increase(organism: RealOrganism): void;
-  abstract duplicate(): Gene;
+  organism: RealOrganism;
+
+  constructor(organism: RealOrganism) {
+    this.organism = organism;
+  }
+  abstract animate(): void;
+  abstract resolve(): void;
+  abstract increase(): void;
+  abstract duplicate(newOrganism: RealOrganism): Gene;
+  abstract mutate(): void;
 }
 
 export default Gene;

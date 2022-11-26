@@ -3,12 +3,12 @@ import Movement from "../movement";
 import RealOrganism from "../realOrganism";
 
 class SeeksEnergy extends Gene {
-  animate(organism: RealOrganism) {
-    this.resolve(organism);
+  animate() {
+    this.resolve();
   }
 
-  resolve(organism: RealOrganism) {
-    const iterator = organism.behaviors.values();
+  resolve() {
+    const iterator = this.organism.behaviors.values();
 
     let current = iterator.next().value;
 
@@ -29,9 +29,11 @@ class SeeksEnergy extends Gene {
 
   increase() {}
 
-  duplicate(): Gene {
-    return new SeeksEnergy();
+  duplicate(newOrganism: RealOrganism): Gene {
+    return new SeeksEnergy(newOrganism);
   }
+
+  mutate() {}
 }
 
 export default SeeksEnergy;
