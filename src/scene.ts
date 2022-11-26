@@ -7,19 +7,23 @@ import RealOrganism from "./realOrganism";
 import Stats from 'stats.js'
 import DetectionGene from "./genes/detectionGene";
 
-const BOUNDARY = 5;
-
 export const MUTATION_FACTOR = 1;
 
 class Scene {
   app: PIXI.Application;
   organisms: Set<RealOrganism>;
+  predators: Set<RealOrganism>;
+  prey: Set<RealOrganism>;
+  naturalDeaths: Set<RealOrganism>;
   allObjects: any[];
 
   constructor() {
     this.app = new PIXI.Application();
     this.organisms = new Set<RealOrganism>();
     this.allObjects = [];
+    this.predators = new Set();
+    this.prey = new Set();
+    this.naturalDeaths = new Set();
   }
 
   draw() {
@@ -31,6 +35,9 @@ class Scene {
     this.createOrganism({ x: this.app.screen.width / 2 - 20, y: this.app.screen.height / 2 + 20 });
 
     let organismsCount = this.organisms.size;
+    let maxOrganisms = organismsCount;
+
+    let displayedStats = false;
 
     this.app.ticker.add(() => {
       stats.begin();
@@ -42,6 +49,25 @@ class Scene {
       }
 
       this.organisms.forEach(organism => organism.animate());
+
+      if (this.organisms.size < 3 && this.organisms.size > 0) {
+        console.log("------------------On the last organisms-----------------");
+        this.organisms.forEach(organism => {
+          console.log("Energy: ", organism.energy);
+        });
+      }
+
+      if (this.organisms.size === 0 && !displayedStats) {
+        console.log("------------------Run Stats-----------------");
+        console.log("Max number of organisms: ", maxOrganisms);
+        console.log("Predators: ", this.predators);
+        console.log("Prey: ", this.prey);
+        console.log("Died of starvation: ", this.naturalDeaths);
+
+        displayedStats = true;
+      }
+
+      maxOrganisms = Math.max(this.organisms.size, maxOrganisms);
 
       stats.end();
     });

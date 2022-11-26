@@ -32,13 +32,17 @@ class RealOrganism {
     this.scene = scene
     this.shape = shape;
     this.behaviors = new Set<Behavior>();
-    this.maxEnergy = 1000;
+    this.maxEnergy = 100;
     this.energy = this.maxEnergy;
     this.color = 0xff0000;
   }
 
   animate() {
-    if (this.energy <= 0) return this.die();
+    if (this.energy <= 0) {
+      "died of starvation!"
+      this.scene.naturalDeaths.add(this);
+      return this.die();
+    }
 
     this.geneticCode!.animate();
 
@@ -90,8 +94,6 @@ class RealOrganism {
 
   private die() {
     this.scene.remove(this);
-    this.geneticCode = undefined;
-    this.behaviors = new Set();
     this.shape.destroy();
   }
 
@@ -153,6 +155,8 @@ class RealOrganism {
 
   consume(organism: RealOrganism) {
     console.log('consumed!');
+    this.scene.predators.add(this);
+    this.scene.prey.add(organism);
     this.energy += organism.energy;
 
     organism.die();
