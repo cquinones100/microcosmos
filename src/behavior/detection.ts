@@ -1,8 +1,6 @@
 import Behavior, { BehaviorProps } from "../behavior";
 import RealOrganism from "../realOrganism";
 
-const DEFAULT_RADIUS = 10;
-
 class Detection extends Behavior {
   detections: any[];
   radius: number;
@@ -14,7 +12,7 @@ class Detection extends Behavior {
 
     const { width } = this.obj.getDimensions();
 
-    this.radius = width;
+    this.radius = width * 20;
   }
 
   call<T extends {}>(args?: T | undefined): void {
@@ -23,7 +21,11 @@ class Detection extends Behavior {
         const { x: objX, y: objY } = this.obj.getAbsolutePosition();
         const { x: currX, y: currY } = curr.getAbsolutePosition();
 
-        if (currX >= objX - this.radius && currX <= objX + this.radius && currY >= objY - this.radius && currY <= objY + this.radius) {
+        if (currX >= objX - this.radius
+          && currX <= objX + this.radius
+          && currY >= objY - this.radius
+          && currY <= objY + this.radius
+        ) {
           acc.push(curr);
         }
       }

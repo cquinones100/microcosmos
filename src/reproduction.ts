@@ -27,7 +27,9 @@ class Reproduction extends Behavior {
   }
 
   private shouldReproduce() {
-    return this.timePassed % this.interval === 0 && this.cycles < this.maxCycles;
+    return this.timePassed % this.interval === 0
+      && this.cycles < this.maxCycles
+      && this.obj.energy > this.obj.energy * 0.75;
   }
 
   private duplicate(obj: RealOrganism) {

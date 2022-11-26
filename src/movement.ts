@@ -1,3 +1,4 @@
+import { NormalAnimationBlendMode } from "three";
 import Behavior, { BehaviorProps } from "./behavior";
 import RealOrganism from "./realOrganism";
 
@@ -7,8 +8,8 @@ type MovementProps = {
   obj: RealOrganism,
   speed?: number,
   defaultSpeed?: number,
-  xDirection?: 1 | 0 | -1,
-  yDirection?: 1 | 0 | -1,
+  xDirection?: number,
+  yDirection?: number,
   energy?: number,
 }
 
@@ -62,6 +63,26 @@ class Movement extends Behavior {
       xDirection: xDirection!,
       yDirection: yDirection!
     }
+  }
+
+  directTo({ x, y }: { x: number, y: number }) {
+    const { x: objX, y: objY } = this.obj.getAbsolutePosition();
+
+    const dx = objX - x;
+    const dy = objY - y;
+
+    const normalizedValue = (delta: number) => {
+      if (delta === 0) return 0;
+
+      if (delta > 0) {
+        return -1;
+      } else {
+        return 1;
+      }
+    }
+
+    this.xDirection = normalizedValue(dx);
+    this.yDirection = normalizedValue(dy);
   }
 }
 

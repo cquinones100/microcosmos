@@ -24,6 +24,7 @@ class RealOrganism {
   behaviors: Set<Behavior>;
   maxEnergy: number;
   energy: number;
+  color: number;
 
   constructor({ energySources = [new Chemical()], geneticCode, scene, shape }: RealOrganismProps) {
     this.energySource = energySources;
@@ -33,14 +34,13 @@ class RealOrganism {
     this.behaviors = new Set<Behavior>();
     this.maxEnergy = 1000;
     this.energy = this.maxEnergy;
+    this.color = 0xff0000;
   }
 
   animate() {
-    if (!this.geneticCode) return;
-
     if (this.energy <= 0) return this.die();
 
-    this.geneticCode.animate();
+    this.geneticCode!.animate();
 
     this.behaviors.forEach(behavior => this.act(behavior));
 
@@ -77,7 +77,6 @@ class RealOrganism {
   getAbsolutePosition() {
     const { x, y } = this.shape.getBounds();
 
-
     return { x,  y };
   }
 
@@ -92,6 +91,7 @@ class RealOrganism {
   private die() {
     this.scene.remove(this);
     this.geneticCode = undefined;
+    this.behaviors = new Set();
     this.shape.destroy();
   }
 
@@ -110,10 +110,10 @@ class RealOrganism {
       const { y } = this.getPosition();
 
       this.shape.position.y = y + height;
-    } else if ((x || thisX) >= sceneWidth) {
+    } else if ((x || thisX) >= sceneWidth - width) {
       const { x } = this.getPosition();
 
-      this.shape.position.x = x - width;
+      this.shape.position.x = sceneWidth - width;
     } else if ((y || thisY) >= sceneHeight) {
       const { y } = this.getPosition();
 
@@ -152,6 +152,7 @@ class RealOrganism {
   }
 
   consume(organism: RealOrganism) {
+    console.log('consumed!');
     this.energy += organism.energy;
 
     organism.die();

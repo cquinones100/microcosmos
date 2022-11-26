@@ -28,7 +28,7 @@ class Scene {
     document.body.appendChild(stats.dom);
 
     document.body.appendChild(this.app.view as unknown as Node);
-    this.createOrganism({ x: this.app.screen.width / 2, y: this.app.screen.height / 2 });
+    this.createOrganism({ x: this.app.screen.width / 2 - 20, y: this.app.screen.height / 2 + 20 });
 
     let organismsCount = this.organisms.size;
 
