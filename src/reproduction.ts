@@ -12,7 +12,7 @@ class Reproduction extends Behavior {
     super(args);
     this.timePassed = 0;
     this.cycles = 0;
-    this.interval = 500;
+    this.interval = 100;
     this.maxCycles = 2;
   }
 

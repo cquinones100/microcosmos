@@ -22,6 +22,7 @@ class RealOrganism {
   shape: RealOrganismProps["shape"];
   movement?: Movement;
   behaviors: Set<Behavior>;
+  maxEnergy: number;
   energy: number;
 
   constructor({ energySources = [new Chemical()], geneticCode, scene, shape }: RealOrganismProps) {
@@ -30,7 +31,8 @@ class RealOrganism {
     this.scene = scene
     this.shape = shape;
     this.behaviors = new Set<Behavior>();
-    this.energy = 10;
+    this.maxEnergy = 1000;
+    this.energy = this.maxEnergy;
   }
 
   animate() {
@@ -75,6 +77,7 @@ class RealOrganism {
   getAbsolutePosition() {
     const { x, y } = this.shape.getBounds();
 
+
     return { x,  y };
   }
 
@@ -87,10 +90,9 @@ class RealOrganism {
   }
 
   private die() {
-    console.log("dying!");
+    this.scene.remove(this);
     this.geneticCode = undefined;
     this.shape.destroy();
-    this.scene.remove(this);
   }
 
   handleIntersection(x?: number, y?: number) {
@@ -137,6 +139,22 @@ class RealOrganism {
     this.energy -= behavior.getEnergy();
 
     behavior.call();
+  }
+
+  hungry() {
+    return this.energy < this.maxEnergy;
+  }
+
+  getDimensions() {
+    const { width, height } = this.shape;
+
+    return { width, height };
+  }
+
+  consume(organism: RealOrganism) {
+    this.energy += organism.energy;
+
+    organism.die();
   }
 }
 

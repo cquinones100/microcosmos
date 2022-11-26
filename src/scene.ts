@@ -5,7 +5,7 @@ import SeeksEnergy from "./genes/seeksEnergy";
 import GeneticCode from "./geneticCode";
 import RealOrganism from "./realOrganism";
 import Stats from 'stats.js'
-import Reproduction from "./reproduction";
+import DetectionGene from "./genes/detectionGene";
 
 const BOUNDARY = 5;
 
@@ -14,10 +14,12 @@ export const MUTATION_FACTOR = 1;
 class Scene {
   app: PIXI.Application;
   organisms: Set<RealOrganism>;
+  allObjects: any[];
 
   constructor() {
     this.app = new PIXI.Application();
     this.organisms = new Set<RealOrganism>();
+    this.allObjects = [];
   }
 
   draw() {
@@ -63,8 +65,9 @@ class Scene {
 
     organism.geneticCode = new GeneticCode([
       new MovementGene(organism),
+      new DetectionGene(organism),
       new SeeksEnergy(organism),
-      new Reproduces(organism)
+      new Reproduces(organism),
     ])
 
     this.add(organism);
@@ -75,10 +78,14 @@ class Scene {
   add(organism: RealOrganism) {
     this.organisms.add(organism);
     this.app.stage.addChild(organism.shape);
+    this.allObjects.push(organism);
   }
 
   remove(organism: RealOrganism) {
     this.organisms.delete(organism);
+    this.allObjects = this.allObjects.filter((curr: any) => {
+      return curr !== organism;
+    });
   }
 
   getBounds() {
