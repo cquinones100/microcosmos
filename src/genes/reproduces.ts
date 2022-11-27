@@ -36,7 +36,7 @@ class Reproduces extends Gene {
   }
 
   private mutateIntervals() {
-    const intervalMagnitude = Math.random() * 1000;
+    const intervalMagnitude = Math.round(Math.random() * 100);
 
     this.reproduction.interval = intervalMagnitude;
   }

@@ -14,9 +14,10 @@ class Detection extends Behavior {
   }
 
   call({ organism }: { organism: RealOrganism }): void {
+    const { x: objX, y: objY } = organism.getAbsolutePosition();
+
     this.detections = organism.scene.allObjects.reduce((acc: RealOrganism[], curr: any) => {
       if (curr !== organism) {
-        const { x: objX, y: objY } = organism.getAbsolutePosition();
         const { x: currX, y: currY } = curr.getAbsolutePosition();
 
         const radius = this.getOrganismRadius(organism);
@@ -32,6 +33,25 @@ class Detection extends Behavior {
 
       return acc;
     }, []);
+
+    this.detections = this.detections.sort((a: RealOrganism, b: RealOrganism) => {
+      const distanceArea = (x: number, y: number) => {
+        return Math.abs(objX - x * objY * y)
+      };
+
+      const { x: aCurrX, y: aCurrY } = a.getAbsolutePosition();
+      const { x: bCurrX, y: bCurrY } = b.getAbsolutePosition();
+
+      if (distanceArea(aCurrX, aCurrY) < distanceArea(bCurrX, bCurrY)) {
+        return -1;
+      }
+
+      if (distanceArea(aCurrX, aCurrY) > distanceArea(bCurrX, bCurrY)) {
+        return 1;
+      }
+
+      return 0;
+    });
   }
 
   getOrganismRadius(organism: RealOrganism) {

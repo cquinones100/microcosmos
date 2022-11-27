@@ -6,6 +6,7 @@ import WorldObject, { WorldObjectProps } from "./worldObject";
 export type RealOrganismProps = {
   energySources?: (any)[];
   geneticCode?: GeneticCode;
+  generation?: number;
 }
 
 class RealOrganism extends WorldObject {
@@ -14,8 +15,9 @@ class RealOrganism extends WorldObject {
   behaviors: Set<Behavior>;
   maxEnergy: number;
   energy: number;
+  generation: number;
 
-  constructor({ energySources = [], geneticCode, ...args }: RealOrganismProps & WorldObjectProps) {
+  constructor({ energySources = [], geneticCode, generation, ...args }: RealOrganismProps & WorldObjectProps) {
     super(args);
 
     this.energySource = energySources;
@@ -23,13 +25,14 @@ class RealOrganism extends WorldObject {
     this.behaviors = new Set<Behavior>();
     this.maxEnergy = 100;
     this.energy = this.maxEnergy;
+    this.generation = generation || 0;
   }
 
   animate() {
     if (this.energy <= 0) {
       "died of starvation!"
       this.scene.naturalDeaths.add(this);
-      return this.die();
+      return;
     }
 
     this.geneticCode!.animate();
@@ -62,6 +65,10 @@ class RealOrganism extends WorldObject {
   }
 
   private die() {
+    this.scene.killOrganism(this);
+  }
+
+  private disappear() {
     this.scene.remove(this);
     this.shape.destroy();
   }
@@ -79,21 +86,39 @@ class RealOrganism extends WorldObject {
   consume(organism: RealOrganism) {
     this.scene.predators.add(this);
     this.scene.prey.add(organism);
-    this.energy += organism.energy;
+    this.setEnergy(this.energy + organism.maxEnergy);
 
     organism.die();
+    organism.disappear();
   }
 
   canBeEatenBy(organism: RealOrganism) {
-    return false;
+    return this.energy * 1.5 < organism.energy;
   }
 
   canEat(organism: RealOrganism | Autotroph) {
-    return organism.energy > organism.maxEnergy * 0.75 && organism.canBeEatenBy(this);
+    return organism.canBeEatenBy(this);
   }
 
   setEnergy(value: number) {
     this.energy = Math.min(this.maxEnergy, value);
+  }
+
+  duplicate() {
+    const { x, y } = this.getAbsolutePosition();
+    const { width: sceneWidth, height: sceneHeight } = this.scene.getBounds();
+
+    const organism = this.scene.createOrganism({ x: sceneWidth / 2 - 10, y: sceneHeight / 2 + 10 });
+    
+    organism.setPosition({ x: x - 10, y: y + 10 });
+    this.generation += 1;
+    organism.generation = this.generation;
+
+    return organism;
+  }
+
+  onHover() {
+    console.log(this);
   }
 }
 

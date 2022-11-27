@@ -7,6 +7,7 @@ import RealOrganism from "./realOrganism";
 import Stats from 'stats.js'
 import DetectionGene from "./genes/detectionGene";
 import Autotroph, { Coords } from "./organisms/autotroph";
+import { Circle } from "pixi.js";
 
 export const MUTATION_FACTOR = 1;
 
@@ -50,11 +51,6 @@ class Scene {
     this.app.ticker.add(() => {
       stats.begin();
 
-      if (this.organisms.size !== organismsCount) {
-        organismsCount = this.organisms.size;
-
-        console.log("Number of organisms: ", organismsCount);
-      }
 
       if (!this.paused) {
         this.organisms.forEach(organism => organism.animate());
@@ -84,6 +80,8 @@ class Scene {
 
     shape.beginFill(0xff0000);
     shape.drawCircle(x, y, 10);
+    shape.interactive = true;
+    shape.hitArea = new Circle(x, y, 10);
 
     const scene = this;
 
@@ -91,7 +89,7 @@ class Scene {
 
     organism.geneticCode = new GeneticCode([
       new MovementGene(organism),
-      // new DetectionGene(organism),
+      new DetectionGene(organism),
       new SeeksEnergy(organism),
       new Reproduces(organism),
     ])
@@ -120,8 +118,11 @@ class Scene {
     this.allObjects.push(organism);
   }
 
-  remove(organism: RealOrganism) {
+  killOrganism(organism: RealOrganism) {
     this.organisms.delete(organism);
+  }
+
+  remove(organism: RealOrganism) {
     this.allObjects = this.allObjects.filter((curr: any) => {
       return curr !== organism;
     });

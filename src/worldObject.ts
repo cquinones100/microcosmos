@@ -21,6 +21,8 @@ class WorldObject {
     this.color = color || 0xff0000;
     this.bounds = this.shape.getBounds();
     this.startingPosition = this.shape.position;
+
+    this.shape.on('mouseover', this.onHover.bind(this));
   }
 
   setPosition({ x, y }: { x: number, y: number }) {
@@ -55,16 +57,7 @@ class WorldObject {
     return { width, height };
   }
 
-  duplicate() {
-    const { x, y } = this.getAbsolutePosition();
-    const { width: sceneWidth, height: sceneHeight } = this.scene.getBounds();
-
-    const organism = this.scene.createOrganism({ x: sceneWidth / 2 - 10, y: sceneHeight / 2 + 10 });
-    
-    organism.setPosition({ x: x - 10, y: y + 10 });
-
-    return organism;
-  }
+  onHover() {}
 }
 
 export default WorldObject;

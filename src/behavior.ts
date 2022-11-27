@@ -34,7 +34,7 @@ abstract class Behavior {
   }
 
   duplicate() {
-    return this.constructor();
+    return new (this.constructor as any)();
   }
 }
 

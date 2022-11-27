@@ -1,3 +1,4 @@
+import { CubeRefractionMapping } from "three";
 import Behavior from "../behavior";
 import Detection from "../behavior/detection";
 import Movement from "../behavior/movement";
@@ -30,6 +31,7 @@ class SeeksEnergy extends Gene {
 
     if (detection) {
       if (detection.detections.length > 0) {
+        debugger;
         for (const curr of detection.detections) {
           if (!this.organism.scene.allObjects.find(obj => obj === curr)) continue;
 

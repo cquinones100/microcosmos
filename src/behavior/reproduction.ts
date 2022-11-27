@@ -13,7 +13,7 @@ class Reproduction extends Behavior {
     this.timePassed = 0;
     this.cycles = 0;
     this.interval = 100;
-    this.maxCycles = 2;
+    this.maxCycles = 10;
   }
 
   call({ organism }: { organism: RealOrganism }) {
@@ -29,7 +29,7 @@ class Reproduction extends Behavior {
   private shouldReproduce(organism: RealOrganism) {
     return this.timePassed % this.interval === 0
       && this.cycles < this.maxCycles
-      && organism.energy > organism.maxEnergy * 0.75;
+      && organism.energy > organism.maxEnergy * 0.1;
   }
 
   private reproduce(obj: RealOrganism) {
