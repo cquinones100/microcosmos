@@ -90,9 +90,9 @@ class Scene {
 
     organism.geneticCode = new GeneticCode([
       new MovementGene(organism),
-      new DetectionGene(organism),
+      // new DetectionGene(organism),
       new SeeksEnergy(organism),
-      new Reproduces(organism),
+      // new Reproduces(organism),
     ])
 
     this.add(organism);

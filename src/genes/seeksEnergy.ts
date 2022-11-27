@@ -18,6 +18,14 @@ class SeeksEnergy extends Gene {
 
     const movement = Behavior.findBehavior<Movement>(this.organism, (current) => current instanceof Movement);
 
+    const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
+  
+    if (movement) {
+      if (movement.speed === 0) movement.speed = movement.defaultSpeed;
+      if (movement.xDirection === 0) movement.xDirection = negatableRandom(1);
+      if (movement.yDirection === 0) movement.yDirection = negatableRandom(1);
+    }
+
     if (detection) {
       if (detection.detections.length > 0) {
         for (const curr of detection.detections) {
@@ -36,14 +44,6 @@ class SeeksEnergy extends Gene {
 
             break;
           }
-        }
-      } else {
-        const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
-  
-        if (movement) {
-          if (movement.speed === 0) movement.speed = movement.defaultSpeed;
-          if (movement.xDirection === 0) movement.xDirection = negatableRandom(1);
-          if (movement.yDirection === 0) movement.yDirection = negatableRandom(1);
         }
       }
     }
