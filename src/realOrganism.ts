@@ -2,6 +2,7 @@ import { Graphics } from "pixi.js";
 import Behavior from "./behavior";
 import GeneticCode from "./geneticCode";
 import Movement from "./movement";
+import Autotroph from "./organisms/autotroph";
 import Scene from "./scene";
 
 export class Chemical {}
@@ -9,7 +10,7 @@ export class Chemical {}
 class Organic {}
 
 export type RealOrganismProps = {
-  energySources?: (Chemical | Organic)[];
+  energySources?: (any)[];
   geneticCode?: GeneticCode;
   scene: Scene;
   shape: Graphics;

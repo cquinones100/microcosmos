@@ -6,6 +6,7 @@ import GeneticCode from "./geneticCode";
 import RealOrganism from "./realOrganism";
 import Stats from 'stats.js'
 import DetectionGene from "./genes/detectionGene";
+import Autotroph, { Coords } from "./organisms/autotroph";
 
 export const MUTATION_FACTOR = 1;
 
@@ -32,7 +33,8 @@ class Scene {
     document.body.appendChild(stats.dom);
 
     document.body.appendChild(this.app.view as unknown as Node);
-    this.createOrganism({ x: this.app.screen.width / 2 - 20, y: this.app.screen.height / 2 + 20 });
+    this.createOrganism({ x: this.app.screen.width / 2 - 10, y: this.app.screen.height / 2 + 10 });
+    this.createAutotroph();
 
     let organismsCount = this.organisms.size;
     let maxOrganisms = organismsCount;
@@ -74,10 +76,7 @@ class Scene {
   }
 
   createOrganism(
-    {
-      x,
-      y,
-    }:
+    { x, y }:
     { x: number, y: number, geneticCode?: GeneticCode }
   ) {
     const shape = new PIXI.Graphics();
@@ -95,6 +94,19 @@ class Scene {
       new SeeksEnergy(organism),
       new Reproduces(organism),
     ])
+
+    this.add(organism);
+
+    return organism;
+  }
+
+  createAutotroph({ x, y }: Partial<Coords> = {}) {
+    const organism = new Autotroph({
+      x: x || this.app.screen.width / 2 + 10,
+      y: y || 0 + 20,
+      scene: this,
+      shape: new PIXI.Graphics,
+    });
 
     this.add(organism);
 
