@@ -37,8 +37,6 @@ class WorldObject {
       }
     }
 
-    console.log("object coords: ", { x, y, thisX, thisY })
-
     this.shape.x = withinBounds(thisX, x, sceneWidth);
     this.shape.y = withinBounds(thisY, y, sceneHeight);
   }

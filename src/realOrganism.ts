@@ -77,7 +77,6 @@ class RealOrganism extends WorldObject {
   }
 
   consume(organism: RealOrganism) {
-    console.log('consumed!');
     this.scene.predators.add(this);
     this.scene.prey.add(organism);
     this.energy += organism.energy;

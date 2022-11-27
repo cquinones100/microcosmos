@@ -24,8 +24,6 @@ class MovementGene extends Gene {
   increase() {}
 
   mutate() {
-    console.log("mutating movement!");
-
     if (this.movement) {
       const increaseOrDecrease = [1,-1][Math.round(Math.random())];
       const magnitude = Math.random() * 10;
@@ -46,8 +44,6 @@ class MovementGene extends Gene {
 
       if (current) {
         current.interval = current.interval / this.movement.speed;
-
-        console.log(current.interval);
       }
     }
   }
