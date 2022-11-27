@@ -161,6 +161,17 @@ class RealOrganism {
 
     organism.die();
   }
+  canBeEatenBy(organism: RealOrganism) {
+    return false;
+  }
+
+  canEat(organism: RealOrganism | Autotroph) {
+    return organism.energy > organism.maxEnergy * 0.75 && organism.canBeEatenBy(this);
+  }
+
+  setEnergy(value: number) {
+    this.energy = Math.min(this.maxEnergy, value);
+  }
 }
 
 export default RealOrganism;
