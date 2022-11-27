@@ -5,26 +5,26 @@ class Detection extends Behavior {
   detections: RealOrganism[];
   radius: number;
 
-  constructor(args: BehaviorProps) {
+  constructor(args?: BehaviorProps) {
     super(args);
 
     this.detections = [];
 
-    const { width } = this.obj.getDimensions();
-
-    this.radius = width * 20;
+    this.radius = 20;
   }
 
-  call<T extends {}>(args?: T | undefined): void {
-    this.detections = this.obj.scene.allObjects.reduce((acc: RealOrganism[], curr: any) => {
-      if (curr !== this.obj) {
-        const { x: objX, y: objY } = this.obj.getAbsolutePosition();
+  call({ organism }: { organism: RealOrganism }): void {
+    this.detections = organism.scene.allObjects.reduce((acc: RealOrganism[], curr: any) => {
+      if (curr !== organism) {
+        const { x: objX, y: objY } = organism.getAbsolutePosition();
         const { x: currX, y: currY } = curr.getAbsolutePosition();
 
-        if (currX >= objX - this.radius
-          && currX <= objX + this.radius
-          && currY >= objY - this.radius
-          && currY <= objY + this.radius
+        const radius = this.getOrganismRadius(organism);
+
+        if (currX >= objX - radius
+          && currX <= objX + radius
+          && currY >= objY - radius
+          && currY <= objY + radius
         ) {
           acc.push(curr);
         }
@@ -34,14 +34,8 @@ class Detection extends Behavior {
     }, []);
   }
 
-  duplicate(newOrganism: RealOrganism): Detection {
-    return new Detection({ obj: newOrganism })
-  }
-
-  forEach(cb: (curr: any) => void) {
-    this.detections.forEach(cb);
-
-    this.call();
+  getOrganismRadius(organism: RealOrganism) {
+    return organism.getDimensions().width * this.radius;
   }
 }
 

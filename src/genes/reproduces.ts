@@ -1,6 +1,6 @@
 import Gene from "../gene";
 import RealOrganism from "../realOrganism";
-import Reproduction from "../reproduction";
+import Reproduction from "../behavior/reproduction";
 
 class Reproduces extends Gene {
   reproduction: Reproduction;
@@ -8,7 +8,7 @@ class Reproduces extends Gene {
   constructor(organism: RealOrganism) {
     super(organism);
 
-    this.reproduction = new Reproduction({ obj: this.organism });
+    this.reproduction = new Reproduction();
   }
 
   animate() {

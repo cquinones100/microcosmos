@@ -4,15 +4,12 @@ const DEFAULT_ENERGY = 0.01;
 
 export type BehaviorProps = {
   energy?: number;
-  obj: RealOrganism
 }
 
 abstract class Behavior {
   energy!: BehaviorProps["energy"];
-  obj: BehaviorProps["obj"];
 
-  constructor({ obj, energy }: BehaviorProps) {
-    this.obj = obj;
+  constructor({ energy }: BehaviorProps = {}) {
     this.energy = energy || DEFAULT_ENERGY;
   }
 
@@ -30,10 +27,14 @@ abstract class Behavior {
     return current;
   }
 
-  abstract call<T extends {}>(args?: T): void;
+  abstract call<T extends {}>({ organism, ...args }: { organism: RealOrganism, args?: T }): void;
 
   getEnergy() {
     return this.energy!;
+  }
+
+  duplicate() {
+    return this.constructor();
   }
 }
 

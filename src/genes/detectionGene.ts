@@ -8,7 +8,7 @@ class DetectionGene extends Gene {
   constructor(organism: RealOrganism) {
     super(organism);
 
-    this.detection = new Detection({ obj: this.organism });
+    this.detection = new Detection();
   }
 
   animate(): void {
@@ -22,7 +22,7 @@ class DetectionGene extends Gene {
   duplicate(newOrganism: RealOrganism): DetectionGene {
     const gene = new DetectionGene(newOrganism);
 
-    gene.detection = this.detection.duplicate(newOrganism) || new Detection({ obj: newOrganism });
+    gene.detection = this.detection.duplicate() || new Detection();
 
     return gene;
   }

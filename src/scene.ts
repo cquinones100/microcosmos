@@ -40,7 +40,7 @@ class Scene {
       if (event.key === " ") this.paused = !this.paused;
     });
     this.createOrganism({ x: this.app.screen.width / 2 - 10, y: this.app.screen.height / 2 + 10 });
-    this.createAutotroph();
+    // this.createAutotroph();
 
     let organismsCount = this.organisms.size;
     let maxOrganisms = organismsCount;

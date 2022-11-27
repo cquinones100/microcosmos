@@ -1,6 +1,5 @@
 import Behavior from "./behavior";
 import GeneticCode from "./geneticCode";
-import Movement from "./movement";
 import Autotroph, { Coords } from "./organisms/autotroph";
 import WorldObject, { WorldObjectProps } from "./worldObject";
 
@@ -12,7 +11,6 @@ export type RealOrganismProps = {
 class RealOrganism extends WorldObject {
   energySource: RealOrganismProps["energySources"];
   geneticCode?: RealOrganismProps["geneticCode"];
-  movement?: Movement;
   behaviors: Set<Behavior>;
   maxEnergy: number;
   energy: number;
@@ -68,24 +66,10 @@ class RealOrganism extends WorldObject {
     this.shape.destroy();
   }
 
-  setSpeed(value: number) {
-    const iterator = this.behaviors.values();
-
-    let current = iterator.next().value;
-
-    const isMovement = current instanceof Movement;
-
-    while (current && !(isMovement)) {
-      current = iterator.next().value;
-    }
-
-    if (current) current.speed = value;
-  }
-
   act(behavior: Behavior) {
     this.energy -= behavior.getEnergy();
 
-    behavior.call();
+    behavior.call({ organism: this });
   }
 
   hungry() {
