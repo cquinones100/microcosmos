@@ -1,15 +1,14 @@
 import RealOrganism, { RealOrganismProps } from "../realOrganism";
 import GeneticCode from "../geneticCode";
 import Reproduces from "../genes/reproduces";
+import { WorldObjectProps } from "../worldObject";
 
 export type Coords = {
   x: number;
   y: number;
 };
 
-type AutotrophType = Exclude<RealOrganismProps, 'shape'>
-  & Coords
-  & Partial<{ shape?: RealOrganismProps['shape'] }>;
+type AutotrophType = WorldObjectProps & RealOrganismProps & Coords;
 
 class Autotroph extends RealOrganism {
   constructor({ scene, shape, x, y, ...args }: AutotrophType) {

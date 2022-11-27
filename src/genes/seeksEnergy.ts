@@ -22,8 +22,10 @@ class SeeksEnergy extends Gene {
   
     if (movement) {
       if (movement.speed === 0) movement.speed = movement.defaultSpeed;
-      if (movement.xDirection === 0) movement.xDirection = negatableRandom(1);
-      if (movement.yDirection === 0) movement.yDirection = negatableRandom(1);
+      if (movement.xDirection === 0 && movement.yDirection === 0) {
+        movement.xDirection = negatableRandom(1);
+        movement.yDirection = negatableRandom(1);
+      }
     }
 
     if (detection) {

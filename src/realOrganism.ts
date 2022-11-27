@@ -1,39 +1,30 @@
-import { Graphics } from "pixi.js";
 import Behavior from "./behavior";
 import GeneticCode from "./geneticCode";
 import Movement from "./movement";
-import Autotroph from "./organisms/autotroph";
-import Scene from "./scene";
-
-export class Chemical {}
+import Autotroph, { Coords } from "./organisms/autotroph";
+import WorldObject, { WorldObjectProps } from "./worldObject";
 
 export type RealOrganismProps = {
   energySources?: (any)[];
   geneticCode?: GeneticCode;
-  scene: Scene;
-  shape: Graphics;
 }
 
-class RealOrganism {
+class RealOrganism extends WorldObject {
   energySource: RealOrganismProps["energySources"];
   geneticCode?: RealOrganismProps["geneticCode"];
-  scene: Scene;
-  shape: RealOrganismProps["shape"];
   movement?: Movement;
   behaviors: Set<Behavior>;
   maxEnergy: number;
   energy: number;
-  color: number;
 
-  constructor({ energySources = [], geneticCode, scene, shape }: RealOrganismProps) {
+  constructor({ energySources = [], geneticCode, ...args }: RealOrganismProps & WorldObjectProps) {
+    super(args);
+
     this.energySource = energySources;
     this.geneticCode = geneticCode;
-    this.scene = scene
-    this.shape = shape;
     this.behaviors = new Set<Behavior>();
     this.maxEnergy = 100;
     this.energy = this.maxEnergy;
-    this.color = 0xff0000;
   }
 
   animate() {
@@ -62,36 +53,6 @@ class RealOrganism {
     this.geneticCode.forEach(gene => {
       gene.animate();
     });
-  }
-
-  setPosition({ x, y }: { x: number, y: number }) {
-    const { x: thisX, y: thisY } = this.getAbsolutePosition();
-    const { width: sceneWidth, height: sceneHeight } = this.scene.getBounds();
-
-    const withinBounds = (thisCoord: number, coord: number, boundary: number) => {
-      if (coord + thisCoord < 0) {
-        return coord + boundary;
-      } else if (coord + thisCoord > sceneWidth) {
-        return coord = boundary;
-      } else {
-        return coord;
-      }
-    }
-
-    this.shape.position.x = withinBounds(thisX, x, sceneWidth);
-    this.shape.position.y = withinBounds(thisY, y, sceneHeight);
-  }
-
-  getPosition() {
-    const { x, y } = this.shape.position;
-
-    return { x,  y };
-  }
-
-  getAbsolutePosition() {
-    const { x, y } = this.shape.getBounds();
-
-    return { x,  y };
   }
 
   setBehavior(behavior: Behavior) {
@@ -131,12 +92,6 @@ class RealOrganism {
     return this.energy < this.maxEnergy;
   }
 
-  getDimensions() {
-    const { width, height } = this.shape;
-
-    return { width, height };
-  }
-
   consume(organism: RealOrganism) {
     console.log('consumed!');
     this.scene.predators.add(this);
@@ -144,12 +99,6 @@ class RealOrganism {
     this.energy += organism.energy;
 
     organism.die();
-  }
-
-  duplicate() {
-    const { x, y } = this.getAbsolutePosition();
-
-    return this.scene.createOrganism({ x, y, });
   }
 
   canBeEatenBy(organism: RealOrganism) {
