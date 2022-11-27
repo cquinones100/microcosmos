@@ -161,6 +161,13 @@ class RealOrganism {
 
     organism.die();
   }
+
+  duplicate() {
+    const { x, y } = this.getAbsolutePosition();
+
+    return this.scene.createOrganism({ x, y, });
+  }
+
   canBeEatenBy(organism: RealOrganism) {
     return false;
   }
@@ -171,6 +178,12 @@ class RealOrganism {
 
   setEnergy(value: number) {
     this.energy = Math.min(this.maxEnergy, value);
+  }
+
+  duplicate() {
+    const { x, y } = this.getAbsolutePosition();
+
+    return this.scene.createOrganism({ x, y, });
   }
 }
 

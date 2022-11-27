@@ -29,13 +29,11 @@ class Reproduction extends Behavior {
   private shouldReproduce() {
     return this.timePassed % this.interval === 0
       && this.cycles < this.maxCycles
-      && this.obj.energy > this.obj.energy * 0.75;
+      && this.obj.energy > this.obj.maxEnergy * 0.75;
   }
 
   private duplicate(obj: RealOrganism) {
     if (!obj.geneticCode) return;
-
-    const { x, y } = obj.getAbsolutePosition();
 
     const conditionalMutation = (gene: Gene) => {
       const shouldMutate = Math.random() > 1 - 0.99 ? false : true;
@@ -45,10 +43,7 @@ class Reproduction extends Behavior {
       }
     }
 
-    const organism = obj.scene.createOrganism({
-      x,
-      y,
-    });
+    const organism = obj.duplicate();
 
     const geneticCode = obj.geneticCode.duplicate(organism);
 
