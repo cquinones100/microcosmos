@@ -12,11 +12,11 @@ class SeeksEnergy extends Gene {
   resolve() {
     if (!this.organism.hungry()) return;
 
-    const detection = Behavior.findBehavior(this.organism, (current) => {
+    const detection = Behavior.findBehavior<Detection>(this.organism, (current) => {
       return current instanceof Detection;
     });
 
-    const movement = Behavior.findBehavior(this.organism, (current) => current instanceof Movement);
+    const movement = Behavior.findBehavior<Movement>(this.organism, (current) => current instanceof Movement);
 
     if (detection) {
       if (detection.detections.length > 0) {

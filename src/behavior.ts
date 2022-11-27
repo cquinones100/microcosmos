@@ -16,7 +16,7 @@ abstract class Behavior {
     this.energy = energy || DEFAULT_ENERGY;
   }
 
-  public static findBehavior(organism: RealOrganism, cb: (current: Behavior) => boolean) {
+  public static findBehavior<T>(organism: RealOrganism, cb: (current: Behavior) => boolean): T {
     const iterator = organism.behaviors.values();
 
     let current = iterator.next().value;
