@@ -17,6 +17,7 @@ class Scene {
   prey: Set<RealOrganism>;
   naturalDeaths: Set<RealOrganism>;
   allObjects: any[];
+  paused: boolean;
 
   constructor() {
     this.app = new PIXI.Application();
@@ -25,14 +26,19 @@ class Scene {
     this.predators = new Set();
     this.prey = new Set();
     this.naturalDeaths = new Set();
+    this.paused = false;
   }
 
   draw() {
+    console.log("screen bounds coords: ", this.getBounds());
     const stats = new Stats();
     stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
     document.body.appendChild(stats.dom);
 
     document.body.appendChild(this.app.view as unknown as Node);
+    document.addEventListener('keypress', (event) => {
+      if (event.key === " ") this.paused = !this.paused;
+    });
     this.createOrganism({ x: this.app.screen.width / 2 - 10, y: this.app.screen.height / 2 + 10 });
     this.createAutotroph();
 
@@ -50,13 +56,8 @@ class Scene {
         console.log("Number of organisms: ", organismsCount);
       }
 
-      this.organisms.forEach(organism => organism.animate());
-
-      if (this.organisms.size < 3 && this.organisms.size > 0) {
-        console.log("------------------On the last organisms-----------------");
-        this.organisms.forEach(organism => {
-          console.log("Energy: ", organism.energy);
-        });
+      if (!this.paused) {
+        this.organisms.forEach(organism => organism.animate());
       }
 
       if (this.organisms.size === 0 && !displayedStats) {
