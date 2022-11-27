@@ -7,8 +7,6 @@ import Scene from "./scene";
 
 export class Chemical {}
 
-class Organic {}
-
 export type RealOrganismProps = {
   energySources?: (any)[];
   geneticCode?: GeneticCode;
@@ -27,7 +25,7 @@ class RealOrganism {
   energy: number;
   color: number;
 
-  constructor({ energySources = [new Chemical()], geneticCode, scene, shape }: RealOrganismProps) {
+  constructor({ energySources = [], geneticCode, scene, shape }: RealOrganismProps) {
     this.energySource = energySources;
     this.geneticCode = geneticCode;
     this.scene = scene

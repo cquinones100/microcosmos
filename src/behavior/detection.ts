@@ -2,7 +2,7 @@ import Behavior, { BehaviorProps } from "../behavior";
 import RealOrganism from "../realOrganism";
 
 class Detection extends Behavior {
-  detections: any[];
+  detections: RealOrganism[];
   radius: number;
 
   constructor(args: BehaviorProps) {
@@ -16,7 +16,7 @@ class Detection extends Behavior {
   }
 
   call<T extends {}>(args?: T | undefined): void {
-    this.detections = this.obj.scene.allObjects.reduce((acc: any[], curr: any) => {
+    this.detections = this.obj.scene.allObjects.reduce((acc: RealOrganism[], curr: any) => {
       if (curr !== this.obj) {
         const { x: objX, y: objY } = this.obj.getAbsolutePosition();
         const { x: currX, y: currY } = curr.getAbsolutePosition();
