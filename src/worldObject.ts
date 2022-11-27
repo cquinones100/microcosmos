@@ -56,6 +56,17 @@ class WorldObject {
 
     return { width, height };
   }
+
+  duplicate() {
+    const { x, y } = this.getAbsolutePosition();
+    const { width: sceneWidth, height: sceneHeight } = this.scene.getBounds();
+
+    const organism = this.scene.createOrganism({ x: sceneWidth / 2 - 10, y: sceneHeight / 2 + 10 });
+    
+    organism.setPosition({ x: x - 10, y: y + 10 });
+
+    return organism;
+  }
 }
 
 export default WorldObject;

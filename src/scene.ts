@@ -93,7 +93,7 @@ class Scene {
       new MovementGene(organism),
       // new DetectionGene(organism),
       new SeeksEnergy(organism),
-      // new Reproduces(organism),
+      new Reproduces(organism),
     ])
 
     this.add(organism);

@@ -112,12 +112,6 @@ class RealOrganism extends WorldObject {
   setEnergy(value: number) {
     this.energy = Math.min(this.maxEnergy, value);
   }
-
-  duplicate() {
-    const { x, y } = this.getAbsolutePosition();
-
-    return this.scene.createOrganism({ x, y, });
-  }
 }
 
 export default RealOrganism;
