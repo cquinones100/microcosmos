@@ -19,6 +19,7 @@ class Scene {
   naturalDeaths: Set<RealOrganism>;
   allObjects: any[];
   paused: boolean;
+  center: { x: number; y: number; };
 
   constructor() {
     this.app = new PIXI.Application();
@@ -28,6 +29,7 @@ class Scene {
     this.prey = new Set();
     this.naturalDeaths = new Set();
     this.paused = false;
+    this.center = { x: this.app.screen.width / 2, y: this.app.screen.height / 2 };
   }
 
   draw() {
@@ -40,8 +42,8 @@ class Scene {
     document.addEventListener('keypress', (event) => {
       if (event.key === " ") this.paused = !this.paused;
     });
-    this.createOrganism({ x: this.app.screen.width / 2 - 10, y: this.app.screen.height / 2 + 10 });
-    // this.createAutotroph();
+    this.createOrganism();
+    this.createAutotroph();
 
     let organismsCount = this.organisms.size;
     let maxOrganisms = organismsCount;
@@ -51,9 +53,9 @@ class Scene {
     this.app.ticker.add(() => {
       stats.begin();
 
-
       if (!this.paused) {
         this.organisms.forEach(organism => organism.animate());
+        console.log("Number of organisms: ", this.organisms.size);
       }
 
       if (this.organisms.size === 0 && !displayedStats) {
@@ -74,12 +76,12 @@ class Scene {
 
   createOrganism(
     { x, y }:
-    { x: number, y: number, geneticCode?: GeneticCode }
+    { x?: number, y?: number, geneticCode?: GeneticCode } = {}
   ) {
     const shape = new PIXI.Graphics();
 
     shape.beginFill(0xff0000);
-    shape.drawCircle(x, y, 10);
+    shape.drawCircle(this.center.x, this.center.y, 10);
     shape.interactive = true;
     shape.hitArea = new Circle(x, y, 10);
 
@@ -101,11 +103,15 @@ class Scene {
 
   createAutotroph({ x, y }: Partial<Coords> = {}) {
     const organism = new Autotroph({
-      x: x || this.app.screen.width / 2 + 10,
-      y: y || 0 + 20,
+      x: x || 100,
+      y: y || -200,
       scene: this,
-      shape: new PIXI.Graphics,
+      shape: new PIXI.Graphics(),
     });
+
+    organism.geneticCode = new GeneticCode([
+      new Reproduces(organism),
+    ])
 
     this.add(organism);
 

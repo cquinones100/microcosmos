@@ -4,11 +4,19 @@ import Reproduction from "../behavior/reproduction";
 
 class Reproduces extends Gene {
   reproduction: Reproduction;
+  behavior: Reproduction;
+  onMutateMaxCycles: (gene: Reproduces) => void;
 
   constructor(organism: RealOrganism) {
     super(organism);
 
     this.reproduction = new Reproduction();
+    this.behavior = this.reproduction; 
+    this.onMutateMaxCycles = (gene: Reproduces) => {
+      const magnitude = Math.round(Math.random() * 50);
+
+      gene.reproduction.maxCycles = magnitude;
+    }
   }
 
   animate() {
@@ -30,9 +38,7 @@ class Reproduces extends Gene {
   }
 
   private mutateMaxCycles() {
-    const magnitude = Math.random() * 10;
-
-    this.reproduction.maxCycles = magnitude;
+    this.onMutateMaxCycles(this);
   }
 
   private mutateIntervals() {

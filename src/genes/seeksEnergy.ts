@@ -31,16 +31,13 @@ class SeeksEnergy extends Gene {
 
     if (detection) {
       if (detection.detections.length > 0) {
-        debugger;
         for (const curr of detection.detections) {
           if (!this.organism.scene.allObjects.find(obj => obj === curr)) continue;
 
           if (this.organism.canEat(curr)) {
-            const { x: objX, y: objY } = this.organism.getAbsolutePosition();
             const { x: currX, y: currY } = curr.getAbsolutePosition();
-            const { width, height } = this.organism.getDimensions();
 
-            if (currX >= objX - width && currX <= objX + width && currY >= objY - height && currY <= objY + height) {
+            if (this.organism.intersects(currX, currY)) {
               this.organism.consume(curr);
             } else {
               movement.directTo({ organism: this.organism, x: currX, y: currY });

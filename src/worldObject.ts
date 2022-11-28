@@ -58,6 +58,16 @@ class WorldObject {
   }
 
   onHover() {}
+
+  intersects(otherX: number, otherY: number) {
+    const { x, y } = this.getAbsolutePosition();
+    const { width, height } = this.getDimensions();
+
+    return otherX >= x - width
+      && otherX <= x + width
+      && otherY >= y - height
+      && otherY <= y + height;
+  }
 }
 
 export default WorldObject;

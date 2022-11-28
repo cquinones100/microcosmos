@@ -86,14 +86,20 @@ class RealOrganism extends WorldObject {
   consume(organism: RealOrganism) {
     this.scene.predators.add(this);
     this.scene.prey.add(organism);
-    this.setEnergy(this.energy + organism.maxEnergy);
+    const energyFromPrey = Math.min(this.maxEnergy - this.energy, organism.energy);
 
-    organism.die();
-    organism.disappear();
+    organism.setEnergy(organism.energy - energyFromPrey);
+
+    this.setEnergy(energyFromPrey);
+
+    if (organism.energy <= 0) {
+      organism.die();
+      organism.disappear();
+    }
   }
 
   canBeEatenBy(organism: RealOrganism) {
-    return this.energy * 1.5 < organism.energy;
+    return false;
   }
 
   canEat(organism: RealOrganism | Autotroph) {
@@ -101,7 +107,7 @@ class RealOrganism extends WorldObject {
   }
 
   setEnergy(value: number) {
-    this.energy = Math.min(this.maxEnergy, value);
+    this.energy = Math.max(Math.min(this.maxEnergy, value), 0);
   }
 
   duplicate() {
