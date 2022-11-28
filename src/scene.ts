@@ -8,6 +8,7 @@ import Stats from 'stats.js'
 import DetectionGene from "./genes/detectionGene";
 import Autotroph, { Coords } from "./organisms/autotroph";
 import { Circle } from "pixi.js";
+import WorldObject from "./worldObject";
 
 export const MUTATION_FACTOR = 1;
 
@@ -17,23 +18,30 @@ class Scene {
   predators: Set<RealOrganism>;
   prey: Set<RealOrganism>;
   naturalDeaths: Set<RealOrganism>;
-  allObjects: any[];
+  allObjects: Set<WorldObject>;
   paused: boolean;
   center: { x: number; y: number; };
+  coordinates: Set<WorldObject>[][];
+  measurements: {
+    [key: string]: number
+  }
+  onAnimates: (() => void)[];
 
   constructor() {
     this.app = new PIXI.Application();
     this.organisms = new Set<RealOrganism>();
-    this.allObjects = [];
+    this.allObjects = new Set();
     this.predators = new Set();
     this.prey = new Set();
     this.naturalDeaths = new Set();
     this.paused = false;
     this.center = { x: this.app.screen.width / 2, y: this.app.screen.height / 2 };
+    this.coordinates = [];
+    this.measurements = {};
+    this.onAnimates = [];
   }
 
   draw() {
-    console.log("screen bounds coords: ", this.getBounds());
     const stats = new Stats();
     stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
     document.body.appendChild(stats.dom);
@@ -43,29 +51,25 @@ class Scene {
       if (event.key === " ") this.paused = !this.paused;
     });
     this.createOrganism();
+    this.createOrganism();
     this.createAutotroph();
 
     let organismsCount = this.organisms.size;
     let maxOrganisms = organismsCount;
 
-    let displayedStats = false;
-
     this.app.ticker.add(() => {
       stats.begin();
 
       if (!this.paused) {
+        Object.keys(this.measurements).forEach(measurement => {
+          this.measurements[measurement] = 0;
+        })
+
         this.organisms.forEach(organism => organism.animate());
-        console.log("Number of organisms: ", this.organisms.size);
-      }
 
-      if (this.organisms.size === 0 && !displayedStats) {
-        console.log("------------------Run Stats-----------------");
-        console.log("Max number of organisms: ", maxOrganisms);
-        console.log("Predators: ", this.predators);
-        console.log("Prey: ", this.prey);
-        console.log("Died of starvation: ", this.naturalDeaths);
-
-        displayedStats = true;
+        Object.keys(this.measurements).forEach(measurement => {
+          console.log(`MEASUREMENT: Number of organisms: ${this.organisms.size}, ${measurement} time: ${this.measurements[measurement]}`);
+        })
       }
 
       maxOrganisms = Math.max(this.organisms.size, maxOrganisms);
@@ -121,7 +125,7 @@ class Scene {
   add(organism: RealOrganism) {
     this.organisms.add(organism);
     this.app.stage.addChild(organism.shape);
-    this.allObjects.push(organism);
+    this.allObjects.add(organism);
   }
 
   killOrganism(organism: RealOrganism) {
@@ -129,15 +133,37 @@ class Scene {
   }
 
   remove(organism: RealOrganism) {
-    this.allObjects = this.allObjects.filter((curr: any) => {
-      return curr !== organism;
-    });
+    this.allObjects.delete(organism);
   }
 
   getBounds() {
     const { width, height } = this.app.screen;
 
     return { width, height };
+  }
+
+  measure(key: string, cb: () => void, sideEffect?: (elapsedTime: number, key: string) => void) {
+    const startTime = Date.now();
+
+    const result = cb();
+
+    const endTime = Date.now();
+
+    const delta = endTime - startTime
+
+    this.measurements[key] ||= 0;
+
+    this.measurements[key] += delta;
+
+    if (sideEffect) sideEffect(delta, key);
+
+    return result
+  }
+
+  onAnimate(db: () => void) {
+    this.onAnimates ||= [];
+
+    this.onAnimates.push(db);
   }
 }
 

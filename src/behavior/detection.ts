@@ -16,7 +16,7 @@ class Detection extends Behavior {
   call({ organism }: { organism: RealOrganism }): void {
     const { x: objX, y: objY } = organism.getAbsolutePosition();
 
-    this.detections = organism.scene.allObjects.reduce((acc: RealOrganism[], curr: any) => {
+    this.detections = Array.from(organism.scene.allObjects).reduce((acc: RealOrganism[], curr: any) => {
       if (curr !== organism) {
         const { x: currX, y: currY } = curr.getAbsolutePosition();
 

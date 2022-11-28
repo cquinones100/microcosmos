@@ -32,7 +32,7 @@ class SeeksEnergy extends Gene {
     if (detection) {
       if (detection.detections.length > 0) {
         for (const curr of detection.detections) {
-          if (!this.organism.scene.allObjects.find(obj => obj === curr)) continue;
+          if (!this.organism.scene.allObjects.has(curr)) continue;
 
           if (this.organism.canEat(curr)) {
             const { x: currX, y: currY } = curr.getAbsolutePosition();
