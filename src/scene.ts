@@ -26,6 +26,7 @@ class Scene {
     [key: string]: number
   }
   onAnimates: (() => void)[];
+  timePassed: number;
 
   constructor() {
     this.app = new PIXI.Application();
@@ -39,6 +40,7 @@ class Scene {
     this.coordinates = [];
     this.measurements = {};
     this.onAnimates = [];
+    this.timePassed = 0;
   }
 
   draw() {
@@ -57,7 +59,8 @@ class Scene {
     let organismsCount = this.organisms.size;
     let maxOrganisms = organismsCount;
 
-    this.app.ticker.add(() => {
+    this.app.ticker.add((time) => {
+      this.timePassed = time;
       stats.begin();
 
       if (!this.paused) {
