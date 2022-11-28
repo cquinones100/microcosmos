@@ -1,21 +1,25 @@
-import { CubeRefractionMapping } from "three";
 import Behavior from "../behavior";
 import Detection from "../behavior/detection";
 import Movement from "../behavior/movement";
 import Gene from "../gene";
 import RealOrganism from "../realOrganism";
+import WorldObject from "../worldObject";
 
 class SeeksEnergy extends Gene {
+  detection: Detection;
+
+  constructor(args: RealOrganism) {
+    super(args);
+
+    this.detection = new Detection();
+  }
+
   animate() {
     this.resolve();
   }
 
   resolve() {
     if (!this.organism.hungry()) return;
-
-    const detection = Behavior.findBehavior<Detection>(this.organism, (current) => {
-      return current instanceof Detection;
-    });
 
     const movement = Behavior.findBehavior<Movement>(this.organism, (current) => current instanceof Movement);
 
@@ -29,25 +33,25 @@ class SeeksEnergy extends Gene {
       }
     }
 
-    if (detection) {
-      if (detection.detections.length > 0) {
-        for (const curr of detection.detections) {
-          if (!this.organism.scene.allObjects.has(curr)) continue;
+    this.detection.onDetect = (obj: WorldObject, breakDetection: () => void) => {
+      if (!(obj instanceof RealOrganism)) return;
 
-          if (this.organism.canEat(curr)) {
-            const { x: currX, y: currY } = curr.getAbsolutePosition();
+      if (!this.organism.scene.allObjects.has(obj)) return;
 
-            if (this.organism.intersects(currX, currY)) {
-              this.organism.consume(curr);
-            } else {
-              movement.directTo({ organism: this.organism, x: currX, y: currY });
-            }
+      if (this.organism.canEat(obj)) {
+        const { x: currX, y: currY } = obj.getAbsolutePosition();
 
-            break;
-          }
+        if (this.organism.intersects(currX, currY)) {
+          this.organism.consume(obj);
+
+          breakDetection();
+        } else {
+          movement.directTo({ organism: this.organism, x: currX, y: currY });
         }
       }
-    }
+    };
+
+    this.detection.call({ organism: this.organism });
   }
 
   increase() {}

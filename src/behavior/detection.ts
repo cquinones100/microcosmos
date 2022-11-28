@@ -1,57 +1,50 @@
 import Behavior, { BehaviorProps } from "../behavior";
 import RealOrganism from "../realOrganism";
+import WorldObject from "../worldObject";
 
 class Detection extends Behavior {
   detections: RealOrganism[];
   radius: number;
+  onDetect: (obj: WorldObject, breakDetection: () => void) => void;
 
   constructor(args?: BehaviorProps) {
     super(args);
 
     this.detections = [];
 
-    this.radius = 20;
+    this.radius = 2;
+    this.onDetect = () => {};
   }
 
   call({ organism }: { organism: RealOrganism }): void {
-    const { x: objX, y: objY } = organism.getAbsolutePosition();
+    const call = () => {
+      const { x: orgX, y: orgY } = organism.getAbsolutePosition();
+      const { width: sceneWidth, height: sceneHeight } = organism.scene.getBounds();
 
-    this.detections = Array.from(organism.scene.allObjects).reduce((acc: RealOrganism[], curr: any) => {
-      if (curr !== organism) {
-        const { x: currX, y: currY } = curr.getAbsolutePosition();
+      const absoluteX = (sceneWidth / 2 + orgX);
+      const absoluteY = (sceneHeight / 2 + orgY);
 
-        const radius = this.getOrganismRadius(organism);
+      const radius = this.getOrganismRadius(organism);
 
-        if (currX >= objX - radius
-          && currX <= objX + radius
-          && currY >= objY - radius
-          && currY <= objY + radius
-        ) {
-          acc.push(curr);
+      const startX = absoluteX - radius;
+      const endX = absoluteX + radius;
+      const startY = absoluteY - radius;
+      const endY = absoluteY + radius;
+
+      for (let x = startX; x < endX; x++) {
+        for (let y = startY; y < endY; y++) {
+          const objs = organism.scene.coordinates[x]?.[y];
+
+          if (objs) {
+            objs.forEach(org => {
+              this.onDetect(org, () => {});
+            });
+          }
         }
       }
+    }
 
-      return acc;
-    }, []);
-
-    this.detections = this.detections.sort((a: RealOrganism, b: RealOrganism) => {
-      const distanceArea = (x: number, y: number) => {
-        return Math.abs(objX - x * objY * y)
-      };
-
-      const { x: aCurrX, y: aCurrY } = a.getAbsolutePosition();
-      const { x: bCurrX, y: bCurrY } = b.getAbsolutePosition();
-
-      if (distanceArea(aCurrX, aCurrY) < distanceArea(bCurrX, bCurrY)) {
-        return -1;
-      }
-
-      if (distanceArea(aCurrX, aCurrY) > distanceArea(bCurrX, bCurrY)) {
-        return 1;
-      }
-
-      return 0;
-    });
+    organism.scene.measure('detect', call);
   }
 
   getOrganismRadius(organism: RealOrganism) {

@@ -95,7 +95,7 @@ class Scene {
 
     organism.geneticCode = new GeneticCode([
       new MovementGene(organism),
-      new DetectionGene(organism),
+      // new DetectionGene(organism),
       new SeeksEnergy(organism),
       new Reproduces(organism),
     ])
@@ -142,7 +142,7 @@ class Scene {
     return { width, height };
   }
 
-  measure(key: string, cb: () => void, sideEffect?: (elapsedTime: number, key: string) => void) {
+  measure(key: string, cb: () => void, sideEffect?: (elapsedTime: number, key: string, totalTime: number) => void) {
     const startTime = Date.now();
 
     const result = cb();
@@ -155,7 +155,7 @@ class Scene {
 
     this.measurements[key] += delta;
 
-    if (sideEffect) sideEffect(delta, key);
+    if (sideEffect) sideEffect(delta, key, this.measurements[key]);
 
     return result
   }
