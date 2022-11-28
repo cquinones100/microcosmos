@@ -75,13 +75,22 @@ class WorldObject {
   onHover() {}
 
   intersects(otherX: number, otherY: number) {
-    const { x, y } = this.getAbsolutePosition();
+    const { x, y } = this.screenBasedPosition();
     const { width, height } = this.getDimensions();
 
-    return otherX >= x - width
-      && otherX <= x + width
-      && otherY >= y - height
-      && otherY <= y + height;
+    return otherX > x - width
+        && otherX < x + width
+        && otherY > y - height
+        && otherY < y + height;
+  }
+
+  screenBasedPosition() {
+    const { width, height } = this.scene.app.screen;
+    const { x: orgX, y: orgY } = this.getAbsolutePosition();
+    const x = (width / 2 + orgX);
+    const y = (height / 2 + orgY);
+
+    return { x, y };
   }
 }
 

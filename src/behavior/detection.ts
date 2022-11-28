@@ -5,46 +5,38 @@ import WorldObject from "../worldObject";
 class Detection extends Behavior {
   detections: RealOrganism[];
   radius: number;
-  onDetect: (obj: WorldObject, breakDetection: () => void) => void;
+  onDetect: (obj: WorldObject) => void;
 
   constructor(args?: BehaviorProps) {
     super(args);
 
     this.detections = [];
 
-    this.radius = 2;
+    this.radius = 5;
     this.onDetect = () => {};
   }
 
   call({ organism }: { organism: RealOrganism }): void {
     const call = () => {
-      const { x: orgX, y: orgY } = organism.getAbsolutePosition();
-      const { width: sceneWidth, height: sceneHeight } = organism.scene.getBounds();
-
-      const absoluteX = (sceneWidth / 2 + orgX);
-      const absoluteY = (sceneHeight / 2 + orgY);
-
+      const { x: absoluteX, y: absoluteY } = organism.screenBasedPosition();
       const radius = this.getOrganismRadius(organism);
 
-      const startX = absoluteX - radius;
-      const endX = absoluteX + radius;
-      const startY = absoluteY - radius;
-      const endY = absoluteY + radius;
+      const objs = Array.from(organism.scene.organisms).filter(org => {
+        const { x: orgX, y: orgY } = org.screenBasedPosition();
 
-      for (let x = startX; x < endX; x++) {
-        for (let y = startY; y < endY; y++) {
-          const objs = organism.scene.coordinates[x]?.[y];
+        return org !== organism
+          && orgX > absoluteX - radius
+          && orgX < absoluteX + radius
+          && orgY > absoluteY - radius
+          && orgY < absoluteY + radius;
+      });
 
-          if (objs) {
-            objs.forEach(org => {
-              this.onDetect(org, () => {});
-            });
-          }
-        }
-      }
+      objs.forEach(this.onDetect);
     }
 
-    organism.scene.measure('detect', call);
+    call();
+
+    // organism.scene.measure('detect', call);
   }
 
   getOrganismRadius(organism: RealOrganism) {
