@@ -41,6 +41,21 @@ class WorldObject {
 
     this.shape.x = withinBounds(thisX, x, sceneWidth);
     this.shape.y = withinBounds(thisY, y, sceneHeight);
+
+    const prevAbsoluteX = sceneWidth / 2 + thisX;
+    const prevAbsoluteY = sceneHeight / 2 + thisY;
+
+    const absoluteX = (sceneWidth / 2 + this.shape.x);
+    const absoluteY = (sceneHeight / 2 + this.shape.y);
+
+    this.scene.coordinates[absoluteX] ||= [];
+    this.scene.coordinates[absoluteX][absoluteY] ||= new Set<WorldObject>();
+
+    if (this.scene.coordinates[prevAbsoluteX]) {
+      this.scene.coordinates[prevAbsoluteX][prevAbsoluteY]?.delete(this);
+    }
+
+    this.scene.coordinates[absoluteX][absoluteY].add(this);
   }
 
   getPosition() {
