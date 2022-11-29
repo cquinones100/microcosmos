@@ -1,6 +1,6 @@
 import Gene from "../gene";
-import Organism from "../realOrganism";
 import Reproduction from "../behavior/reproduction";
+import Organism from "../organisms/organism";
 
 class Reproduces extends Gene {
   reproduction: Reproduction;

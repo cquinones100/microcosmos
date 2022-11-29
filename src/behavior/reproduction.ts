@@ -1,7 +1,6 @@
 import Behavior, { BehaviorProps } from "../behavior";
 import Gene from "../gene";
 import Organism from "../organisms/organism";
-import RealOrganism from "../realOrganism";
 
 class Reproduction extends Behavior {
   timePassed: number;
@@ -17,7 +16,7 @@ class Reproduction extends Behavior {
     this.maxCycles = 10;
   }
 
-  call({ organism }: { organism: RealOrganism }) {
+  call({ organism }: { organism: Organism }) {
     this.timePassed += 1;
 
     if (this.shouldReproduce(organism)) {
@@ -27,13 +26,13 @@ class Reproduction extends Behavior {
     }
   }
 
-  private shouldReproduce(organism: RealOrganism) {
+  private shouldReproduce(organism: Organism) {
     return this.timePassed % this.interval === 0
       && this.cycles < this.maxCycles
       && organism.energy > organism.maxEnergy * 0.4;
   }
 
-  private reproduce(obj: RealOrganism) {
+  private reproduce(obj: Organism) {
     if (!obj.geneticCode) return;
 
     const conditionalMutation = (gene: Gene) => {

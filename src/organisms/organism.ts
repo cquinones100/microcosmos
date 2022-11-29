@@ -1,7 +1,6 @@
 import Behavior from "../behavior";
 import GeneticCode from "../geneticCode";
 import WorldObject, { WorldObjectProps } from "../worldObject";
-import * as PIXI from "pixi.js";
 
 export type OrganismProps = {
   energySources?: (any)[];

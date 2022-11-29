@@ -2,12 +2,12 @@ import Behavior from "../behavior";
 import Movement from "../behavior/movement";
 import Reproduction from "../behavior/reproduction";
 import Gene from "../gene";
-import RealOrganism from "../realOrganism";
+import Organism from "../organisms/organism";
 
 class MovementGene extends Gene {
   movement: Movement;
 
-  constructor(organism: RealOrganism, movement?: Movement) {
+  constructor(organism: Organism, movement?: Movement) {
     super(organism);
 
     this.movement = movement || new Movement();
@@ -50,7 +50,7 @@ class MovementGene extends Gene {
     }
   }
 
-  duplicate(newOrganism: RealOrganism): MovementGene {
+  duplicate(newOrganism: Organism): MovementGene {
     const gene = new MovementGene(newOrganism);
 
     gene.movement = this.movement.duplicate() || new Movement();

@@ -1,5 +1,4 @@
 import * as PIXI from "pixi.js";
-import RealOrganism from "./realOrganism";
 import Stats from 'stats.js'
 import WorldObject from "./worldObject";
 import Organism from "./organisms/organism";
@@ -7,6 +6,7 @@ import { Application, Container } from "pixi.js";
 import TextureOrganism from "./textureOrganism";
 import TextureAutotroph from "./textureAutotroph";
 import Autotroph from "./organisms/autotroph";
+import HeteroTroph from "./organisms/heterotroph";
 
 export const MUTATION_FACTOR = 1;
 
@@ -76,12 +76,12 @@ class Scene {
         this.stop = !this.stop;
 
         console.log("Number of objects: ", this.allObjects.size);
-        console.log("Number of Heterotrophs: ", Array.from(this.allObjects).filter(org => org instanceof RealOrganism).length);
+        console.log("Number of Heterotrophs: ", Array.from(this.allObjects).filter(org => org instanceof HeteroTroph).length);
         console.log(
           "Generations of Heterotrophs: ",
-          (Array.from(this.allObjects) as RealOrganism[])
-            .filter(org => org instanceof RealOrganism)
-            .sort((a: RealOrganism, b: RealOrganism) => {
+          (Array.from(this.allObjects) as HeteroTroph[])
+            .filter(org => org instanceof HeteroTroph)
+            .sort((a: HeteroTroph, b: HeteroTroph) => {
               if (a.generation < b.generation) {
                 return - 1;
               }
@@ -138,7 +138,7 @@ class Scene {
   ) {
     const texture = TextureOrganism.create({ scene: this, x: Math.random() * this.app.screen.width, y: Math.random() * this.app.screen.height })
 
-    const organism = RealOrganism.create({ texture, scene: this })
+    const organism = HeteroTroph.create({ texture, scene: this })
 
     this.organisms.add(organism);
 

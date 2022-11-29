@@ -1,11 +1,11 @@
 import Detection from "../behavior/detection";
 import Gene from "../gene";
-import RealOrganism from "../realOrganism";
+import Organism from "../organisms/organism";
 
 class DetectionGene extends Gene {
   detection: Detection;
 
-  constructor(organism: RealOrganism) {
+  constructor(organism: Organism) {
     super(organism);
 
     this.detection = new Detection();
@@ -19,7 +19,7 @@ class DetectionGene extends Gene {
     this.organism.setBehavior(this.detection);
   }
 
-  duplicate(newOrganism: RealOrganism): DetectionGene {
+  duplicate(newOrganism: Organism): DetectionGene {
     const gene = new DetectionGene(newOrganism);
 
     gene.detection = this.detection.duplicate() || new Detection();

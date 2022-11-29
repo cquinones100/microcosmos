@@ -1,5 +1,5 @@
 import Behavior, { BehaviorProps } from "../behavior";
-import RealOrganism from "../realOrganism";
+import HeteroTroph from "../organisms/heterotroph";
 
 const DEFAULT_SPEED = 5;
 
@@ -36,7 +36,7 @@ class Movement extends Behavior {
 
   call(
     { organism, x: explicitX, y: explicitY }:
-    { organism: RealOrganism, x?: number, y?: number }
+    { organism: HeteroTroph, x?: number, y?: number }
   ): void {
     const { x: objX, y: objY } = organism.getPosition();
 
@@ -66,7 +66,7 @@ class Movement extends Behavior {
     }
   }
 
-  directTo({ organism, x, y }: { organism: RealOrganism, x: number, y: number }) {
+  directTo({ organism, x, y }: { organism: HeteroTroph, x: number, y: number }) {
     const { x: objX, y: objY } = organism.getPosition();
 
     const dx = objX - x;

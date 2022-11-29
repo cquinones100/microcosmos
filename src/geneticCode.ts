@@ -1,6 +1,5 @@
 import Gene from "./gene";
-import NewOrganism from "./newOrganism";
-import RealOrganism from "./realOrganism";
+import Organism from "./organisms/organism";
 
 class GeneticCode {
   genes: Gene[];
@@ -21,7 +20,7 @@ class GeneticCode {
     return this.genes.map(cb);
   }
 
-  duplicate(organism: RealOrganism): GeneticCode {
+  duplicate(organism: Organism): GeneticCode {
     return new GeneticCode(this.map(gene => {
       return gene.duplicate(organism);
     }));

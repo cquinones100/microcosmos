@@ -3,13 +3,12 @@ import Detection from "../behavior/detection";
 import Movement from "../behavior/movement";
 import Gene from "../gene";
 import Organism from "../organisms/organism";
-import RealOrganism from "../realOrganism";
 import WorldObject from "../worldObject";
 
 class SeeksEnergy extends Gene {
   detection: Detection;
 
-  constructor(args: RealOrganism) {
+  constructor(args: Organism) {
     super(args);
 
     this.detection = new Detection();
@@ -54,7 +53,7 @@ class SeeksEnergy extends Gene {
 
   increase() {}
 
-  duplicate(newOrganism: RealOrganism): Gene {
+  duplicate(newOrganism: Organism): Gene {
     return new SeeksEnergy(newOrganism);
   }
 

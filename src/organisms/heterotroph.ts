@@ -1,25 +1,25 @@
-import DetectionGene from "./genes/detectionGene";
-import MovementGene from "./genes/movementGene";
-import Reproduces from "./genes/reproduces";
-import SeeksEnergy from "./genes/seeksEnergy";
-import GeneticCode from "./geneticCode";
-import { Coords } from "./organisms/autotroph";
-import Organism, { OrganismProps } from "./organisms/organism";
-import TextureOrganism from "./textureOrganism";
-import WorldObject from "./worldObject";
+import MovementGene from "../genes/movementGene";
+import Reproduces from "../genes/reproduces";
+import SeeksEnergy from "../genes/seeksEnergy";
+import GeneticCode from "../geneticCode";
+import { OrganismProps } from "./organism";
+import TextureOrganism from "../textureOrganism";
+import WorldObject from "../worldObject";
+import { Coords } from "./autotroph";
+import Organism from "./organism";
 
-type RealOrganismProps = {
+type HeteroTrophProps = {
   texture: TextureOrganism;
 }
 & Partial<Coords>
 & Pick<OrganismProps, "scene" | "generation" | "color">
 & Partial<Pick<OrganismProps, "geneticCode">>
 
-class RealOrganism extends Organism {
-  public static create({ texture, geneticCode, ...args }: RealOrganismProps) {
+class HeteroTroph extends Organism {
+  public static create({ texture, geneticCode, ...args }: HeteroTrophProps) {
     const { x, y } = texture.getPosition();
 
-    const organism = new RealOrganism({ x, y, shape: texture, ...args});
+    const organism = new HeteroTroph({ x, y, shape: texture, ...args});
 
     if (geneticCode) {
       organism.geneticCode = geneticCode;
@@ -62,7 +62,7 @@ class RealOrganism extends Organism {
     }
   }
 
-  canBeEatenBy(organism: RealOrganism) {
+  canBeEatenBy(organism: HeteroTroph) {
     return this.dead();
   }
 
@@ -82,7 +82,7 @@ class RealOrganism extends Organism {
     const { x, y } = this.shape.shape.position;
 
     const texture = TextureOrganism.create({ scene, x: x! - width, y: y! - height });
-    const organism = RealOrganism.create({ texture, scene })
+    const organism = HeteroTroph.create({ texture, scene })
 
     scene.organisms.add(organism);
 
@@ -95,4 +95,4 @@ class RealOrganism extends Organism {
   }
 }
 
-export default RealOrganism;
+export default HeteroTroph;

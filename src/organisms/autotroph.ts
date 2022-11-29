@@ -2,7 +2,6 @@ import Reproduces from "../genes/reproduces";
 import WorldObject from "../worldObject";
 import Organism from "./organism";
 import { OrganismProps } from "../organisms/organism";
-import RealOrganism from "../realOrganism";
 import TextureAutotroph from "../textureAutotroph";
 import GeneticCode from "../geneticCode";
 

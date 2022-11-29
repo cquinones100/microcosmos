@@ -1,6 +1,4 @@
 import Organism from "./organisms/organism";
-import RealOrganism from "./realOrganism";
-
 const DEFAULT_ENERGY = 0.01;
 
 export type BehaviorProps = {

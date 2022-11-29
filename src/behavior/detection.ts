@@ -1,5 +1,5 @@
 import Behavior, { BehaviorProps } from "../behavior";
-import Organism from "../realOrganism";
+import Organism from "../organisms/organism";
 import WorldObject from "../worldObject";
 
 class Detection extends Behavior {
