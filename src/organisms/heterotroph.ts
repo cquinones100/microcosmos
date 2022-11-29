@@ -55,7 +55,7 @@ class HeteroTroph extends Organism {
       const energyFromPrey = Math.min(this.maxEnergy - this.energy, organism.energy);
 
       organism.setEnergy(organism.energy - energyFromPrey);
-      this.setEnergy(energyFromPrey);
+      this.setEnergy(this.energy + energyFromPrey);
 
       if (organism.energy <= 0) {
         organism.die();
