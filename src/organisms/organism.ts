@@ -11,13 +11,15 @@ export type OrganismProps = {
 } & WorldObjectProps;
 
 class Organism extends WorldObject {
+  public static color = 0xEFA8B1;
+
   energySource: OrganismProps["energySources"];
   geneticCode?: OrganismProps["geneticCode"];
   behaviors: Set<Behavior>;
   maxEnergy: number;
   energy: number;
   generation: number;
-  color: number = 0xEFA8B1;
+  color: number = Organism.color;
 
   constructor({ energySources = [], geneticCode, generation, x, y, color, ...args }: OrganismProps) {
     super(args);
@@ -28,8 +30,6 @@ class Organism extends WorldObject {
     this.maxEnergy = 100;
     this.energy = this.maxEnergy;
     this.generation = generation || 0;
-    this.shape.beginFill(color || this.color);
-    this.shape.endFill;
   }
 
   animate() {
@@ -70,15 +70,15 @@ class Organism extends WorldObject {
   }
 
   die() {
-    this.shape.clear()
-    this.shape.beginFill(0x663633);
-    this.shape.drawCircle(this.scene.center.x, this.scene.center.y, 10);
-    this.shape.endFill;
+    // this.shape.clear()
+    // this.shape.beginFill(0x663633);
+    // this.shape.drawCircle(this.scene.center.x, this.scene.center.y, 10);
+    // this.shape.endFill;
   }
 
   disappear() {
     this.scene.remove(this);
-    this.shape.destroy();
+    // this.shape.destroy();
   }
 
   act(behavior: Behavior) {
@@ -103,16 +103,7 @@ class Organism extends WorldObject {
   }
 
   duplicate(): Organism {
-    const { x, y } = this.getAbsolutePosition();
-    const { width: sceneWidth, height: sceneHeight } = this.scene.getBounds();
-
-    const organism = this.scene.createOrganism({ x: sceneWidth / 2 - 10, y: sceneHeight / 2 + 10 });
-    
-    organism.setPosition({ x: x - 10, y: y + 10 });
-    this.generation += 1;
-    organism.generation = this.generation;
-
-    return organism;
+    return this;
   }
 
   onHover() {

@@ -24,7 +24,7 @@ class Movement extends Behavior {
 
     this.defaultSpeed = speed || DEFAULT_SPEED;
     this.speed = speed || this.defaultSpeed;
-    this.xDirection = xDirection || 0;
+    this.xDirection = xDirection || 1;
     this.yDirection = yDirection || 0;
   }
 

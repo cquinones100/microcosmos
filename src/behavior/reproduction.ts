@@ -1,5 +1,6 @@
 import Behavior, { BehaviorProps } from "../behavior";
 import Gene from "../gene";
+import Organism from "../organisms/organism";
 import RealOrganism from "../realOrganism";
 
 class Reproduction extends Behavior {
