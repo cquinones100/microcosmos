@@ -50,6 +50,7 @@ class HeteroTroph extends Organism {
 
     if (organism.dead()) {
       this.setEnergy(organism.maxEnergy * 0.1)
+      organism.scene.container.removeChild(organism.text);
       this.scene.remove(organism);
     } else {
       const energyFromPrey = Math.min(this.maxEnergy - this.energy, organism.energy);
@@ -110,6 +111,8 @@ class HeteroTroph extends Organism {
   die() {
     this.shape.shape.zIndex = 0;
     this.shape.shape.tint = 0x663633; 
+
+    super.die();
   }
 }
 

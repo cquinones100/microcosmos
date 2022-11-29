@@ -93,11 +93,11 @@ class Organism extends WorldObject {
   }
 
   die() {
+    this.scene.container.removeChild(this.text);
   }
 
   disappear() {
     this.scene.remove(this);
-    // this.shape.destroy();
   }
 
   act(behavior: Behavior) {

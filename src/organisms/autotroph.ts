@@ -95,6 +95,7 @@ class Autotroph extends Organism {
 
   die() {
     this.scene.remove(this);
+    super.die();
   }
 }
 

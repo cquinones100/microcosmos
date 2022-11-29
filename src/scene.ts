@@ -175,6 +175,7 @@ class Scene {
   remove(organism: Organism) {
     this.allObjects.delete(organism);
     this.organisms.delete(organism);
+    this.container.removeChild(organism.shape.shape);
   }
 
   getBounds() {
