@@ -168,7 +168,6 @@ class Scene {
   }
 
   remove(organism: Organism) {
-    organism.shape.shape.destroy()
     this.allObjects.delete(organism);
     this.organisms.delete(organism);
   }

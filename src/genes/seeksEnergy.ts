@@ -1,3 +1,4 @@
+import { getDistance } from "geolib";
 import Behavior from "../behavior";
 import Detection from "../behavior/detection";
 import Movement from "../behavior/movement";
@@ -33,13 +34,30 @@ class SeeksEnergy extends Gene {
       }
     }
 
+    let closestDistance = Infinity;
+    let closestOrganism: Organism | undefined;
 
     this.detection.onDetect = (obj: WorldObject) => {
       if (!(obj instanceof Organism)) return;
 
       if (this.organism.canEat(obj)) {
         const { x: currX, y: currY } = obj.getPosition();
+        const { x: latitude, y: longitude } = this.organism.getPosition();
 
+        const distance = getDistance(
+          { latitude, longitude },
+          { latitude: currX, longitude: currY }
+        );
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestOrganism = obj;
+        }
+      }
+
+      if (!closestOrganism) return;
+
+      const { x: currX, y: currY } = closestOrganism.getPosition();
         if (this.organism.intersects(currX, currY)) {
           this.organism.consume(obj);
         } else {
