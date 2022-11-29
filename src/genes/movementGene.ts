@@ -25,28 +25,10 @@ class MovementGene extends Gene {
 
   mutate() {
     if (this.movement) {
-      const increaseOrDecrease = [1,-1][Math.round(Math.random())];
-      const magnitude = Math.random() * 2;
+      this.updateSpeed();
 
-      this.movement.speed -= Math.max(this.movement.speed * increaseOrDecrease * magnitude, 0);
-
-      this.movement.speed = Math.max(this.movement.speed, 5);
       this.movement.xDirection = Movement.randomDirectionValue();
       this.movement.yDirection = Movement.randomDirectionValue();
-
-      const iterator = this.organism.behaviors.values();
-
-      let current = iterator.next().value;
-
-      const isBehavior = (current: Behavior) => current instanceof Reproduction;
-
-      while (current && !(isBehavior(current))) {
-        current = iterator.next().value;
-      }
-
-      if (current) {
-        current.interval = current.interval / this.movement.speed;
-      }
     }
   }
 
@@ -56,6 +38,12 @@ class MovementGene extends Gene {
     gene.movement = this.movement.duplicate() || new Movement();
 
     return gene;
+  }
+
+  updateSpeed() {
+    const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
+
+    this.movement.speed += negatableRandom(1);
   }
 }
 
