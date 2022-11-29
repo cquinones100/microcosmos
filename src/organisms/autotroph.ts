@@ -72,7 +72,6 @@ class Autotroph extends Organism {
 
     const texture = TextureAutotroph.create({ scene, x: x + negatableRandom(10), y: y + negatableRandom(10) });
     const organism = Autotroph.create({ texture, scene })
-    organism.generation += 1;
 
     scene.organisms.add(organism);
 

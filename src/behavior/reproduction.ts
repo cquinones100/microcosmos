@@ -54,6 +54,7 @@ class Reproduction extends Behavior {
 
     organism.geneticCode.forEach(gene => gene.resolve());
     organism.geneticCode.forEach(conditionalMutation)
+    organism.generation = obj.generation + 1;
   }
 }
 
