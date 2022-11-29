@@ -43,16 +43,31 @@ class WorldObject {
 
         return obj.intersects(thisX!, thisY!);
       });
+    
+    let newX = x;
+    let newY = y;
 
-    this.shape.shape.position.x = x;
-    this.shape.shape.position.y = y;
-
-    if (this.shape.shape.position.x > sceneWidth) {
-      this.shape.shape.position.x -= sceneWidth + width + width;
+    if (newX > sceneWidth) {
+      newX = 0;
     }
 
-    if (this.shape.shape.position.y > sceneHeight) {
-      this.shape.shape.position.y -= sceneHeight + height + height;
+    if (newY > sceneHeight) {
+      newY = 0;
+    }
+
+    if (newX < 0) {
+      newX = sceneWidth;
+    }
+
+    if (newY < 0) {
+      newY = sceneHeight;
+    }
+
+    if (intersectingObject) {
+      this.onIntersection({ x: newX, y: newY }, intersectingObject, () => {});
+    } else {
+      this.shape.shape.position.x = newX;
+      this.shape.shape.position.y = newY;
     }
   }
 
@@ -73,18 +88,18 @@ class WorldObject {
   onHover() { }
 
   intersects(otherX: number, otherY: number) {
-    const { x, y } = this.screenBasedPosition();
+    const { x, y } = this.getPosition();
     const { width, height } = this.getDimensions();
 
-    return otherX > x - width
+    return otherX > x
       && otherX < x + width
-      && otherY > y - height
+      && otherY > y
       && otherY < y + height;
   }
 
   intersectsObject(obj: WorldObject) {
     if (obj === this) return;
-    const { x, y } = obj.screenBasedPosition();
+    const { x, y } = obj.getPosition();
 
     return this.intersects(x, y);
   }

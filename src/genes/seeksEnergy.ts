@@ -34,13 +34,12 @@ class SeeksEnergy extends Gene {
       }
     }
 
+
     this.detection.onDetect = (obj: WorldObject) => {
       if (!(obj instanceof Organism)) return;
 
-      if (!this.organism.scene.allObjects.has(obj)) return;
-
       if (this.organism.canEat(obj)) {
-        const { x: currX, y: currY } = obj.screenBasedPosition();
+        const { x: currX, y: currY } = obj.getPosition();
 
         if (this.organism.intersects(currX, currY)) {
           this.organism.consume(obj);

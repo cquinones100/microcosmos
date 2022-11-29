@@ -67,7 +67,7 @@ class Movement extends Behavior {
   }
 
   directTo({ organism, x, y }: { organism: RealOrganism, x: number, y: number }) {
-    const { x: objX, y: objY } = organism.screenBasedPosition();
+    const { x: objX, y: objY } = organism.getPosition();
 
     const dx = objX - x;
     const dy = objY - y;

@@ -1,29 +1,49 @@
 import Reproduces from "../genes/reproduces";
-import WorldObject, { WorldObjectProps } from "../worldObject";
-import { Circle, Rectangle } from "pixi.js";
+import WorldObject from "../worldObject";
 import Organism from "./organism";
 import { OrganismProps } from "../organisms/organism";
 import RealOrganism from "../realOrganism";
+import TextureAutotroph from "../textureAutotroph";
+import GeneticCode from "../geneticCode";
 
 export type Coords = {
   x: number;
   y: number;
 };
 
-type AutotrophType = OrganismProps;
+type AutotrophProps = {
+  texture: TextureAutotroph;
+}
+& Partial<Coords>
+& Pick<OrganismProps, "scene" | "generation" | "color">
+& Partial<Pick<OrganismProps, "geneticCode">>
 
 class Autotroph extends Organism {
-  constructor({ scene, shape, x = 0, y = 0, ...args }: AutotrophType) {
-    // shape.beginFill(0x50B959);
-    // shape.drawRoundedRect(scene.center.x, scene.center.y, 10, 10, 2);
-    // shape.interactive = true;
-    // shape.hitArea = new Circle(scene.center.x, scene.center.y, 10);
+  public static create({ texture, geneticCode, ...args }: AutotrophProps) {
+    const { x, y } = texture.getPosition();
 
-    super({ shape, scene, ...args, x, y });
+    const organism = new Autotroph({ x, y, shape: texture, ...args});
 
-    // this.setPosition({ x, y })
-    // this.maxEnergy = 100000
-    // this.energy = this.maxEnergy;
+    if (geneticCode) {
+      organism.geneticCode = geneticCode;
+    } else {
+      organism.geneticCode = new GeneticCode([
+        new Reproduces(organism),
+      ]);
+    }
+
+    organism.setPosition({ x, y });
+    organism.shape.shape.zIndex = 0;
+
+    return organism;
+  }
+
+  constructor({ x, y, ...args }: OrganismProps) {
+    super({ x, y, ...args });
+
+    if (x !== undefined && y !== undefined) {
+      this.setPosition({ x, y });
+    }
   }
 
   animate() {
@@ -32,7 +52,7 @@ class Autotroph extends Organism {
         gene.onMutateMaxCycles = (gene: Reproduces) => {}
         gene.onMutateIntervals = (gene: Reproduces) => {}
 
-        gene.behavior.interval = 1;
+        gene.behavior.interval = 5;
         gene.behavior.maxCycles = 1;
       }
     })
@@ -43,17 +63,19 @@ class Autotroph extends Organism {
   }
 
   duplicate() {
-    // const organism = this.scene.createAutotroph();
-    
-    // this.generation += 1;
-    // organism.generation = this.generation;
+    const { width, height } = this.shape.getDimensions();
+    const { renderTexture, scene } = this.shape;
+    const { x, y } = this.getPosition();
 
-    // const x = [-10, 0, 10][Math.round(Math.random() * 2)];
-    // const y = [-10, 0, 10][Math.round(Math.random() * 2)];
+    const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
 
-    // organism.setPosition({ x: this.getAbsolutePosition().x + x, y: this.getAbsolutePosition().y + y });
+    const texture = TextureAutotroph.create({ scene, x: x + negatableRandom(10), y: y + negatableRandom(10) });
+    const organism = Autotroph.create({ texture, scene })
+    organism.generation += 1;
 
-    return this;
+    scene.organisms.add(organism);
+
+    return organism;
   }
 
   canBeEatenBy(organism: Organism): boolean {
@@ -66,11 +88,13 @@ class Autotroph extends Organism {
     } else {
       const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
 
-      this.setPosition({ x: x + negatableRandom(20), y: y + negatableRandom(20) });
+      this.setPosition({ x: x + negatableRandom(10), y: y + negatableRandom(10) });
     }
   }
 
-  die() {}
+  die() {
+    this.scene.remove(this);
+  }
 }
 
 export default Autotroph;

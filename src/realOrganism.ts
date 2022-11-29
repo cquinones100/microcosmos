@@ -1,4 +1,3 @@
-import { Circle } from "pixi.js";
 import DetectionGene from "./genes/detectionGene";
 import MovementGene from "./genes/movementGene";
 import Reproduces from "./genes/reproduces";
@@ -26,13 +25,13 @@ class RealOrganism extends Organism {
       organism.geneticCode = geneticCode;
     } else {
       organism.geneticCode = new GeneticCode([
-        new DetectionGene(organism),
         new Reproduces(organism),
         new MovementGene(organism),
         new SeeksEnergy(organism),
       ]);
     }
 
+    organism.shape.shape.zIndex = 1;
     return organism;
   }
 
@@ -47,18 +46,19 @@ class RealOrganism extends Organism {
   consume(organism: Organism) {
     this.scene.predators.add(this);
     this.scene.prey.add(organism);
-    const energyFromPrey = 
-      organism.dead()
-      ? organism.maxEnergy * 0.1 
-      : Math.min(this.maxEnergy - this.energy, organism.energy);
 
-    organism.setEnergy(organism.energy - energyFromPrey);
+    if (organism.dead()) {
+      this.setEnergy(organism.maxEnergy * 0.1)
+      this.scene.remove(organism);
+    } else {
+      const energyFromPrey = Math.min(this.maxEnergy - this.energy, organism.energy);
 
-    this.setEnergy(energyFromPrey);
+      organism.setEnergy(organism.energy - energyFromPrey);
+      this.setEnergy(energyFromPrey);
 
-    if (organism.energy <= 0) {
-      organism.die();
-      organism.disappear();
+      if (organism.energy <= 0) {
+        organism.die();
+      }
     }
   }
 
@@ -71,8 +71,8 @@ class RealOrganism extends Organism {
       ignoreIntersection();
     } else {
       const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
-
-      this.setPosition({ x: x + negatableRandom(5), y: y + negatableRandom(5) });
+      this.shape.shape.position.x = negatableRandom(x + this.getDimensions().width);
+      this.shape.shape.position.x = negatableRandom(y + this.getDimensions().height);
     }
   }
 
@@ -87,6 +87,11 @@ class RealOrganism extends Organism {
     scene.organisms.add(organism);
 
     return organism;
+  }
+
+  die() {
+    this.shape.shape.zIndex = 0;
+    this.shape.shape.tint = 0x663633; 
   }
 }
 

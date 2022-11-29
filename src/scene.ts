@@ -5,6 +5,8 @@ import WorldObject from "./worldObject";
 import Organism from "./organisms/organism";
 import { Application, Container } from "pixi.js";
 import TextureOrganism from "./textureOrganism";
+import TextureAutotroph from "./textureAutotroph";
+import Autotroph from "./organisms/autotroph";
 
 export const MUTATION_FACTOR = 1;
 
@@ -24,6 +26,7 @@ class Scene {
   onAnimates: (() => void)[];
   timePassed: number;
   container: PIXI.Container<PIXI.DisplayObject>;
+  stop: boolean;
 
   constructor() {
     this.organisms = new Set<Organism>();
@@ -47,6 +50,8 @@ class Scene {
       resolution: window.devicePixelRatio
     });
     this.center = { x: this.app.screen.width / 2, y: this.app.screen.height / 2 };
+    this.stop = false;
+    this.container.sortableChildren = true;
   }
 
   draw() {
@@ -59,21 +64,66 @@ class Scene {
     document.body.appendChild(app.view as unknown as Node);
 
     this.createOrganism();
+    this.createAutotroph();
+    this.createAutotroph();
+    this.createAutotroph();
+    this.createAutotroph();
 
     app.stage.addChild(this.container);
 
-    this.container.interactive = true;
-    this.container.on("click", () => {
-      this.createOrganism()
-    });
+    document.addEventListener("keydown", ({ key }) => {
+      if (key === ' ') {
+        this.stop = !this.stop;
+
+        console.log("Number of objects: ", this.allObjects.size);
+        console.log("Number of Heterotrophs: ", Array.from(this.allObjects).filter(org => org instanceof RealOrganism).length);
+        console.log(
+          "Generations of Heterotrophs: ",
+          (Array.from(this.allObjects) as RealOrganism[])
+            .filter(org => org instanceof RealOrganism)
+            .sort((a: RealOrganism, b: RealOrganism) => {
+              if (a.generation < b.generation) {
+                return - 1;
+              }
+
+              if (a.generation > b.generation) {
+                return 1;
+              }
+
+              return 0;
+            })[0].generation + 1
+        );
+        console.log("Number of Autotrophs: ", Array.from(this.allObjects).filter(org => org instanceof Autotroph).length);
+        console.log(
+          "Generations of Autotrophs: ",
+          (Array.from(this.allObjects) as Autotroph[])
+            .filter(org => org instanceof Autotroph)
+            .sort((a: Autotroph, b: Autotroph) => {
+              if (a.generation < b.generation) {
+                return -1;
+              }
+
+              if (a.generation > b.generation) {
+                return 1;
+              }
+
+              return 0;
+            })[0].generation + 1
+        );
+      }
+    })
 
     app.ticker.add((timePassed: number) => {
       stats.begin();
-      this.timePassed = timePassed;
 
-      console.log(this.organisms.size);
-      this.organisms.forEach(organism => organism.animate());
+      if (!this.stop) {
+        this.timePassed = timePassed;
 
+        this.allObjects = this.organisms;
+
+        this.organisms.forEach(organism => organism.animate());
+
+      }
       app.render();
       stats.end();
     })
@@ -86,9 +136,21 @@ class Scene {
     : { x?: number, y?: number, color?: number }
     = {}
   ) {
-    const texture = TextureOrganism.create({ scene: this })
+    const texture = TextureOrganism.create({ scene: this, x: Math.random() * this.app.screen.width, y: Math.random() * this.app.screen.height })
 
     const organism = RealOrganism.create({ texture, scene: this })
+
+    this.organisms.add(organism);
+
+    return organism;
+  }
+
+  createAutotroph() {
+    const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
+
+    const texture = TextureAutotroph.create({ scene: this, x: Math.random() * this.app.screen.width, y: Math.random() * this.app.screen.height })
+
+    const organism = Autotroph.create({ texture, scene: this })
 
     this.organisms.add(organism);
 
@@ -105,7 +167,9 @@ class Scene {
   }
 
   remove(organism: Organism) {
+    organism.shape.shape.destroy()
     this.allObjects.delete(organism);
+    this.organisms.delete(organism);
   }
 
   getBounds() {
