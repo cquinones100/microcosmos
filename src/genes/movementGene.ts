@@ -43,7 +43,8 @@ class MovementGene extends Gene {
   updateSpeed() {
     const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
 
-    this.movement.speed += negatableRandom(1);
+    this.movement.defaultSpeed += negatableRandom(1);
+    this.movement.defaultSpeed = this.movement.defaultSpeed;
   }
 }
 
