@@ -2,6 +2,7 @@ import Behavior from "../behavior";
 import Detection from "../behavior/detection";
 import Movement from "../behavior/movement";
 import Gene from "../gene";
+import Organism from "../organisms/organism";
 import RealOrganism from "../realOrganism";
 import WorldObject from "../worldObject";
 
@@ -15,7 +16,7 @@ class SeeksEnergy extends Gene {
   }
 
   animate() {
-    this.resolve();
+    this.organism.scene.measure('seeking energy', this.resolve.bind(this));
   }
 
   resolve() {
@@ -34,7 +35,7 @@ class SeeksEnergy extends Gene {
     }
 
     this.detection.onDetect = (obj: WorldObject) => {
-      if (!(obj instanceof RealOrganism)) return;
+      if (!(obj instanceof Organism)) return;
 
       if (!this.organism.scene.allObjects.has(obj)) return;
 

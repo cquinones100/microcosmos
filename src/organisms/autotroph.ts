@@ -1,8 +1,9 @@
 import Reproduces from "../genes/reproduces";
-import { WorldObjectProps } from "../worldObject";
-import { Rectangle } from "pixi.js";
+import WorldObject, { WorldObjectProps } from "../worldObject";
+import { Circle, Rectangle } from "pixi.js";
 import Organism from "./organism";
 import { OrganismProps } from "../organisms/organism";
+import RealOrganism from "../realOrganism";
 
 export type Coords = {
   x: number;
@@ -16,14 +17,12 @@ class Autotroph extends Organism {
     shape.beginFill(0x00FF00);
     shape.drawRoundedRect(scene.center.x, scene.center.y, 10, 10, 2);
     shape.interactive = true;
-    shape.hitArea = new Rectangle(scene.center.x, scene.center.y, 10);
+    shape.hitArea = new Circle(scene.center.x, scene.center.y, 10);
 
     super({ shape, scene, ...args });
 
-    console.log(x,y)
-
     this.setPosition({ x, y })
-    this.maxEnergy = 10000;
+    this.maxEnergy = 100000
     this.energy = this.maxEnergy;
   }
 
@@ -31,7 +30,9 @@ class Autotroph extends Organism {
     this.geneticCode?.forEach(gene => {
       if (gene instanceof Reproduces) {
         gene.onMutateMaxCycles = (gene: Reproduces) => {}
-        gene.behavior.interval = 5;
+        gene.onMutateIntervals = (gene: Reproduces) => {}
+
+        gene.behavior.interval = 1;
         gene.behavior.maxCycles = 1;
       }
     })
@@ -47,8 +48,8 @@ class Autotroph extends Organism {
     this.generation += 1;
     organism.generation = this.generation;
 
-    const x = [-5, 0, 5][Math.round(Math.random() * 2)];
-    const y = [-5, 0, 5][Math.round(Math.random() * 2)];
+    const x = [-10, 0, 10][Math.round(Math.random() * 2)];
+    const y = [-10, 0, 10][Math.round(Math.random() * 2)];
 
     organism.setPosition({ x: this.getAbsolutePosition().x + x, y: this.getAbsolutePosition().y + y });
 
@@ -59,8 +60,14 @@ class Autotroph extends Organism {
     return true;
   }
 
-  onIntersection({ x, y }: Coords, runAnyway: () => void): void {
-    runAnyway();
+  onIntersection({ x, y }: Coords, intersectionObject: WorldObject, runAnyway: () => void): void {
+    if (intersectionObject instanceof Organism && this.canBeEatenBy(intersectionObject)) {
+      runAnyway();
+    } else {
+      const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
+
+      this.setPosition({ x: x + negatableRandom(20), y: y + negatableRandom(20) });
+    }
   }
 }
 

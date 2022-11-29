@@ -26,7 +26,7 @@ class MovementGene extends Gene {
   mutate() {
     if (this.movement) {
       const increaseOrDecrease = [1,-1][Math.round(Math.random())];
-      const magnitude = Math.random() * 10;
+      const magnitude = Math.random() * 2;
 
       this.movement.speed -= Math.max(this.movement.speed * increaseOrDecrease * magnitude, 0);
 

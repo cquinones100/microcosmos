@@ -7,7 +7,6 @@ import RealOrganism from "./realOrganism";
 import Stats from 'stats.js'
 import DetectionGene from "./genes/detectionGene";
 import Autotroph, { Coords } from "./organisms/autotroph";
-import { Circle } from "pixi.js";
 import WorldObject from "./worldObject";
 import Movement from "./behavior/movement";
 import Organism from "./organisms/organism";
@@ -55,7 +54,8 @@ class Scene {
       if (event.key === " ") this.paused = !this.paused;
     });
 
-    // this.createOrganism();
+    this.createOrganism();
+    this.createAutotroph();
     this.createAutotroph();
 
     let organismsCount = this.organisms.size;
@@ -71,6 +71,8 @@ class Scene {
         })
 
         this.organisms.forEach(organism => organism.animate());
+
+        console.log(`MEASUREMENT: Number of organisms: ${Array.from(this.organisms).filter(org => org.energy > 0).length}`);
 
         Object.keys(this.measurements).forEach(measurement => {
           console.log(`MEASUREMENT: Number of organisms: ${Array.from(this.organisms).filter(org => org.energy > 0).length}, ${measurement} time: ${this.measurements[measurement]}`);
@@ -91,13 +93,19 @@ class Scene {
 
     const scene = this;
 
-    const organism = new RealOrganism({ x, y, shape, scene });
+    const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
+    const organism = new RealOrganism({
+      x: x || negatableRandom(this.app.screen.width / 2),
+      y: y || negatableRandom(this.app.screen.height / 2),
+      shape,
+      scene
+    });
 
     organism.geneticCode = new GeneticCode([
       new MovementGene(organism),
-      // new DetectionGene(organism),
-      // new SeeksEnergy(organism),
-      // new Reproduces(organism),
+      new DetectionGene(organism),
+      new SeeksEnergy(organism),
+      new Reproduces(organism),
     ])
 
     this.add(organism);
@@ -106,9 +114,11 @@ class Scene {
   }
 
   createAutotroph({ x, y }: Partial<Coords> = {}) {
+    const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
+
     const organism = new Autotroph({
-      x: x || 100,
-      y: y || -200,
+      x: x || negatableRandom(100),
+      y: y || negatableRandom(200),
       scene: this,
       shape: new PIXI.Graphics(),
     });

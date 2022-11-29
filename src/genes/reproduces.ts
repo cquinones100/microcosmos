@@ -6,6 +6,7 @@ class Reproduces extends Gene {
   reproduction: Reproduction;
   behavior: Reproduction;
   onMutateMaxCycles: (gene: Reproduces) => void;
+  onMutateIntervals: (gene: Reproduces) => void;
 
   constructor(organism: Organism) {
     super(organism);
@@ -13,9 +14,15 @@ class Reproduces extends Gene {
     this.reproduction = new Reproduction();
     this.behavior = this.reproduction; 
     this.onMutateMaxCycles = (gene: Reproduces) => {
-      const magnitude = Math.round(Math.random() * 50);
+      const magnitude = Math.round(Math.random() * 10);
 
       gene.reproduction.maxCycles = magnitude;
+    }
+
+    this.onMutateIntervals = (gene: Reproduces) => {
+      const intervalMagnitude = Math.round(Math.random() * 100);
+
+      this.reproduction.interval = intervalMagnitude;
     }
   }
 
@@ -42,9 +49,7 @@ class Reproduces extends Gene {
   }
 
   private mutateIntervals() {
-    const intervalMagnitude = Math.round(Math.random() * 100);
-
-    this.reproduction.interval = intervalMagnitude;
+    this.onMutateMaxCycles(this);
   }
 }
 

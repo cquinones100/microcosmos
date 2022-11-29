@@ -1,6 +1,7 @@
 import { Circle } from "pixi.js";
 import { Coords } from "./organisms/autotroph";
 import Organism, { OrganismProps } from "./organisms/organism";
+import WorldObject from "./worldObject";
 
 class RealOrganism extends Organism {
   constructor({ x, y, ...args }: OrganismProps) {
@@ -18,7 +19,10 @@ class RealOrganism extends Organism {
   consume(organism: Organism) {
     this.scene.predators.add(this);
     this.scene.prey.add(organism);
-    const energyFromPrey = Math.min(this.maxEnergy - this.energy, organism.energy);
+    const energyFromPrey = 
+      organism.dead()
+      ? organism.maxEnergy * 0.1 
+      : Math.min(this.maxEnergy - this.energy, organism.energy);
 
     organism.setEnergy(organism.energy - energyFromPrey);
 
@@ -31,11 +35,17 @@ class RealOrganism extends Organism {
   }
 
   canBeEatenBy(organism: RealOrganism) {
-    return false;
+    return this.dead();
   }
 
-  onIntersection({ x, y }: Coords, callback: () => void): void {
-    this.setPosition({ x: x - 10, y: y -10 });
+  onIntersection({ x, y }: Coords, intersectionObject: WorldObject, ignoreIntersection: () => void): void {
+    if (intersectionObject instanceof Organism && this.canEat(intersectionObject)) {
+      ignoreIntersection();
+    } else {
+      const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
+
+      this.setPosition({ x: x + negatableRandom(5), y: y + negatableRandom(5) });
+    }
   }
 }
 

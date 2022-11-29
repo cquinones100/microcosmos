@@ -90,7 +90,7 @@ class Organism extends WorldObject {
     return organism.canBeEatenBy(this);
   }
   canBeEatenBy<Organism>(arg0: this) {
-    throw new Error("Method not implemented.");
+    return false;
   }
 
   setEnergy(value: number) {
@@ -115,6 +115,10 @@ class Organism extends WorldObject {
   }
 
   consume(organism: Organism) {}
+
+  dead() {
+    return this.energy <= 0;
+  }
 }
 
 export default Organism;

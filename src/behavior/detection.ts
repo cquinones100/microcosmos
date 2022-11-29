@@ -34,9 +34,7 @@ class Detection extends Behavior {
       objs.forEach(this.onDetect);
     }
 
-    call();
-
-    organism.scene.measure('detect', call);
+    organism.scene.measure('detection', call)
   }
 
   getOrganismRadius(organism: Organism) {

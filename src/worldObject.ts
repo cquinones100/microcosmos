@@ -29,6 +29,7 @@ class WorldObject {
     this.color = color || 0xff0000;
     this.bounds = this.shape.getBounds();
     this.startingPosition = this.shape.position;
+    shape.interactive = true;
 
     this.shape.on('mouseover', this.onHover.bind(this));
   }
@@ -75,14 +76,14 @@ class WorldObject {
       coordinates[absoluteX][absoluteY] ||= new Set<WorldObject>();
 
       if (coordinates[prevAbsoluteX]) {
-       coordinates[prevAbsoluteX][prevAbsoluteY]?.delete(this);
+        coordinates[prevAbsoluteX][prevAbsoluteY]?.delete(this);
       }
 
       this.scene.coordinates[absoluteX][absoluteY].add(this);
     };
 
     if (intersectingObject) {
-      this.onIntersection({ x: newX, y: newY }, callback);
+      this.onIntersection({ x: newX, y: newY }, intersectingObject, callback);
     } else {
       callback();
     }
@@ -102,16 +103,16 @@ class WorldObject {
     return { width, height };
   }
 
-  onHover() {}
+  onHover() { }
 
   intersects(otherX: number, otherY: number) {
     const { x, y } = this.screenBasedPosition();
     const { width, height } = this.getDimensions();
 
     return otherX > x - width
-        && otherX < x + width
-        && otherY > y - height
-        && otherY < y + height;
+      && otherX < x + width
+      && otherY > y - height
+      && otherY < y + height;
   }
 
   intersectsObject(obj: WorldObject) {
@@ -126,7 +127,7 @@ class WorldObject {
       .screenBasedPosition({ ...this.getAbsolutePosition(), scene: this.scene });
   }
 
-  onIntersection({ x, y }: Coords, cb: () => void) {}
+  onIntersection({ x, y }: Coords, intersectionObject: WorldObject, cb: () => void) { }
 }
 
 export default WorldObject;
