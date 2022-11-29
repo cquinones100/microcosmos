@@ -1,3 +1,4 @@
+import { Text } from "pixi.js";
 import Behavior from "../behavior";
 import Movement from "../behavior/movement";
 import GeneticCode from "../geneticCode";
@@ -19,6 +20,7 @@ class Organism extends WorldObject {
   energy: number;
   generation: number;
   color: number = Organism.color;
+  text: Text;
 
   constructor({ energySources = [], geneticCode, generation, x, y, color, ...args }: OrganismProps) {
     super({ x, y, ...args });
@@ -34,6 +36,21 @@ class Organism extends WorldObject {
     this.shape.shape.on("click", () => {
       console.log(this);
     })
+
+    this.text = new Text("", {
+      fill: "white",
+      fontWeight: "bold",
+      fontSize: 8
+    });
+
+    this.text.position.set(x, y);
+    this.text.zIndex = 2;
+
+    this.scene.container.addChild(this.text);
+  }
+
+  updateEnergyText() {
+    this.text.text = `${Math.round(this.energy)} / ${this.maxEnergy}`;
   }
 
   animate() {
@@ -43,6 +60,8 @@ class Organism extends WorldObject {
 
       return;
     }
+
+    this.updateEnergyText();
 
     this.geneticCode!.animate();
 
@@ -118,6 +137,12 @@ class Organism extends WorldObject {
 
   movement() {
     return Array.from(this.behaviors).find((behavior) => behavior instanceof Movement) as Movement | undefined;
+  }
+
+  setPosition({ x, y }: { x: number; y: number; }): void {
+    super.setPosition({ x, y });
+
+    this.text.position.set(x + 3, y + this.getDimensions().height / 2 - 3);
   }
 }
 

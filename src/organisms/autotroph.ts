@@ -45,6 +45,8 @@ class Autotroph extends Organism {
     }
   }
 
+  updateEnergyText(): void {}
+
   animate() {
     this.geneticCode?.forEach(gene => {
       if (gene instanceof Reproduces) {
