@@ -14,7 +14,7 @@ type AutotrophType = OrganismProps;
 
 class Autotroph extends Organism {
   constructor({ scene, shape, x = 0, y = 0, ...args }: AutotrophType) {
-    shape.beginFill(0x00FF00);
+    shape.beginFill(0x50B959);
     shape.drawRoundedRect(scene.center.x, scene.center.y, 10, 10, 2);
     shape.interactive = true;
     shape.hitArea = new Circle(scene.center.x, scene.center.y, 10);
@@ -69,6 +69,8 @@ class Autotroph extends Organism {
       this.setPosition({ x: x + negatableRandom(20), y: y + negatableRandom(20) });
     }
   }
+
+  die() {}
 }
 
 export default Autotroph;

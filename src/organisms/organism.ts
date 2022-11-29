@@ -17,7 +17,7 @@ class Organism extends WorldObject {
   maxEnergy: number;
   energy: number;
   generation: number;
-  color: number = 0xff0000;
+  color: number = 0xEFA8B1;
 
   constructor({ energySources = [], geneticCode, generation, x, y, color, ...args }: OrganismProps) {
     super(args);
@@ -29,11 +29,13 @@ class Organism extends WorldObject {
     this.energy = this.maxEnergy;
     this.generation = generation || 0;
     this.shape.beginFill(color || this.color);
+    this.shape.endFill;
   }
 
   animate() {
     if (this.energy <= 0) {
       this.scene.naturalDeaths.add(this);
+      this.die();
 
       return;
     }
@@ -68,7 +70,10 @@ class Organism extends WorldObject {
   }
 
   die() {
-    this.scene.killOrganism(this);
+    this.shape.clear()
+    this.shape.beginFill(0x663633);
+    this.shape.drawCircle(this.scene.center.x, this.scene.center.y, 10);
+    this.shape.endFill;
   }
 
   disappear() {

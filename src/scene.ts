@@ -72,10 +72,10 @@ class Scene {
 
         this.organisms.forEach(organism => organism.animate());
 
-        console.log(`MEASUREMENT: Number of organisms: ${Array.from(this.organisms).filter(org => org.energy > 0).length}`);
+        const numOrganisms = Array.from(this.organisms).filter(org => org.energy > 0).length;
 
         Object.keys(this.measurements).forEach(measurement => {
-          console.log(`MEASUREMENT: Number of organisms: ${Array.from(this.organisms).filter(org => org.energy > 0).length}, ${measurement} time: ${this.measurements[measurement]}`);
+          console.log(`MEASUREMENT: Number of organisms: ${numOrganisms}, ${measurement} time: ${this.measurements[measurement]}`);
         })
       }
 
