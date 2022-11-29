@@ -1,12 +1,43 @@
 import { Circle } from "pixi.js";
+import DetectionGene from "./genes/detectionGene";
+import MovementGene from "./genes/movementGene";
+import Reproduces from "./genes/reproduces";
+import SeeksEnergy from "./genes/seeksEnergy";
+import GeneticCode from "./geneticCode";
 import { Coords } from "./organisms/autotroph";
 import Organism, { OrganismProps } from "./organisms/organism";
 import TextureOrganism from "./textureOrganism";
 import WorldObject from "./worldObject";
 
+type RealOrganismProps = {
+  texture: TextureOrganism;
+}
+& Partial<Coords>
+& Pick<OrganismProps, "scene" | "generation" | "color">
+& Partial<Pick<OrganismProps, "geneticCode">>
+
 class RealOrganism extends Organism {
+  public static create({ texture, geneticCode, ...args }: RealOrganismProps) {
+    const { x, y } = texture.getPosition();
+
+    const organism = new RealOrganism({ x, y, shape: texture, ...args});
+
+    if (geneticCode) {
+      organism.geneticCode = geneticCode;
+    } else {
+      organism.geneticCode = new GeneticCode([
+        new DetectionGene(organism),
+        new Reproduces(organism),
+        new MovementGene(organism),
+        new SeeksEnergy(organism),
+      ]);
+    }
+
+    return organism;
+  }
+
   constructor({ x, y, ...args }: OrganismProps) {
-    super(args);
+    super({ x, y, ...args });
 
     if (x !== undefined && y !== undefined) {
       this.setPosition({ x, y });
@@ -46,15 +77,16 @@ class RealOrganism extends Organism {
   }
 
   duplicate(): Organism {
-    const { renderTexture, width, height, scene } = this.shape;
+    const { width, height } = this.shape.getDimensions();
+    const { renderTexture, scene } = this.shape;
     const { x, y } = this.shape.shape.position;
 
-    const textureOrg = new TextureOrganism({ renderTexture, width, height, scene, x: x! - width, y: y! - width });
+    const texture = TextureOrganism.create({ scene, x: x! - width, y: y! - height });
+    const organism = RealOrganism.create({ texture, scene })
 
-    this.setPosition({ x: x - 10, y: y + 10 });
-    scene.organisms.add(textureOrg as unknown as Organism);
+    scene.organisms.add(organism);
 
-    return this;
+    return organism;
   }
 }
 

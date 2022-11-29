@@ -1,4 +1,3 @@
-import { BitmapFontData, DisplayObject, Graphics } from "pixi.js";
 import { Coords } from "./organisms/autotroph";
 import Scene from "./scene";
 import TextureOrganism from "./textureOrganism";
@@ -7,12 +6,16 @@ export type WorldObjectProps = {
   scene: Scene;
   shape: TextureOrganism;
   color?: number;
+  x: number;
+  y: number;
 }
 
 class WorldObject {
   scene: Scene;
   color?: number;
   shape: TextureOrganism;
+  x: number = 0;
+  y: number = 0;
 
   public static screenBasedPosition({ x, y, scene }: { x: number; y: number; scene: Scene }) {
     const { width, height } = scene.app.screen;
@@ -22,75 +25,35 @@ class WorldObject {
     return { x: newX, y: newY };
   }
 
-  constructor({ shape, scene, color }: WorldObjectProps) {
+  constructor({ shape, scene, color, x, y }: WorldObjectProps) {
     this.scene = scene;
     this.shape = shape;
   }
 
   setPosition({ x, y }: { x: number, y: number }) {
-    // const { x: thisX, y: thisY } = this.shape;
-    // const { width: sceneWidth, height: sceneHeight } = this.scene.getBounds();
-    // const { coordinates } = this.scene;
+    const { x: thisX, y: thisY } = this.getPosition();
+    const { scene } = this.shape;
+    const { width, height } = this.shape.getDimensions();
+    const { width: sceneWidth, height: sceneHeight } = scene.getDimensions();
 
-    // const withinBounds = (originalCoord: number, targetCoord: number, boundary: number) => {
-    //   if (targetCoord < boundary / 2 * -1) {
-    //     return targetCoord + boundary;
-    //   } else if (targetCoord > boundary / 2) {
-    //     return targetCoord - boundary;
-    //   } else {
-    //     return targetCoord;
-    //   }
-    // }
+    const intersectingObject = Array
+      .from(this.scene.allObjects)
+      .find(obj => {
+        if (obj === this) return false;
 
-    // const newX = withinBounds(thisX!, x, sceneWidth);
-    // const newY = withinBounds(thisY!, y, sceneHeight);
+        return obj.intersects(thisX!, thisY!);
+      });
 
-    // const intersectingObject = Array
-    //   .from(this.scene.allObjects)
-    //   .find(obj => {
-    //     if (obj === this) return false;
-
-    //     const { x, y } = WorldObject.screenBasedPosition({ x: newX, y: newY, scene: this.scene });
-
-    //     return obj.intersects(x, y);
-    //   });
-
-    // const callback = () => {
-    //   this.shape.x = newX;
-    //   this.shape.y = newY;
-
-    //   const prevAbsoluteX = sceneWidth / 2 + thisX!;
-    //   const prevAbsoluteY = sceneHeight / 2 + thisY!;
-
-    //   const absoluteX = (sceneWidth / 2 + this.shape.x);
-    //   const absoluteY = (sceneHeight / 2 + this.shape.y);
-
-    //   coordinates[absoluteX] ||= [];
-    //   coordinates[absoluteX][absoluteY] ||= new Set<WorldObject>();
-
-    //   if (coordinates[prevAbsoluteX]) {
-    //     coordinates[prevAbsoluteX][prevAbsoluteY]?.delete(this);
-    //   }
-
-    //   this.scene.coordinates[absoluteX][absoluteY].add(this);
-    // };
-
-    // if (intersectingObject) {
-    // this.onIntersection({ x: newX, y: newY }, intersectingObject, callback);
-    // } else {
-    const { width, height, scene } = this.shape
     this.shape.shape.position.x = x;
     this.shape.shape.position.y = y;
 
-    if (this.shape.shape.position.x > scene.app.screen.width + width) {
-      this.shape.shape.position.x -= scene.app.screen.width + width + width;
+    if (this.shape.shape.position.x > sceneWidth) {
+      this.shape.shape.position.x -= sceneWidth + width + width;
     }
 
-    if (this.shape.shape.position.y > scene.app.screen.height + height) {
-      this.shape.shape.position.y -= scene.app.screen.height + height + height;
+    if (this.shape.shape.position.y > sceneHeight) {
+      this.shape.shape.position.y -= sceneHeight + height + height;
     }
-    // callback();
-    // }
   }
 
   getPosition() {
@@ -102,7 +65,7 @@ class WorldObject {
   }
 
   getDimensions() {
-    const { width, height } = this.shape;
+    const { width, height } = this.shape.getDimensions();
 
     return { width, height };
   }

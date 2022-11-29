@@ -31,6 +31,8 @@ class MovementGene extends Gene {
       this.movement.speed -= Math.max(this.movement.speed * increaseOrDecrease * magnitude, 0);
 
       this.movement.speed = Math.max(this.movement.speed, 5);
+      this.movement.xDirection = Movement.randomDirectionValue();
+      this.movement.yDirection = Movement.randomDirectionValue();
 
       const iterator = this.organism.behaviors.values();
 

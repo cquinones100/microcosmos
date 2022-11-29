@@ -1,7 +1,7 @@
 import Behavior, { BehaviorProps } from "../behavior";
 import RealOrganism from "../realOrganism";
 
-const DEFAULT_SPEED = 1;
+const DEFAULT_SPEED = 5;
 
 type MovementProps = {
   speed?: number,
@@ -12,6 +12,12 @@ type MovementProps = {
 }
 
 class Movement extends Behavior {
+  public static randomDirectionValue() {
+    const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
+
+    return negatableRandom(1);
+  }
+
   speed: number;
   defaultSpeed: number;
   xDirection: MovementProps["xDirection"];
@@ -24,7 +30,7 @@ class Movement extends Behavior {
 
     this.defaultSpeed = speed || DEFAULT_SPEED;
     this.speed = speed || this.defaultSpeed;
-    this.xDirection = xDirection || 1;
+    this.xDirection = xDirection || 0;
     this.yDirection = yDirection || 0;
   }
 

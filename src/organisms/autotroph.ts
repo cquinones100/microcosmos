@@ -14,16 +14,16 @@ type AutotrophType = OrganismProps;
 
 class Autotroph extends Organism {
   constructor({ scene, shape, x = 0, y = 0, ...args }: AutotrophType) {
-    shape.beginFill(0x50B959);
-    shape.drawRoundedRect(scene.center.x, scene.center.y, 10, 10, 2);
-    shape.interactive = true;
-    shape.hitArea = new Circle(scene.center.x, scene.center.y, 10);
+    // shape.beginFill(0x50B959);
+    // shape.drawRoundedRect(scene.center.x, scene.center.y, 10, 10, 2);
+    // shape.interactive = true;
+    // shape.hitArea = new Circle(scene.center.x, scene.center.y, 10);
 
-    super({ shape, scene, ...args });
+    super({ shape, scene, ...args, x, y });
 
-    this.setPosition({ x, y })
-    this.maxEnergy = 100000
-    this.energy = this.maxEnergy;
+    // this.setPosition({ x, y })
+    // this.maxEnergy = 100000
+    // this.energy = this.maxEnergy;
   }
 
   animate() {
@@ -43,17 +43,17 @@ class Autotroph extends Organism {
   }
 
   duplicate() {
-    const organism = this.scene.createAutotroph();
+    // const organism = this.scene.createAutotroph();
     
-    this.generation += 1;
-    organism.generation = this.generation;
+    // this.generation += 1;
+    // organism.generation = this.generation;
 
-    const x = [-10, 0, 10][Math.round(Math.random() * 2)];
-    const y = [-10, 0, 10][Math.round(Math.random() * 2)];
+    // const x = [-10, 0, 10][Math.round(Math.random() * 2)];
+    // const y = [-10, 0, 10][Math.round(Math.random() * 2)];
 
-    organism.setPosition({ x: this.getAbsolutePosition().x + x, y: this.getAbsolutePosition().y + y });
+    // organism.setPosition({ x: this.getAbsolutePosition().x + x, y: this.getAbsolutePosition().y + y });
 
-    return organism;
+    return this;
   }
 
   canBeEatenBy(organism: Organism): boolean {

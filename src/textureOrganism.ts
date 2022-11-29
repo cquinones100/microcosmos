@@ -1,9 +1,5 @@
-import { RenderTexture, Sprite } from "pixi.js"
-import MovementGene from "./genes/movementGene";
-import Reproduces from "./genes/reproduces";
-import GeneticCode from "./geneticCode";
+import { Graphics, Matrix, MSAA_QUALITY, Renderer, RenderTexture, Sprite } from "pixi.js"
 import { Coords } from "./organisms/autotroph";
-import RealOrganism from "./realOrganism";
 import Scene from "./scene";
 
 type TextureOrganismProps = {
@@ -11,55 +7,59 @@ type TextureOrganismProps = {
   scene: Scene;
   width: number;
   height: number;
-} & Partial<Coords>
+} & Partial<Coords>;
 
 class TextureOrganism {
+  static renderTexture: RenderTexture;
+  static templateShape: Graphics;
+  public static create({ scene, x, y }: { scene: Scene } & Partial<Coords>) {
+    const { app } = scene;
+
+    const templateShape = new Graphics()
+      .beginFill(0xffffff)
+      .lineStyle({ width: 1, color: 0x333333, alignment: 0 })
+      .drawCircle(0, 0, 20);
+
+    const { width, height } = templateShape;
+
+    // Draw the circle to the RenderTexture
+    this.renderTexture ||= RenderTexture.create({
+      width,
+      height,
+      multisample: MSAA_QUALITY.HIGH,
+      resolution: window.devicePixelRatio
+    });
+
+    const { renderTexture } = this;
+
+    // With the existing renderer, render texture
+    // make sure to apply a transform Matrix
+    app.renderer.render(templateShape, {
+      renderTexture,
+      transform: new Matrix(1, 0, 0, 1, width / 2, height / 2)
+    });
+
+    // Required for MSAA, WebGL 2 only
+    (app.renderer as Renderer).framebuffer.blit();
+
+    // Discard the original Graphics
+    templateShape.destroy(true);
+
+    return new TextureOrganism({ scene, width, height, renderTexture, x, y });
+  }
+
   renderTexture: RenderTexture;
   shape: Sprite;
-  speed: number;
   scene: Scene;
-  width: number;
-  height: number;
-  organism: RealOrganism;
-  x: number | undefined;
-  y: number | undefined;
 
-  constructor({ renderTexture, scene, x, y, width, height }: TextureOrganismProps) {
+  constructor({ renderTexture, scene, x, y }: TextureOrganismProps) {
     this.shape = new Sprite(renderTexture);
     this.renderTexture = renderTexture;
-    this.speed = 1;
     this.scene = scene;
     this.shape.position.x = x || this.scene.app.screen.width / 2;
     this.shape.position.y = y || this.scene.app.screen.height / 2;
-    this.shape.tint = parseInt(Math.floor(Math.random() * 16777215).toString(16), 16);
+    this.shape.tint = 0xEFA8B1;
     this.scene.container.addChild(this.shape);
-    this.width = width;
-    this.height = height;
-    this.organism = new RealOrganism({ x, y, scene, shape: this });
-    this.organism.geneticCode = new GeneticCode([
-      new Reproduces(this.organism),
-      new MovementGene(this.organism),
-    ])
-    this.x = this.shape.position.x;
-    this.y = this.shape.position.y;
-  }
-
-  animate() {
-    // const { shape, speed, scene, width, height } = this;
-    // const { app } = scene;
-
-    // shape.position.x += speed;
-    // if (shape.position.x > app.screen.width + width) {
-    //   shape.position.x -= app.screen.width + width + width;
-    // }
-
-    // if (shape.position.y > app.screen.height + height) {
-    //   shape.position.y -= app.screen.height + height + height;
-    // }
-
-    // this.x = shape.position.x;
-    // this.y = shape.position.y;
-    this.organism.animate();
   }
 
   getPosition() {
@@ -68,6 +68,9 @@ class TextureOrganism {
 
   getGlobalPosition() {
     return this.shape.getGlobalPosition();
+  }
+  getDimensions() {
+    return { width: this.shape.width, height: this.shape.height };
   }
 }
 

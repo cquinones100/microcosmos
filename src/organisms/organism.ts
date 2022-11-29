@@ -6,8 +6,6 @@ export type OrganismProps = {
   energySources?: (any)[];
   geneticCode?: GeneticCode;
   generation?: number;
-  x?: number;
-  y?: number;
 } & WorldObjectProps;
 
 class Organism extends WorldObject {
@@ -22,7 +20,7 @@ class Organism extends WorldObject {
   color: number = Organism.color;
 
   constructor({ energySources = [], geneticCode, generation, x, y, color, ...args }: OrganismProps) {
-    super(args);
+    super({ x, y, ...args });
 
     this.energySource = energySources;
     this.geneticCode = geneticCode;
@@ -103,7 +101,7 @@ class Organism extends WorldObject {
   }
 
   duplicate(): Organism {
-    return this;
+    return this.scene.createOrganism()
   }
 
   onHover() {

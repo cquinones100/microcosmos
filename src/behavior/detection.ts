@@ -18,11 +18,11 @@ class Detection extends Behavior {
 
   call({ organism }: { organism: Organism }): void {
     const call = () => {
-      const { x: absoluteX, y: absoluteY } = organism.screenBasedPosition();
+      const { x: absoluteX, y: absoluteY } = organism.getPosition();
       const radius = this.getOrganismRadius(organism);
 
       const objs = Array.from(organism.scene.organisms).filter(org => {
-        const { x: orgX, y: orgY } = org.screenBasedPosition();
+        const { x: orgX, y: orgY } = org.getPosition();
 
         return org !== organism
           && orgX > absoluteX - radius
