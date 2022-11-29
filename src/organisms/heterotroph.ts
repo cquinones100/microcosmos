@@ -7,6 +7,7 @@ import TextureOrganism from "../textureOrganism";
 import WorldObject from "../worldObject";
 import { Coords } from "./autotroph";
 import Organism from "./organism";
+import Movement from "../behavior/movement";
 
 type HeteroTrophProps = {
   texture: TextureOrganism;
@@ -70,15 +71,32 @@ class HeteroTroph extends Organism {
     if (intersectionObject instanceof Organism && this.canEat(intersectionObject)) {
       ignoreIntersection();
     } else {
-      const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
-      this.shape.shape.position.x = negatableRandom(x + this.getDimensions().width);
-      this.shape.shape.position.x = negatableRandom(y + this.getDimensions().height);
+      const movement = this.movement();
+
+      if (movement) {
+        const { xDirection, yDirection, speed } = movement;
+        const { scene } = this;
+
+        const { x, y } = Movement.calculatedCoordinate({
+          xDirection: xDirection! * -1,
+          yDirection: yDirection! * -1,
+          speed,
+          scene,
+          x: this.getPosition().x,
+          y: this.getPosition().y
+        });
+
+        const { width, height } = this.getDimensions();
+
+        this.shape.shape.position.x = x + width * 2;
+        this.shape.shape.position.y = y + height * 2;
+      }
     }
   }
 
   duplicate(): Organism {
     const { width, height } = this.shape.getDimensions();
-    const { renderTexture, scene } = this.shape;
+    const { scene } = this.shape;
     const { x, y } = this.shape.shape.position;
 
     const texture = TextureOrganism.create({ scene, x: x! - width, y: y! - height });

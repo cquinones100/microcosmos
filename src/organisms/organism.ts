@@ -1,4 +1,5 @@
 import Behavior from "../behavior";
+import Movement from "../behavior/movement";
 import GeneticCode from "../geneticCode";
 import WorldObject, { WorldObjectProps } from "../worldObject";
 
@@ -30,7 +31,6 @@ class Organism extends WorldObject {
     this.generation = generation || 0;
 
     this.shape.shape.interactive = true
-    // this.shape.shape.hitArea = new PIXI.Rectangle(this.ge, 0, this.getDimensions().width, this.getDimensions().height);
     this.shape.shape.on("click", () => {
       console.log(this);
     })
@@ -103,7 +103,7 @@ class Organism extends WorldObject {
   }
 
   duplicate(): Organism {
-    return this.scene.createOrganism()
+    return this.scene.createHeterotroph()
   }
 
   onHover() {
@@ -114,6 +114,10 @@ class Organism extends WorldObject {
 
   dead() {
     return this.energy <= 0;
+  }
+
+  movement() {
+    return Array.from(this.behaviors).find((behavior) => behavior instanceof Movement) as Movement | undefined;
   }
 }
 

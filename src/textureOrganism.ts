@@ -3,16 +3,16 @@ import { Coords } from "./organisms/autotroph";
 import Scene from "./scene";
 
 type TextureOrganismProps = {
-  renderTexture: RenderTexture;
+  shape: Sprite;
   scene: Scene;
   width: number;
   height: number;
-} & Partial<Coords>;
+} & Coords;
 
 class TextureOrganism {
   static renderTexture: RenderTexture;
   static templateShape: Graphics;
-  public static create({ scene, x, y }: { scene: Scene } & Partial<Coords>) {
+  public static create({ scene, x, y }: { scene: Scene } & Coords) {
     const { app } = scene;
 
     const templateShape = new Graphics()
@@ -45,19 +45,20 @@ class TextureOrganism {
     // Discard the original Graphics
     templateShape.destroy(true);
 
-    return new TextureOrganism({ scene, width, height, renderTexture, x, y });
+    const shape = new Sprite(renderTexture);
+
+    shape.position.x = x;
+    shape.position.y = y;
+
+    return new TextureOrganism({ shape, scene, width, height, x, y });
   }
 
-  renderTexture: RenderTexture;
   shape: Sprite;
   scene: Scene;
 
-  constructor({ renderTexture, scene, x, y }: TextureOrganismProps) {
-    this.shape = new Sprite(renderTexture);
-    this.renderTexture = renderTexture;
+  constructor({ shape, scene, x, y }: TextureOrganismProps) {
+    this.shape = shape;
     this.scene = scene;
-    this.shape.position.x = x || this.scene.app.screen.width / 2;
-    this.shape.position.y = y || this.scene.app.screen.height / 2;
     this.shape.tint = 0xEFA8B1;
     this.scene.container.addChild(this.shape);
   }

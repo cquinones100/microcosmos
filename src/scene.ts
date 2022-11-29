@@ -7,6 +7,7 @@ import TextureOrganism from "./textureOrganism";
 import TextureAutotroph from "./textureAutotroph";
 import Autotroph from "./organisms/autotroph";
 import HeteroTroph from "./organisms/heterotroph";
+import { create } from "./scenarios/movement";
 
 export const MUTATION_FACTOR = 1;
 
@@ -42,7 +43,7 @@ class Scene {
     this.container = new Container();
     this.app = new Application({
       width: window.innerWidth,
-      height: window.innerHeight,
+      height: window.innerHeight - 5,
       autoDensity: true,
       antialias: true,
       autoStart: false,
@@ -62,12 +63,6 @@ class Scene {
     const { app } = this;
 
     document.body.appendChild(app.view as unknown as Node);
-
-    this.createOrganism();
-    this.createAutotroph();
-    this.createAutotroph();
-    this.createAutotroph();
-    this.createAutotroph();
 
     app.stage.addChild(this.container);
 
@@ -113,6 +108,10 @@ class Scene {
       }
     })
 
+    // create(this);
+    this.createHeterotroph();
+    this.createAutotroph();
+
     app.ticker.add((timePassed: number) => {
       stats.begin();
 
@@ -131,14 +130,18 @@ class Scene {
     app.ticker.start();
   }
 
-  createOrganism(
+  createHeterotroph(
     { x, y, color }
     : { x?: number, y?: number, color?: number }
     = {}
   ) {
-    const texture = TextureOrganism.create({ scene: this, x: Math.random() * this.app.screen.width, y: Math.random() * this.app.screen.height })
+    const texture = TextureOrganism.create({
+      scene: this,
+      x: x  === undefined ? Math.random() * this.app.screen.width : x,
+      y: y === undefined ? Math.random() * this.app.screen.height : y
+    });
 
-    const organism = HeteroTroph.create({ texture, scene: this })
+    const organism = HeteroTroph.create({ texture, scene: this });
 
     this.organisms.add(organism);
 
@@ -146,8 +149,6 @@ class Scene {
   }
 
   createAutotroph() {
-    const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
-
     const texture = TextureAutotroph.create({ scene: this, x: Math.random() * this.app.screen.width, y: Math.random() * this.app.screen.height })
 
     const organism = Autotroph.create({ texture, scene: this })

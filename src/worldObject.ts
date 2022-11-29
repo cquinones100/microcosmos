@@ -91,9 +91,9 @@ class WorldObject {
     const { x, y } = this.getPosition();
     const { width, height } = this.getDimensions();
 
-    return otherX > x
+    return otherX > x - width
       && otherX < x + width
-      && otherY > y
+      && otherY > y - width
       && otherY < y + height;
   }
 

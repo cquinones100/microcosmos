@@ -63,7 +63,7 @@ class Autotroph extends Organism {
 
   duplicate() {
     const { width, height } = this.shape.getDimensions();
-    const { renderTexture, scene } = this.shape;
+    const { scene } = this.shape;
     const { x, y } = this.getPosition();
 
     const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
