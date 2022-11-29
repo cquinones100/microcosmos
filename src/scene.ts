@@ -105,15 +105,20 @@ class Scene {
               return 0;
             })[0].generation + 1
         );
+
+        Object.keys(this.measurements).forEach(measurement => {
+          console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
+        });
       }
     })
 
-    // create(this);
     this.createHeterotroph();
     this.createAutotroph();
 
     app.ticker.add((timePassed: number) => {
       stats.begin();
+
+      Object.keys(this.measurements).forEach(measurement => {this.measurements[measurement] = 0});
 
       if (!this.stop) {
         this.timePassed = timePassed;
