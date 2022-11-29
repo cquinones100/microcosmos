@@ -1,9 +1,9 @@
 import Behavior, { BehaviorProps } from "../behavior";
-import RealOrganism from "../realOrganism";
+import Organism from "../realOrganism";
 import WorldObject from "../worldObject";
 
 class Detection extends Behavior {
-  detections: RealOrganism[];
+  detections: Organism[];
   radius: number;
   onDetect: (obj: WorldObject) => void;
 
@@ -16,7 +16,7 @@ class Detection extends Behavior {
     this.onDetect = () => {};
   }
 
-  call({ organism }: { organism: RealOrganism }): void {
+  call({ organism }: { organism: Organism }): void {
     const call = () => {
       const { x: absoluteX, y: absoluteY } = organism.screenBasedPosition();
       const radius = this.getOrganismRadius(organism);
@@ -36,10 +36,10 @@ class Detection extends Behavior {
 
     call();
 
-    // organism.scene.measure('detect', call);
+    organism.scene.measure('detect', call);
   }
 
-  getOrganismRadius(organism: RealOrganism) {
+  getOrganismRadius(organism: Organism) {
     return organism.getDimensions().width * this.radius;
   }
 }

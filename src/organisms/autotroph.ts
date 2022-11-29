@@ -1,23 +1,26 @@
-import RealOrganism, { RealOrganismProps } from "../realOrganism";
 import Reproduces from "../genes/reproduces";
 import { WorldObjectProps } from "../worldObject";
 import { Rectangle } from "pixi.js";
+import Organism from "./organism";
+import { OrganismProps } from "../organisms/organism";
 
 export type Coords = {
   x: number;
   y: number;
 };
 
-type AutotrophType = WorldObjectProps & RealOrganismProps & Coords;
+type AutotrophType = OrganismProps;
 
-class Autotroph extends RealOrganism {
-  constructor({ scene, shape, x, y, ...args }: AutotrophType) {
+class Autotroph extends Organism {
+  constructor({ scene, shape, x = 0, y = 0, ...args }: AutotrophType) {
     shape.beginFill(0x00FF00);
     shape.drawRoundedRect(scene.center.x, scene.center.y, 10, 10, 2);
     shape.interactive = true;
     shape.hitArea = new Rectangle(scene.center.x, scene.center.y, 10);
 
     super({ shape, scene, ...args });
+
+    console.log(x,y)
 
     this.setPosition({ x, y })
     this.maxEnergy = 10000;
@@ -52,8 +55,12 @@ class Autotroph extends RealOrganism {
     return organism;
   }
 
-  canBeEatenBy(organism: RealOrganism): boolean {
+  canBeEatenBy(organism: Organism): boolean {
     return true;
+  }
+
+  onIntersection({ x, y }: Coords, runAnyway: () => void): void {
+    runAnyway();
   }
 }
 

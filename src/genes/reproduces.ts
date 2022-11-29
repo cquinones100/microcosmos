@@ -1,5 +1,5 @@
 import Gene from "../gene";
-import RealOrganism from "../realOrganism";
+import Organism from "../realOrganism";
 import Reproduction from "../behavior/reproduction";
 
 class Reproduces extends Gene {
@@ -7,7 +7,7 @@ class Reproduces extends Gene {
   behavior: Reproduction;
   onMutateMaxCycles: (gene: Reproduces) => void;
 
-  constructor(organism: RealOrganism) {
+  constructor(organism: Organism) {
     super(organism);
 
     this.reproduction = new Reproduction();
@@ -29,7 +29,7 @@ class Reproduces extends Gene {
 
   increase() {}
 
-  duplicate(newOrganism: RealOrganism) {
+  duplicate(newOrganism: Organism) {
     return new Reproduces(newOrganism);
   }
 

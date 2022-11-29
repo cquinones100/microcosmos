@@ -9,15 +9,17 @@ import DetectionGene from "./genes/detectionGene";
 import Autotroph, { Coords } from "./organisms/autotroph";
 import { Circle } from "pixi.js";
 import WorldObject from "./worldObject";
+import Movement from "./behavior/movement";
+import Organism from "./organisms/organism";
 
 export const MUTATION_FACTOR = 1;
 
 class Scene {
   app: PIXI.Application;
-  organisms: Set<RealOrganism>;
-  predators: Set<RealOrganism>;
-  prey: Set<RealOrganism>;
-  naturalDeaths: Set<RealOrganism>;
+  organisms: Set<Organism>;
+  predators: Set<Organism>;
+  prey: Set<Organism>;
+  naturalDeaths: Set<Organism>;
   allObjects: Set<WorldObject>;
   paused: boolean;
   center: { x: number; y: number; };
@@ -30,7 +32,7 @@ class Scene {
 
   constructor() {
     this.app = new PIXI.Application();
-    this.organisms = new Set<RealOrganism>();
+    this.organisms = new Set<Organism>();
     this.allObjects = new Set();
     this.predators = new Set();
     this.prey = new Set();
@@ -52,8 +54,8 @@ class Scene {
     document.addEventListener('keypress', (event) => {
       if (event.key === " ") this.paused = !this.paused;
     });
-    this.createOrganism();
-    this.createOrganism();
+
+    // this.createOrganism();
     this.createAutotroph();
 
     let organismsCount = this.organisms.size;
@@ -82,25 +84,20 @@ class Scene {
   }
 
   createOrganism(
-    { x, y }:
-    { x?: number, y?: number, geneticCode?: GeneticCode } = {}
+    { x, y, color }:
+    { x?: number, y?: number, geneticCode?: GeneticCode, color?: number } = {}
   ) {
     const shape = new PIXI.Graphics();
 
-    shape.beginFill(0xff0000);
-    shape.drawCircle(this.center.x, this.center.y, 10);
-    shape.interactive = true;
-    shape.hitArea = new Circle(x, y, 10);
-
     const scene = this;
 
-    const organism = new RealOrganism({ shape, scene });
+    const organism = new RealOrganism({ x, y, shape, scene });
 
     organism.geneticCode = new GeneticCode([
       new MovementGene(organism),
       // new DetectionGene(organism),
-      new SeeksEnergy(organism),
-      new Reproduces(organism),
+      // new SeeksEnergy(organism),
+      // new Reproduces(organism),
     ])
 
     this.add(organism);
@@ -125,17 +122,17 @@ class Scene {
     return organism;
   }
 
-  add(organism: RealOrganism) {
+  add(organism: Organism) {
     this.organisms.add(organism);
     this.app.stage.addChild(organism.shape);
     this.allObjects.add(organism);
   }
 
-  killOrganism(organism: RealOrganism) {
+  killOrganism(organism: Organism) {
     this.organisms.delete(organism);
   }
 
-  remove(organism: RealOrganism) {
+  remove(organism: Organism) {
     this.allObjects.delete(organism);
   }
 

@@ -36,11 +36,11 @@ class Movement extends Behavior {
 
     const { xDirection, yDirection } = this.getDirection();
 
-    const x = 
-      Math.round(explicitX !== undefined ? explicitX : objX + xDirection + this.speed * organism.scene.timePassed);
+    const xVelocity = (this.speed * xDirection)
+    const yVelocity = (this.speed * yDirection)
 
-    const y = 
-      Math.round(explicitY !== undefined ? explicitY : objY + yDirection * this.speed * organism.scene.timePassed);
+    const x = objX + xVelocity * organism.scene.timePassed;
+    const y = objY + yVelocity * organism.scene.timePassed;
 
     organism.setPosition({ x, y });
   }

@@ -1,15 +1,15 @@
-import RealOrganism from "./realOrganism";
+import Organism from "./organisms/organism";
 
 abstract class Gene {
-  organism: RealOrganism;
+  organism: Organism;
 
-  constructor(organism: RealOrganism) {
+  constructor(organism: Organism) {
     this.organism = organism;
   }
   abstract animate(): void;
   abstract resolve(): void;
   abstract increase(): void;
-  abstract duplicate(newOrganism: RealOrganism): Gene;
+  abstract duplicate(newOrganism: Organism): Gene;
   abstract mutate(): void;
 }
 

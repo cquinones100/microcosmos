@@ -7,10 +7,10 @@ import RealOrganism from "../realOrganism";
 class MovementGene extends Gene {
   movement: Movement;
 
-  constructor(organism: RealOrganism) {
+  constructor(organism: RealOrganism, movement?: Movement) {
     super(organism);
 
-    this.movement = new Movement();
+    this.movement = movement || new Movement();
   }
 
   animate() {

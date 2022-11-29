@@ -1,3 +1,4 @@
+import Organism from "./organisms/organism";
 import RealOrganism from "./realOrganism";
 
 const DEFAULT_ENERGY = 0.01;
@@ -13,7 +14,7 @@ abstract class Behavior {
     this.energy = energy || DEFAULT_ENERGY;
   }
 
-  public static findBehavior<T>(organism: RealOrganism, cb: (current: Behavior) => boolean): T {
+  public static findBehavior<T>(organism: Organism, cb: (current: Behavior) => boolean): T {
     const iterator = organism.behaviors.values();
 
     let current = iterator.next().value;
@@ -27,7 +28,7 @@ abstract class Behavior {
     return current;
   }
 
-  abstract call<T extends {}>({ organism, ...args }: { organism: RealOrganism, args?: T }): void;
+  abstract call<T extends {}>({ organism, ...args }: { organism: Organism, args?: T }): void;
 
   getEnergy() {
     return this.energy!;

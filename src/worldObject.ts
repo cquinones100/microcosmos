@@ -15,6 +15,14 @@ class WorldObject {
   bounds: Coords;
   startingPosition: Coords;
 
+  public static screenBasedPosition({ x, y, scene }: { x: number; y: number; scene: Scene }) {
+    const { width, height } = scene.app.screen;
+    const newX = (width / 2 + x);
+    const newY = (height / 2 + y);
+
+    return { x: newX, y: newY };
+  }
+
   constructor({ shape, scene, color }: WorldObjectProps) {
     this.scene = scene;
     this.shape = shape;
@@ -28,6 +36,7 @@ class WorldObject {
   setPosition({ x, y }: { x: number, y: number }) {
     const { x: thisX, y: thisY } = this.shape;
     const { width: sceneWidth, height: sceneHeight } = this.scene.getBounds();
+    const { coordinates } = this.scene;
 
     const withinBounds = (originalCoord: number, targetCoord: number, boundary: number) => {
       if (targetCoord < boundary / 2 * -1) {
@@ -39,23 +48,44 @@ class WorldObject {
       }
     }
 
-    this.shape.x = withinBounds(thisX, x, sceneWidth);
-    this.shape.y = withinBounds(thisY, y, sceneHeight);
+    const newX = withinBounds(thisX, x, sceneWidth);
+    const newY = withinBounds(thisY, y, sceneHeight);
 
-    const prevAbsoluteX = sceneWidth / 2 + thisX;
-    const prevAbsoluteY = sceneHeight / 2 + thisY;
+    const intersectingObject = Array
+      .from(this.scene.allObjects)
+      .find(obj => {
+        if (obj === this) return false;
 
-    const absoluteX = (sceneWidth / 2 + this.shape.x);
-    const absoluteY = (sceneHeight / 2 + this.shape.y);
+        const { x, y } = WorldObject.screenBasedPosition({ x: newX, y: newY, scene: this.scene });
 
-    this.scene.coordinates[absoluteX] ||= [];
-    this.scene.coordinates[absoluteX][absoluteY] ||= new Set<WorldObject>();
+        return obj.intersects(x, y);
+      });
 
-    if (this.scene.coordinates[prevAbsoluteX]) {
-      this.scene.coordinates[prevAbsoluteX][prevAbsoluteY]?.delete(this);
+    const callback = () => {
+      this.shape.x = newX;
+      this.shape.y = newY;
+
+      const prevAbsoluteX = sceneWidth / 2 + thisX;
+      const prevAbsoluteY = sceneHeight / 2 + thisY;
+
+      const absoluteX = (sceneWidth / 2 + this.shape.x);
+      const absoluteY = (sceneHeight / 2 + this.shape.y);
+
+      coordinates[absoluteX] ||= [];
+      coordinates[absoluteX][absoluteY] ||= new Set<WorldObject>();
+
+      if (coordinates[prevAbsoluteX]) {
+       coordinates[prevAbsoluteX][prevAbsoluteY]?.delete(this);
+      }
+
+      this.scene.coordinates[absoluteX][absoluteY].add(this);
+    };
+
+    if (intersectingObject) {
+      this.onIntersection({ x: newX, y: newY }, callback);
+    } else {
+      callback();
     }
-
-    this.scene.coordinates[absoluteX][absoluteY].add(this);
   }
 
   getPosition() {
@@ -84,14 +114,19 @@ class WorldObject {
         && otherY < y + height;
   }
 
-  screenBasedPosition() {
-    const { width, height } = this.scene.app.screen;
-    const { x: orgX, y: orgY } = this.getAbsolutePosition();
-    const x = (width / 2 + orgX);
-    const y = (height / 2 + orgY);
+  intersectsObject(obj: WorldObject) {
+    if (obj === this) return;
+    const { x, y } = obj.screenBasedPosition();
 
-    return { x, y };
+    return this.intersects(x, y);
   }
+
+  screenBasedPosition() {
+    return WorldObject
+      .screenBasedPosition({ ...this.getAbsolutePosition(), scene: this.scene });
+  }
+
+  onIntersection({ x, y }: Coords, cb: () => void) {}
 }
 
 export default WorldObject;
