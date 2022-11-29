@@ -36,12 +36,18 @@ class HeteroTroph extends Organism {
     return organism;
   }
 
+  prey: Organism | undefined;
+
   constructor({ x, y, ...args }: OrganismProps) {
     super({ x, y, ...args });
 
     if (x !== undefined && y !== undefined) {
       this.setPosition({ x, y });
     }
+  }
+
+  animate() {
+    super.animate();
   }
 
   consume(organism: Organism) {
@@ -75,22 +81,28 @@ class HeteroTroph extends Organism {
       const movement = this.movement();
 
       if (movement) {
-        const { xDirection, yDirection, speed } = movement;
-        const { scene } = this;
+        const move = () => {
+          const { xDirection, yDirection, speed } = movement;
+          const { scene } = this;
 
-        const { x, y } = Movement.calculatedCoordinate({
-          xDirection: xDirection! * -1,
-          yDirection: yDirection! * -1,
-          speed,
-          scene,
-          x: this.getPosition().x,
-          y: this.getPosition().y
-        });
+          const { x, y } = Movement.calculatedCoordinate({
+            xDirection: xDirection! * -1,
+            yDirection: yDirection! * -1,
+            speed,
+            scene,
+            x: this.getPosition().x,
+            y: this.getPosition().y
+          });
 
-        const { width, height } = this.getDimensions();
+          const { width, height } = this.getDimensions();
 
-        this.shape.shape.position.x = x + width * 2;
-        this.shape.shape.position.y = y + height * 2;
+          this.shape.shape.position.x = x + width / 2;
+          this.shape.shape.position.y = y + height / 2;
+        }
+
+        if (!(intersectionObject instanceof Organism) || this.energy < intersectionObject.energy) {
+          move();
+        }
       }
     }
   }

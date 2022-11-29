@@ -5,11 +5,12 @@ import Organism from "./organisms/organism";
 import { Application, Container } from "pixi.js";
 import TextureOrganism from "./textureOrganism";
 import TextureAutotroph from "./textureAutotroph";
-import Autotroph from "./organisms/autotroph";
+import Autotroph, { Coords } from "./organisms/autotroph";
 import HeteroTroph from "./organisms/heterotroph";
-import { create } from "./scenarios/movement";
 
 export const MUTATION_FACTOR = 1;
+
+const CHUNK_SIZE = 50;
 
 class Scene {
   app: PIXI.Application;
@@ -17,7 +18,6 @@ class Scene {
   predators: Set<Organism>;
   prey: Set<Organism>;
   naturalDeaths: Set<Organism>;
-  allObjects: Set<WorldObject>;
   paused: boolean;
   center: { x: number; y: number; };
   coordinates: Set<WorldObject>[][];
@@ -28,10 +28,10 @@ class Scene {
   timePassed: number;
   container: PIXI.Container<PIXI.DisplayObject>;
   stop: boolean;
+  allObjects: Set<WorldObject>[][];
 
   constructor() {
     this.organisms = new Set<Organism>();
-    this.allObjects = new Set();
     this.predators = new Set();
     this.prey = new Set();
     this.naturalDeaths = new Set();
@@ -51,6 +51,9 @@ class Scene {
       resolution: window.devicePixelRatio
     });
     this.center = { x: this.app.screen.width / 2, y: this.app.screen.height / 2 };
+    this.allObjects = Array.from(Array(Math.ceil(this.app.screen.width / CHUNK_SIZE))).map(() => {
+      return Array.from(Array(Math.ceil(this.app.screen.height / CHUNK_SIZE))).map(() => new Set());
+    });
     this.stop = false;
     this.container.sortableChildren = true;
   }
@@ -70,45 +73,16 @@ class Scene {
       if (key === ' ') {
         this.stop = !this.stop;
 
-        console.log("Number of objects: ", this.allObjects.size);
-        console.log("Number of Heterotrophs: ", Array.from(this.allObjects).filter(org => org instanceof HeteroTroph).length);
-        console.log(
-          "Generations of Heterotrophs: ",
-          (Array.from(this.allObjects) as HeteroTroph[])
-            .filter(org => org instanceof HeteroTroph)
-            .sort((a: HeteroTroph, b: HeteroTroph) => {
-              if (a.generation < b.generation) {
-                return - 1;
-              }
-
-              if (a.generation > b.generation) {
-                return 1;
-              }
-
-              return 0;
-            })[0].generation + 1
-        );
-        console.log("Number of Autotrophs: ", Array.from(this.allObjects).filter(org => org instanceof Autotroph).length);
-        console.log(
-          "Generations of Autotrophs: ",
-          (Array.from(this.allObjects) as Autotroph[])
-            .filter(org => org instanceof Autotroph)
-            .sort((a: Autotroph, b: Autotroph) => {
-              if (a.generation < b.generation) {
-                return -1;
-              }
-
-              if (a.generation > b.generation) {
-                return 1;
-              }
-
-              return 0;
-            })[0].generation + 1
-        );
-
-        Object.keys(this.measurements).forEach(measurement => {
-          console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
-        });
+        if (this.stop) {
+          console.log("PAUSED");
+          console.log(this.allObjects);
+          console.log(`MEASUREMENT Organisms: ${this.organisms.size}`);
+          console.log(`MEASUREMENT Heterotrophs: ${Array.from(this.organisms).filter(org => org instanceof HeteroTroph).length}`);
+          console.log(`MEASUREMENT Autotrophs: ${Array.from(this.organisms).filter(org => org instanceof Autotroph).length}`);
+          Object.keys(this.measurements).forEach(measurement => {
+            console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
+          });
+        }
       }
     })
 
@@ -123,7 +97,7 @@ class Scene {
       if (!this.stop) {
         this.timePassed = timePassed;
 
-        this.allObjects = this.organisms;
+        // this.allObjects = this.organisms;
 
         this.organisms.forEach(organism => organism.animate());
 
@@ -165,7 +139,7 @@ class Scene {
 
   add(organism: Organism) {
     this.organisms.add(organism);
-    this.allObjects.add(organism);
+    // this.allObjects.add(organism);
   }
 
   killOrganism(organism: Organism) {
@@ -173,7 +147,7 @@ class Scene {
   }
 
   remove(organism: Organism) {
-    this.allObjects.delete(organism);
+    // this.allObjects.delete(organism);
     this.organisms.delete(organism);
     this.container.removeChild(organism.shape.shape);
   }
@@ -191,7 +165,7 @@ class Scene {
 
     const endTime = Date.now();
 
-    const delta = endTime - startTime
+    const delta = endTime - startTime;
 
     this.measurements[key] ||= 0;
 
@@ -210,6 +184,41 @@ class Scene {
 
   getDimensions() {
     return { width: this.app.screen.width, height: this.app.screen.width };
+  }
+
+  setPosition({ x: objX, y: objY }: Coords, object: WorldObject) {
+    const { x, y } = this.getPosition({ x: objX, y: objY });
+
+    try { 
+      this.allObjects[x][y].delete(object);
+      this.allObjects[x][y].add(object);
+    } catch (e) {
+    }
+  }
+
+  getPositionCell({ x, y }: Coords) {
+    return this.allObjects[x][y];
+  }
+
+  getAtPosition({ x: objX, y: objY }: Coords) {
+    const { x, y } = this.getPosition({ x: objX, y: objY });
+
+    return this.allObjects[x]?.[y];
+  }
+
+  getPosition({ x: objX, y: objY }: Coords) {
+    const x = Math.round(objX / CHUNK_SIZE);
+    const y = Math.round(objY / CHUNK_SIZE);
+
+    return { x, y };
+  }
+
+  getPositionRows() {
+    return this.allObjects.length;
+  }
+
+  getPositionCols() {
+    return this.allObjects[0].length;
   }
 }
 

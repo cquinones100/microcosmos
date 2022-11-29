@@ -1,5 +1,5 @@
 import Behavior, { BehaviorProps } from "../behavior";
-import Gene from "../gene";
+import Mutator from "../mutator";
 import Organism from "../organisms/organism";
 
 class Reproduction extends Behavior {
@@ -35,14 +35,6 @@ class Reproduction extends Behavior {
   private reproduce(obj: Organism) {
     if (!obj.geneticCode) return;
 
-    const conditionalMutation = (gene: Gene) => {
-      const shouldMutate = Math.random() > 1 - 0.99 ? false : true;
-
-      if (shouldMutate) {
-        gene.mutate();
-      }
-    }
-
     const organism = obj.duplicate();
 
     const geneticCode = obj.geneticCode.duplicate(organism);
@@ -53,7 +45,7 @@ class Reproduction extends Behavior {
     organism.geneticCode = geneticCode;
 
     organism.geneticCode.forEach(gene => gene.resolve());
-    organism.geneticCode.forEach(conditionalMutation)
+    organism.geneticCode.forEach(Mutator.conditionallyMutate)
     organism.generation = obj.generation + 1;
   }
 }

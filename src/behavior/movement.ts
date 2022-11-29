@@ -75,9 +75,9 @@ class Movement extends Behavior {
   }
 
   duplicate() {
-    const { speed } = this;
+    const { speed, defaultSpeed } = this;
 
-    return new Movement({ speed });
+    return new Movement({ speed, defaultSpeed });
   }
 
   getDirection() {

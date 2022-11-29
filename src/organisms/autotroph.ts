@@ -53,7 +53,7 @@ class Autotroph extends Organism {
         gene.onMutateMaxCycles = (gene: Reproduces) => {}
         gene.onMutateIntervals = (gene: Reproduces) => {}
 
-        gene.behavior.interval = 5;
+        gene.behavior.interval = 3;
         gene.behavior.maxCycles = 1;
       }
     })

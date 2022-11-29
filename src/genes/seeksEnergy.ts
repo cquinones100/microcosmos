@@ -3,6 +3,7 @@ import Behavior from "../behavior";
 import Detection from "../behavior/detection";
 import Movement from "../behavior/movement";
 import Gene from "../gene";
+import HeteroTroph from "../organisms/heterotroph";
 import Organism from "../organisms/organism";
 import WorldObject from "../worldObject";
 
@@ -21,6 +22,7 @@ class SeeksEnergy extends Gene {
 
   resolve() {
     if (!this.organism.hungry()) return;
+    if (!(this.organism instanceof HeteroTroph)) return;
 
     const movement = Behavior.findBehavior<Movement>(this.organism, (current) => current instanceof Movement);
 
@@ -43,8 +45,8 @@ class SeeksEnergy extends Gene {
         const { x: latitude, y: longitude } = this.organism.getPosition();
 
         const distance = getDistance(
-          { latitude, longitude },
-          { latitude: currX, longitude: currY }
+          { latitude: Math.round(latitude), longitude: Math.round(longitude) },
+          { latitude: Math.round(currX), longitude: Math.round(currY) }
         );
 
         if (distance < closestDistance) {
@@ -52,18 +54,18 @@ class SeeksEnergy extends Gene {
           closestOrganism = obj;
         }
       }
-
-      if (!closestOrganism) return;
-
-      const { x: currX, y: currY } = closestOrganism.getPosition();
-      if (this.organism.intersects(currX, currY)) {
-        this.organism.consume(obj);
-      } else {
-        movement.directTo({ organism: this.organism, x: currX, y: currY });
-      }
     };
 
     this.detection.call({ organism: this.organism });
+
+    if (!closestOrganism) return;
+
+    const { x: currX, y: currY } = closestOrganism.getPosition();
+    if (this.organism.intersects(currX, currY)) {
+      this.organism.consume(closestOrganism);
+    } else {
+      movement.directTo({ organism: this.organism, x: currX, y: currY });
+    }
   }
 
   increase() {}

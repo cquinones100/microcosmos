@@ -1,4 +1,5 @@
 import Gene from "./gene";
+import Mutator from "./mutator";
 import Organism from "./organisms/organism";
 
 class GeneticCode {
@@ -10,6 +11,7 @@ class GeneticCode {
 
   animate() {
     this.forEach((gene: Gene) => gene.animate());
+    this.forEach(Mutator.conditionallyMutate);
   }
 
   forEach(cb: { (gene: Gene): void; (value: Gene, index: number, array: Gene[]): void; }) {

@@ -18,27 +18,33 @@ class Detection extends Behavior {
 
   call({ organism }: { organism: Organism }): void {
     const call = () => {
-      const { x: absoluteX, y: absoluteY } = organism.getPosition();
+      const { getPosition, getAtPosition, getPositionRows, getPositionCols  } = organism.scene;
+      const { x: objX, y: objY } = organism.scene.getPosition(organism.getPosition());
       const radius = this.getOrganismRadius(organism);
 
-      const objs = Array.from(organism.scene.organisms).filter(org => {
-        const { x: orgX, y: orgY } = org.getPosition();
+      const numRows = getPositionRows.bind(organism.scene)();
+      const numCols = getPositionCols.bind(organism.scene)();
 
-        return org !== organism
-          && orgX > absoluteX - radius
-          && orgX < absoluteX + radius
-          && orgY > absoluteY - radius
-          && orgY < absoluteY + radius;
-      });
+      organism.scene.measure("For loop", () => {
+        for (let x = Math.max(objX - radius, 0); x < Math.min(objX + radius, numRows); x++) {
+          for (let y = Math.max(objY - radius, 0); y < Math.min(objY + radius, numCols); y++) {
+            const set = organism.scene.getPositionCell({ x, y });
 
-      objs.forEach(this.onDetect);
+            if (set) {
+              set.forEach(obj => {
+                this.onDetect(obj);
+              })
+            }
+          }
+        }
+      })
     }
 
-    organism.scene.measure('detection', call)
+    call();
   }
 
   getOrganismRadius(organism: Organism) {
-    return organism.getDimensions().width * this.radius;
+    return this.radius;
   }
 }
 
