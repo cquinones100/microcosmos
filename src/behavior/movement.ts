@@ -38,11 +38,45 @@ class Movement extends Behavior {
   }
 
   public static randomize(organism: Organism) {
+    let direction;
+
     organism.behaviors.forEach((behavior: Behavior) => {
       if (behavior instanceof Movement) {
         behavior.setDirection({ x: Movement.randomDirectionValue(), y: Movement.randomDirectionValue() });
+        const { xDirection, yDirection } = behavior;
+
+        direction = { xDirection, yDirection };
       }
     })
+
+    return direction || { xDirection: 0, yDirection: 0 };
+  }
+
+  public static move(organism: Organism) {
+    organism.behaviors.forEach((behavior: Behavior) => {
+      if (behavior instanceof Movement) {
+        behavior.move({ organism });
+      }
+    })
+  }
+
+  public static reverse(organism: Organism) {
+    let direction;
+
+    organism.behaviors.forEach((behavior: Behavior) => {
+      if (behavior instanceof Movement) {
+        const { xDirection: oldX, yDirection: oldY } = behavior;
+
+        const xDirection = oldX! * -1;
+        const yDirection = oldY! * -1;
+
+        behavior.setDirection({ x: xDirection, y: yDirection });
+
+        direction = { xDirection, yDirection };
+      }
+    })
+
+    return direction || { xDirection: 0, yDirection: 0 };
   }
 
   speed: number;
@@ -59,6 +93,7 @@ class Movement extends Behavior {
     this.speed = speed || this.defaultSpeed;
     this.xDirection = xDirection || 0;
     this.yDirection = yDirection || 0;
+    this.energy = 0.05
   }
 
   call({ organism }: { organism: Organism }): void {
