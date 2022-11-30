@@ -5,7 +5,7 @@ import WorldObject from "../worldObject";
 class Detection extends Behavior {
   detections: Organism[];
   radius: number;
-  onDetect: (obj: WorldObject) => void;
+  onDetect: (obj: WorldObject, cancel: () => void) => void;
 
   constructor(args?: BehaviorProps) {
     super(args);
@@ -18,7 +18,9 @@ class Detection extends Behavior {
 
   call({ organism }: { organism: Organism }): void {
     const call = () => {
-      const { getPosition, getAtPosition, getPositionRows, getPositionCols  } = organism.scene;
+      let cancel = false;
+
+      const { getPositionRows, getPositionCols  } = organism.scene;
       const { x: objX, y: objY } = organism.scene.getPosition(organism.getPosition());
       const radius = this.getOrganismRadius(organism);
 
@@ -27,13 +29,20 @@ class Detection extends Behavior {
 
       organism.scene.measure("For loop", () => {
         for (let x = Math.max(objX - radius, 0); x < Math.min(objX + radius, numRows); x++) {
+          if (cancel) break;
           for (let y = Math.max(objY - radius, 0); y < Math.min(objY + radius, numCols); y++) {
-            const set = organism.scene.getPositionCell({ x, y });
+            if (cancel) break;
+
+            let set: Set<WorldObject> | WorldObject[] = organism.scene.getPositionCell({ x, y });
+
+            if (set) set = Array.from(set);
 
             if (set) {
-              set.forEach(obj => {
-                this.onDetect(obj);
-              })
+              for (const obj of set) {
+                if (cancel) break;
+
+                this.onDetect(obj, () => { cancel = true });
+              }
             }
           }
         }

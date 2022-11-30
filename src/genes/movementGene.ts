@@ -26,9 +26,6 @@ class MovementGene extends Gene {
   mutate() {
     if (this.movement) {
       this.updateSpeed();
-
-      this.movement.xDirection = Movement.randomDirectionValue();
-      this.movement.yDirection = Movement.randomDirectionValue();
     }
   }
 

@@ -36,35 +36,52 @@ class SeeksEnergy extends Gene {
 
     let closestDistance = Infinity;
     let closestOrganism: Organism | undefined;
+    let feeding = false;
 
-    this.detection.onDetect = (obj: WorldObject) => {
+    this.detection.onDetect = (obj: WorldObject, cancel: () => void) => {
+      if (feeding) cancel();
+
       if (!(obj instanceof Organism)) return;
 
+      const { x: currX, y: currY } = obj.getPosition();
+
       if (this.organism.canEat(obj)) {
-        const { x: currX, y: currY } = obj.getPosition();
-        const { x: latitude, y: longitude } = this.organism.getPosition();
-
-        const distance = getDistance(
-          { latitude: Math.round(latitude), longitude: Math.round(longitude) },
-          { latitude: Math.round(currX), longitude: Math.round(currY) }
-        );
-
-        if (distance < closestDistance) {
-          closestDistance = distance;
+        if (this.organism.intersects(currX, currY)) {
           closestOrganism = obj;
+
+          feeding = true;
+        } else {
+          const { x: currX, y: currY } = obj.getPosition();
+          const { x: latitude, y: longitude } = this.organism.getPosition();
+
+          const distance = getDistance(
+            { latitude: Math.round(latitude), longitude: Math.round(longitude) },
+            { latitude: Math.round(currX), longitude: Math.round(currY) }
+          );
+
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            closestOrganism = obj;
+          }
         }
       }
     };
 
     this.detection.call({ organism: this.organism });
 
-    if (!closestOrganism) return;
+    if (!closestOrganism) {
+      movement.move({ organism: this.organism });
+
+      return;
+    }
 
     const { x: currX, y: currY } = closestOrganism.getPosition();
+
     if (this.organism.intersects(currX, currY)) {
       this.organism.consume(closestOrganism);
     } else {
       movement.directTo({ organism: this.organism, x: currX, y: currY });
+      movement.move({ organism: this.organism })
     }
   }
 

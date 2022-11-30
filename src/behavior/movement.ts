@@ -37,6 +37,14 @@ class Movement extends Behavior {
     return { x, y };
   }
 
+  public static randomize(organism: Organism) {
+    organism.behaviors.forEach((behavior: Behavior) => {
+      if (behavior instanceof Movement) {
+        behavior.setDirection({ x: Movement.randomDirectionValue(), y: Movement.randomDirectionValue() });
+      }
+    })
+  }
+
   speed: number;
   defaultSpeed: number;
   xDirection!: MovementProps["xDirection"];
@@ -53,10 +61,11 @@ class Movement extends Behavior {
     this.yDirection = yDirection || 0;
   }
 
-  call(
-    { organism }:
-    { organism: Organism }
-  ): void {
+  call({ organism }: { organism: Organism }): void {
+    this.move({ organism });
+  }
+
+  move({ organism }: { organism : Organism }): void {
     const { x: objX, y: objY } = organism.getPosition();
     const { xDirection, yDirection } = this.getDirection();
     const { speed } = this;
@@ -86,6 +95,16 @@ class Movement extends Behavior {
     return {
       xDirection: xDirection!,
       yDirection: yDirection!
+    }
+  }
+
+  setDirection({ x, y }: Partial<Coords>) {
+    if (x !== undefined) {
+      this.xDirection = x;
+    }
+
+    if (y !== undefined) {
+      this.yDirection = y;
     }
   }
 
