@@ -88,69 +88,44 @@ class Scene {
       }
     })
 
-    // this.createHeterotroph();
-    // this.createAutotroph();
-
     create(this);
 
     const worker = new Worker(new URL('./utils/collisions.worker.ts', import.meta.url))
 
-    // const redraw = (timePassed: number) => {
-    //   stats.begin();
+    const redraw = (timePassed: number) => {
+      Object.keys(this.measurements).forEach(measurement => { this.measurements[measurement] = 0 });
 
-    //   Object.keys(this.measurements).forEach(measurement => { this.measurements[measurement] = 0 });
+      const sync = () => {
+        stats.begin();
+        this.timePassed = timePassed;
 
-    //   if (!this.stop) {
-    //     this.timePassed = timePassed;
+        app.ticker.stop();
+        console.log('-----------------------') 
+        return new Promise<void>((resolve, reject) => {
+          this.organisms.forEach(organism => organism.animate());
 
-    //     this.organisms.forEach(organism => organism.animate());
-    //   }
-    //   stats.end();
-    // }
+          Object.keys(this.measurements).forEach(measurement => {
+            if (this.measurements[measurement] > 5) {
+              console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
+            }
+          });
 
-    // app.ticker.add(redraw);
-    // app.ticker.start();
 
-    // app.render();
-    // const startTime = performance.now();
-    // const animationRedraw = () => {
-    //   stats.begin();
-
-    //   if (!this.stop) {
-
-    //     this.organisms.forEach(organism => organism.animate());
-    //   }
-    //   stats.end();
-
-    //   this.timePassed = performance.now() - startTime;
-    //   requestAnimationFrame(animationRedraw);
-    // }
-
-    const animationRedraw = () => {
-      stats.begin();
-      const start = performance.now();
-
-      this.organisms.forEach(organism => organism.animate());
-      app.render();
-
-      this.timePassed = Math.ceil(performance.now() - start);
-      setTimeout(() => {
-        const sync = () => {
-          return new Promise<void>((resolve, reject) => {
-            setTimeout(() => {
-              console.log('synced!');
               resolve();
-            }, 1);
           });
         };
 
+      if (!this.stop) {
         sync().then(() => {
+          app.ticker.start();
+
           stats.end();
-          requestAnimationFrame(animationRedraw)
-        })
-      }, 1000 / 60)
+        });
     }
-    requestAnimationFrame(animationRedraw);
+    }
+
+    app.ticker.add(redraw);
+    app.ticker.start();
   }
 
   createHeterotroph(
