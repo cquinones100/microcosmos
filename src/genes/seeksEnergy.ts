@@ -81,7 +81,6 @@ class SeeksEnergy extends Gene {
       this.organism.consume(closestOrganism);
     } else {
       movement.directTo({ organism: this.organism, x: currX, y: currY });
-      movement.move({ organism: this.organism })
     }
   }
 
