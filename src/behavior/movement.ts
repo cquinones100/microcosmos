@@ -3,6 +3,7 @@ import { Coords } from "../organisms/autotroph";
 import HeteroTroph from "../organisms/heterotroph";
 import Organism from "../organisms/organism";
 import Scene from "../scene";
+import Physics, { IDirected } from "../utils/physics/physics";
 
 const DEFAULT_SPEED = 5;
 
@@ -17,7 +18,7 @@ type MovementProps = {
   energy?: number,
 } & Partial<Direction>;
 
-class Movement extends Behavior {
+class Movement extends Behavior implements IDirected {
   public static randomDirectionValue() {
     const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
 
@@ -81,8 +82,8 @@ class Movement extends Behavior {
 
   speed: number;
   defaultSpeed: number;
-  xDirection!: MovementProps["xDirection"];
-  yDirection!: MovementProps["yDirection"];
+  xDirection: IDirected["xDirection"];
+  yDirection: IDirected["yDirection"];
 
   constructor(args?: BehaviorProps & MovementProps) {
     const { speed, defaultSpeed, xDirection, yDirection, ...superArgs } = args || {};
@@ -97,7 +98,11 @@ class Movement extends Behavior {
   }
 
   call({ organism }: { organism: Organism }): void {
-    this.move({ organism });
+    if (this.speed > 0) {
+      Physics.Collision.update(organism, Movement.for(organism))
+        .onClear(() => { this.move({ organism }) })
+        .onCollision(Physics.avoid);
+    }
   }
 
   move({ organism }: { organism : Organism }): void {
@@ -161,6 +166,25 @@ class Movement extends Behavior {
 
     this.xDirection = normalizedValue(dx);
     this.yDirection = normalizedValue(dy);
+  }
+
+  randomDirectionValue() {
+    const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
+
+    return negatableRandom(1) < 0 ? -1 : 1;
+  }
+
+  calculatedCoordinate(
+    { x: objX, y: objY, xDirection, yDirection, speed, scene }
+    : Direction & Coords & { speed: number, scene: Scene }
+  ) {
+    const xVelocity = (speed * xDirection)
+    const yVelocity = (speed * yDirection)
+
+    const x = objX + xVelocity * scene.timePassed;
+    const y = objY + yVelocity * scene.timePassed;
+
+    return { x, y };
   }
 }
 

@@ -28,23 +28,10 @@ class Detection extends Behavior {
       const numCols = getPositionCols.bind(organism.scene)();
 
       organism.scene.measure("For loop", () => {
-        for (let x = Math.max(objX - radius, 0); x < Math.min(objX + radius, numRows); x++) {
-          if (cancel) break;
-          for (let y = Math.max(objY - radius, 0); y < Math.min(objY + radius, numCols); y++) {
-            if (cancel) break;
+        for (let obj of Array.from(organism.scene.organisms)) {
+          if (obj === organism) continue;
 
-            let set: Set<WorldObject> | WorldObject[] = organism.scene.getPositionCell({ x, y });
-
-            if (set) set = Array.from(set);
-
-            if (set) {
-              for (const obj of set) {
-                if (cancel) break;
-
-                this.onDetect(obj, () => { cancel = true });
-              }
-            }
-          }
+          this.onDetect(obj, () => {});
         }
       })
     }

@@ -7,7 +7,7 @@ import TextureOrganism from "./textureOrganism";
 import TextureAutotroph from "./textureAutotroph";
 import Autotroph, { Coords } from "./organisms/autotroph";
 import HeteroTroph from "./organisms/heterotroph";
-import { create } from "./scenarios/movement";
+import { create } from "./scenarios/default";
 
 export const MUTATION_FACTOR = 1;
 

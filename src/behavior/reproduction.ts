@@ -1,6 +1,8 @@
 import Behavior, { BehaviorProps } from "../behavior";
 import Mutator from "../mutator";
 import Organism from "../organisms/organism";
+import Physics from "../utils/physics/physics";
+import Movement from "./movement";
 
 class Reproduction extends Behavior {
   timePassed: number;
@@ -47,6 +49,10 @@ class Reproduction extends Behavior {
     organism.geneticCode.forEach(gene => gene.resolve());
     organism.geneticCode.forEach(Mutator.conditionallyMutate)
     organism.generation = obj.generation + 1;
+
+    const movement = Movement.for(organism);
+
+    if (movement) Physics.avoid(organism, obj, Movement.for(organism));
   }
 }
 

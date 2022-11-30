@@ -28,12 +28,6 @@ class SeeksEnergy extends Gene {
 
     const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
 
-    if (movement) {
-      if (movement.speed === 0) movement.speed = movement.defaultSpeed;
-      if (movement.xDirection === 0) movement.xDirection = negatableRandom(1);
-      if (movement.yDirection === 0) movement.yDirection = negatableRandom(1);
-    }
-
     let closestDistance = Infinity;
     let closestOrganism: Organism | undefined;
     let feeding = false;
@@ -78,8 +72,16 @@ class SeeksEnergy extends Gene {
     const { x: currX, y: currY } = closestOrganism.getPosition();
 
     if (this.organism.intersects(currX, currY)) {
+      movement.speed = 0;
+
       this.organism.consume(closestOrganism);
     } else {
+      if (movement) {
+        if (movement.speed === 0) movement.speed = movement.defaultSpeed;
+        if (movement.xDirection === 0) movement.xDirection = negatableRandom(1);
+        if (movement.yDirection === 0) movement.yDirection = negatableRandom(1);
+      }
+
       movement.directTo({ organism: this.organism, x: currX, y: currY });
     }
   }

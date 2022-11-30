@@ -26,6 +26,10 @@ abstract class Behavior {
     return current;
   }
 
+  public static for<T>(organism: Organism): T {
+    return this.findBehavior(organism, (current) => current instanceof this);
+  }
+
   abstract call<T extends {}>({ organism, ...args }: { organism: Organism, args?: T }): void;
 
   getEnergy() {

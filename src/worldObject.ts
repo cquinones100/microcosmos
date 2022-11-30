@@ -57,23 +57,8 @@ class WorldObject {
       newY = sceneHeight;
     }
 
-    const intersectionObject = this.scene.measure('intersection loop', () => {
-      return Array.from(this.scene.organisms).find((organism) => {
-        return this.intersectsObject(organism) && !this.canEat(organism);
-      });
-    })
-
-    if (intersectionObject && this instanceof Organism) {
-      const { xDirection, yDirection } = Movement.reverse(this);
-
-      this.shape.shape.position.x += (width * xDirection) / 3;
-      this.shape.shape.position.y += (height * yDirection) / 3;
-    } else {
-      this.shape.shape.position.x = newX
-      this.shape.shape.position.y = newY
-    }
-
-    this.scene.setPosition({ x: thisX, y: thisY }, this);
+    this.shape.shape.position.x = newX
+    this.shape.shape.position.y = newY
   }
 
   canEat(organism: Organism) {
