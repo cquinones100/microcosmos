@@ -7,6 +7,8 @@ import TextureOrganism from "./textureOrganism";
 import TextureAutotroph from "./textureAutotroph";
 import Autotroph, { Coords } from "./organisms/autotroph";
 import HeteroTroph from "./organisms/heterotroph";
+import { create } from "./scenarios/movement";
+import Worker from "worker-loader!./utils/collisions.worker";
 
 export const MUTATION_FACTOR = 1;
 
@@ -67,6 +69,14 @@ class Scene {
 
     document.body.appendChild(app.view as unknown as Node);
 
+    const worker = new Worker();
+
+    worker.postMessage({ a: 1 });
+
+    worker.onmessage = (event) => {
+      debugger;
+    };
+
     app.stage.addChild(this.container);
 
     document.addEventListener("keydown", ({ key }) => {
@@ -86,8 +96,10 @@ class Scene {
       }
     })
 
-    this.createHeterotroph();
-    this.createAutotroph();
+    // this.createHeterotroph();
+    // this.createAutotroph();
+
+    create(this);
 
     app.ticker.add((timePassed: number) => {
       stats.begin();
@@ -127,8 +139,12 @@ class Scene {
     return organism;
   }
 
-  createAutotroph() {
-    const texture = TextureAutotroph.create({ scene: this, x: Math.random() * this.app.screen.width, y: Math.random() * this.app.screen.height })
+  createAutotroph({ x, y }: Partial<Coords> = {}) {
+    const texture = TextureAutotroph.create({
+      scene: this,
+      x: x  === undefined ? Math.random() * this.app.screen.width : x,
+      y: y === undefined ? Math.random() * this.app.screen.height : y
+    });
 
     const organism = Autotroph.create({ texture, scene: this })
 
@@ -158,7 +174,7 @@ class Scene {
     return { width, height };
   }
 
-  measure(key: string, cb: () => void, sideEffect?: (elapsedTime: number, key: string, totalTime: number) => void) {
+  measure<T>(key: string, cb: () => T, sideEffect?: (elapsedTime: number, key: string, totalTime: number) => void): T {
     const startTime = Date.now();
 
     const result = cb();
@@ -203,7 +219,7 @@ class Scene {
   getAtPosition({ x: objX, y: objY }: Coords) {
     const { x, y } = this.getPosition({ x: objX, y: objY });
 
-    return this.allObjects[x]?.[y];
+    return this.getPositionCell({ x, y });
   }
 
   getPosition({ x: objX, y: objY }: Coords) {
