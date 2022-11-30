@@ -1,4 +1,6 @@
+import Movement from "./behavior/movement";
 import { Coords } from "./organisms/autotroph";
+import Organism from "./organisms/organism";
 import Scene from "./scene";
 import TextureOrganism from "./textureOrganism";
 
@@ -55,10 +57,27 @@ class WorldObject {
       newY = sceneHeight;
     }
 
-    this.shape.shape.position.x = newX;
-    this.shape.shape.position.y = newY;
+    const intersectionObject = this.scene.measure('intersection loop', () => {
+      return Array.from(this.scene.organisms).find((organism) => {
+        return this.intersectsObject(organism) && !this.canEat(organism);
+      });
+    })
+
+    if (intersectionObject && this instanceof Organism) {
+      const { xDirection, yDirection } = Movement.reverse(this);
+
+      this.shape.shape.position.x += (width * xDirection) / 3;
+      this.shape.shape.position.y += (height * yDirection) / 3;
+    } else {
+      this.shape.shape.position.x = newX
+      this.shape.shape.position.y = newY
+    }
 
     this.scene.setPosition({ x: thisX, y: thisY }, this);
+  }
+
+  canEat(organism: Organism) {
+    return false;
   }
 
   getPosition() {
