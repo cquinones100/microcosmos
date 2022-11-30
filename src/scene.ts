@@ -8,7 +8,6 @@ import TextureAutotroph from "./textureAutotroph";
 import Autotroph, { Coords } from "./organisms/autotroph";
 import HeteroTroph from "./organisms/heterotroph";
 import { create } from "./scenarios/movement";
-import Worker from "worker-loader!./utils/collisions.worker";
 
 export const MUTATION_FACTOR = 1;
 
@@ -69,13 +68,6 @@ class Scene {
 
     document.body.appendChild(app.view as unknown as Node);
 
-    const worker = new Worker();
-
-    worker.postMessage({ a: 1 });
-
-    worker.onmessage = (event) => {
-      debugger;
-    };
 
     app.stage.addChild(this.container);
 
@@ -101,34 +93,74 @@ class Scene {
 
     create(this);
 
-    app.ticker.add((timePassed: number) => {
+    const worker = new Worker(new URL('./utils/collisions.worker.ts', import.meta.url))
+
+    // const redraw = (timePassed: number) => {
+    //   stats.begin();
+
+    //   Object.keys(this.measurements).forEach(measurement => { this.measurements[measurement] = 0 });
+
+    //   if (!this.stop) {
+    //     this.timePassed = timePassed;
+
+    //     this.organisms.forEach(organism => organism.animate());
+    //   }
+    //   stats.end();
+    // }
+
+    // app.ticker.add(redraw);
+    // app.ticker.start();
+
+    // app.render();
+    // const startTime = performance.now();
+    // const animationRedraw = () => {
+    //   stats.begin();
+
+    //   if (!this.stop) {
+
+    //     this.organisms.forEach(organism => organism.animate());
+    //   }
+    //   stats.end();
+
+    //   this.timePassed = performance.now() - startTime;
+    //   requestAnimationFrame(animationRedraw);
+    // }
+
+    const animationRedraw = () => {
       stats.begin();
+      const start = performance.now();
 
-      Object.keys(this.measurements).forEach(measurement => {this.measurements[measurement] = 0});
-
-      if (!this.stop) {
-        this.timePassed = timePassed;
-
-        // this.allObjects = this.organisms;
-
-        this.organisms.forEach(organism => organism.animate());
-
-      }
+      this.organisms.forEach(organism => organism.animate());
       app.render();
-      stats.end();
-    })
 
-    app.ticker.start();
+      this.timePassed = Math.ceil(performance.now() - start);
+      setTimeout(() => {
+        const sync = () => {
+          return new Promise<void>((resolve, reject) => {
+            setTimeout(() => {
+              console.log('synced!');
+              resolve();
+            }, 1);
+          });
+        };
+
+        sync().then(() => {
+          stats.end();
+          requestAnimationFrame(animationRedraw)
+        })
+      }, 1000 / 60)
+    }
+    requestAnimationFrame(animationRedraw);
   }
 
   createHeterotroph(
     { x, y, color }
-    : { x?: number, y?: number, color?: number }
-    = {}
+      : { x?: number, y?: number, color?: number }
+      = {}
   ) {
     const texture = TextureOrganism.create({
       scene: this,
-      x: x  === undefined ? Math.random() * this.app.screen.width : x,
+      x: x === undefined ? Math.random() * this.app.screen.width : x,
       y: y === undefined ? Math.random() * this.app.screen.height : y
     });
 
@@ -142,7 +174,7 @@ class Scene {
   createAutotroph({ x, y }: Partial<Coords> = {}) {
     const texture = TextureAutotroph.create({
       scene: this,
-      x: x  === undefined ? Math.random() * this.app.screen.width : x,
+      x: x === undefined ? Math.random() * this.app.screen.width : x,
       y: y === undefined ? Math.random() * this.app.screen.height : y
     });
 
@@ -205,7 +237,7 @@ class Scene {
   setPosition({ x: objX, y: objY }: Coords, object: WorldObject) {
     const { x, y } = this.getPosition({ x: objX, y: objY });
 
-    try { 
+    try {
       this.allObjects[x][y].delete(object);
       this.allObjects[x][y].add(object);
     } catch (e) {

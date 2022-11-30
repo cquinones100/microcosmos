@@ -36,14 +36,6 @@ class WorldObject {
     const { width, height } = this.shape.getDimensions();
     const { width: sceneWidth, height: sceneHeight } = scene.getDimensions();
 
-    // const intersectingObject = Array
-    //   .from(this.scene.allObjects)
-    //   .find(obj => {
-    //     if (obj === this) return false;
-
-    //     return obj.intersects(thisX!, thisY!);
-    //   });
-    
     let newX = x;
     let newY = y;
 
@@ -63,15 +55,10 @@ class WorldObject {
       newY = sceneHeight;
     }
 
-    // if (intersectingObject) {
-    //   this.onIntersection({ x: newX, y: newY }, intersectingObject, () => {});
-    // } else {
+    this.shape.shape.position.x = newX;
+    this.shape.shape.position.y = newY;
 
-      this.shape.shape.position.x = newX;
-      this.shape.shape.position.y = newY;
-
-      this.scene.setPosition({ x: thisX, y: thisY }, this);
-    // }
+    this.scene.setPosition({ x: thisX, y: thisY }, this);
   }
 
   getPosition() {

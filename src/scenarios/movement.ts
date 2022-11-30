@@ -33,11 +33,4 @@ export const create = (scene: Scene) => {
 
   secondOrganism.shape.shape.tint = 0x1ECEE6;
   secondOrganism.geneticCode = new GeneticCode([movementGene(secondOrganism, { xDirection: -1 })]);
-
-  const thirdOrganism = scene.createHeterotroph({
-    x: scene.app.screen.width - organism.getDimensions().width,
-    y: scene.center.y
-  });
-  thirdOrganism.shape.shape.tint = 0x1ECEE6;
-  thirdOrganism.geneticCode = new GeneticCode([movementGene(thirdOrganism, { xDirection: -1 }), new Reproduces(thirdOrganism)]);
 };
