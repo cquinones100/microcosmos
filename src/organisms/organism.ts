@@ -21,6 +21,7 @@ class Organism extends WorldObject {
   generation: number;
   color: number = Organism.color;
   text: Text;
+  consumed: boolean;
 
   constructor({ energySources = [], geneticCode, generation, x, y, color, ...args }: OrganismProps) {
     super({ x, y, ...args });
@@ -47,6 +48,7 @@ class Organism extends WorldObject {
     this.text.zIndex = 2;
 
     this.scene.container.addChild(this.text);
+    this.consumed = false;
   }
 
   updateEnergyText() {
