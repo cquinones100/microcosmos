@@ -32,6 +32,7 @@ class Scene {
   allObjects: Set<WorldObject>[][];
   workerPool: Worker[];
 
+
   constructor() {
     this.organisms = new Set<Organism>();
     this.predators = new Set();
@@ -63,7 +64,7 @@ class Scene {
       new Worker(new URL('./utils/collisions.worker.ts', import.meta.url)),
       new Worker(new URL('./utils/collisions.worker.ts', import.meta.url)),
       new Worker(new URL('./utils/collisions.worker.ts', import.meta.url)),
-    ]
+    ];
   }
 
   draw() {
@@ -106,16 +107,15 @@ class Scene {
         this.timePassed = timePassed;
 
         app.ticker.stop();
-        console.log('-----------------------') 
         return new Promise<void>((resolve, reject) => {
             this.organisms.forEach(organism => { 
-              const worker = this.workerPool[count % 4];
+              // const worker = this.workerPool[count % 4];
 
-              worker.postMessage(count);
+              // worker.postMessage(count);
 
-              worker.onmessage = (data) => {
-                organism.animate()
-              };
+              // worker.onmessage = (data) => {
+              organism.animate();
+              // };
             });
 
             Object.keys(this.measurements).forEach(measurement => {

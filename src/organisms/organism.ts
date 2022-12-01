@@ -2,7 +2,7 @@ import { Text } from "pixi.js";
 import Behavior from "../behavior";
 import Movement from "../behavior/movement";
 import GeneticCode from "../geneticCode";
-import WorldObject, { WorldObjectProps } from "../worldObject";
+import WorldObject, { IWorkerObject, WorldObjectProps } from "../worldObject";
 
 export type OrganismProps = {
   energySources?: (any)[];
@@ -145,6 +145,15 @@ class Organism extends WorldObject {
     super.setPosition({ x, y });
 
     this.text.position.set(x + 3, y + this.getDimensions().height / 2 - 3);
+  }
+
+  toWorkerObject(id?: number): IWorkerObject {
+    return {
+      id,
+      position: this.getPosition(),
+      dimensions: this.getDimensions(),
+      hungry: this.hungry(),
+    }
   }
 }
 

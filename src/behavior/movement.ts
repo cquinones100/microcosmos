@@ -1,3 +1,4 @@
+import { getDistance } from "geolib";
 import Behavior, { BehaviorProps } from "../behavior";
 import { Coords } from "../organisms/autotroph";
 import HeteroTroph from "../organisms/heterotroph";
@@ -160,14 +161,14 @@ class Movement extends Behavior implements IDirected {
       if (delta === 0) return 0;
 
       if (delta > 0) {
-        return Math.random() * -1;
+        return -1;
       } else {
-        return Math.random();
+        return 1;
       }
     }
 
-    this.xDirection = normalizedValue(dx);
-    this.yDirection = normalizedValue(dy);
+    this.xDirection = normalizedValue(Math.round(dx) + 5);
+    this.yDirection = normalizedValue(Math.round(dy) + 5);
   }
 
   randomDirectionValue() {

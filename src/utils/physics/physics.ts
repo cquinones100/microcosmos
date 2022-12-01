@@ -1,4 +1,4 @@
-import WorldObject from "../../worldObject";
+import WorldObject, { IWorkerObject } from "../../worldObject";
 import { Coords } from "../../organisms/autotroph";
 
 export interface IDirected {
@@ -22,11 +22,7 @@ type ICollisionHandler = {
   onClear: (cb: () => void) => ICollisionHandler;
 };
 
-export interface ICollisionObject {
-  getPosition: () => Coords;
-  getDimensions: () => { width: number; height: number; };
-}
-
+type ICollisionObject = IWorkerObject;
 class Collision implements ICollisionHandler {
   private static grid: Set<ICollisionObject> = new Set();
   public static update(collider: ICollisionObject, directionHandler: IDirected): ICollisionHandler {
@@ -36,9 +32,9 @@ class Collision implements ICollisionHandler {
     grid.add(collider);
 
     const collisionObjects = Array.from(grid).filter(object => {
-      const { x, y } = collider.getPosition();
-      const { x: objectX, y: objectY } = object.getPosition();
-      const { width, height } = collider.getDimensions();
+      const { x, y } = collider.position;
+      const { x: objectX, y: objectY } = object.position;
+      const { width, height } = collider.dimensions;
 
       return object !== collider
         && objectX > x - width
@@ -55,9 +51,9 @@ class Collision implements ICollisionHandler {
   }
 
   public static collides(collider: ICollisionObject, collided: ICollisionObject): boolean {
-      const { x, y } = collider.getPosition();
-      const { width, height } = collider.getDimensions();
-      const { x: collidedX, y: collidedY } = collided.getPosition();
+      const { x, y } = collider.position;
+      const { width, height } = collider.dimensions;
+      const { x: collidedX, y: collidedY } = collided.position;
 
       return collided !== collider
         && collidedX > x - width
@@ -115,7 +111,7 @@ class NoCollision implements ICollisionHandler {
   }
 }
 
-const avoid = (hugger: ICollisionObject & WorldObject, hugged: ICollisionObject, directionHandler: IDirected) => {
+const avoid = (hugger: WorldObject, hugged: WorldObject, directionHandler: IDirected) => {
   const { x: huggerX, y: huggerY } = hugger.getPosition();
   const { width: huggerWidth, height: huggerHeight } = hugger.getDimensions();
 

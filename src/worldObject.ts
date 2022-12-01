@@ -12,6 +12,14 @@ export type WorldObjectProps = {
   y: number;
 }
 
+export interface IWorkerObject {
+  id?: number;
+  position: Coords;
+  dimensions: { width: number; height: number; };
+  hungry: boolean;
+  canBeEaten?: boolean;
+}
+
 class WorldObject {
   scene: Scene;
   color?: number;
@@ -104,6 +112,7 @@ class WorldObject {
   }
 
   onIntersection({ x, y }: Coords, intersectionObject: WorldObject, cb: () => void) { }
+
 }
 
 export default WorldObject;
