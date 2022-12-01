@@ -5,15 +5,21 @@ import Movement from "../behavior/movement";
 import Gene from "../gene";
 import HeteroTroph from "../organisms/heterotroph";
 import Organism from "../organisms/organism";
+import Physics from "../utils/physics/physics";
 import WorldObject from "../worldObject";
+export const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
 
 class SeeksEnergy extends Gene {
   detection: Detection;
+  interval: number;
+  target: Organism | undefined;
 
   constructor(args: Organism) {
     super(args);
 
     this.detection = new Detection();
+    this.interval = 0;
+    this.target = undefined;
   }
 
   animate() {
@@ -21,69 +27,57 @@ class SeeksEnergy extends Gene {
   }
 
   resolve() {
-    if (!this.organism.hungry()) return;
-    if (!(this.organism instanceof HeteroTroph)) return;
+    const movement = Movement.for<Movement>(this.organism);
 
-    const movement = Behavior.findBehavior<Movement>(this.organism, (current) => current instanceof Movement);
+    if (this.organism.hungry()) {
+      if (this.target && this.organism.canEat(this.target)) {
+        const { x, y } = this.target?.getPosition();
 
-    const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
+        if (Physics.Collision.collides(this.organism, this.target)) {
+          this.organism.consume(this.target);
 
-    let closestDistance = Infinity;
-    let closestOrganism: Organism | undefined;
-    let feeding = false;
-
-    this.detection.onDetect = (obj: WorldObject, cancel: () => void) => {
-      if (feeding) cancel();
-
-      if (!(obj instanceof Organism)) return;
-
-      const { x: currX, y: currY } = obj.getPosition();
-
-      if (this.organism.canEat(obj)) {
-        if (this.organism.intersects(currX, currY)) {
-          closestOrganism = obj;
-
-          feeding = true;
+          return;
         } else {
-          const { x: currX, y: currY } = obj.getPosition();
-          const { x: latitude, y: longitude } = this.organism.getPosition();
+          movement.directTo({
+            organism: this.organism,
+            x,
+            y
+          });
 
-          const distance = getDistance(
-            { latitude: Math.round(latitude), longitude: Math.round(longitude) },
-            { latitude: Math.round(currX), longitude: Math.round(currY) }
-          );
+          return;
+        }
+      } else {
+        this.target = undefined
+      }
 
-          if (distance < closestDistance) {
-            closestDistance = distance;
-            closestOrganism = obj;
-          }
+      const objs: WorldObject[] = [];
+
+      this.detection.onDetect = (obj: WorldObject, cancel: () => void) => {
+        objs.push(obj);
+      };
+
+      this.detection.call({ organism: this.organism });
+
+      if (objs.length > 0) {
+        const food = objs.find(obj => {
+          return obj instanceof Organism && this.organism.canEat(obj);
+        }) as Organism;
+
+        if (food) {
+          this.target = food;
+        }
+      } else {
+        if (this.interval <= 0) {
+          if (movement.speed === 0) movement.speed = movement.defaultSpeed;
+          if (movement.xDirection === 0) movement.xDirection = negatableRandom(1);
+          if (movement.yDirection === 0) movement.yDirection = negatableRandom(1);
+
+          this.interval = 120;
         }
       }
-    };
-
-    this.detection.call({ organism: this.organism });
-
-    if (!closestOrganism) {
-      movement.move({ organism: this.organism });
-
-      return;
     }
 
-    const { x: currX, y: currY } = closestOrganism.getPosition();
-
-    if (this.organism.intersects(currX, currY)) {
-      movement.speed = 0;
-
-      this.organism.consume(closestOrganism);
-    } else {
-      if (movement) {
-        if (movement.speed === 0) movement.speed = movement.defaultSpeed;
-        if (movement.xDirection === 0) movement.xDirection = negatableRandom(1);
-        if (movement.yDirection === 0) movement.yDirection = negatableRandom(1);
-      }
-
-      movement.directTo({ organism: this.organism, x: currX, y: currY });
-    }
+    this.interval -= 1;
   }
 
   increase() {}

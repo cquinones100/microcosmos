@@ -30,6 +30,7 @@ class Scene {
   container: PIXI.Container<PIXI.DisplayObject>;
   stop: boolean;
   allObjects: Set<WorldObject>[][];
+  workerPool: Worker[];
 
   constructor() {
     this.organisms = new Set<Organism>();
@@ -57,6 +58,12 @@ class Scene {
     });
     this.stop = false;
     this.container.sortableChildren = true;
+    this.workerPool = [
+      new Worker(new URL('./utils/collisions.worker.ts', import.meta.url)),
+      new Worker(new URL('./utils/collisions.worker.ts', import.meta.url)),
+      new Worker(new URL('./utils/collisions.worker.ts', import.meta.url)),
+      new Worker(new URL('./utils/collisions.worker.ts', import.meta.url)),
+    ]
   }
 
   draw() {
@@ -77,7 +84,6 @@ class Scene {
 
         if (this.stop) {
           console.log("PAUSED");
-          console.log(this.allObjects);
           console.log(`MEASUREMENT Organisms: ${this.organisms.size}`);
           console.log(`MEASUREMENT Heterotrophs: ${Array.from(this.organisms).filter(org => org instanceof HeteroTroph).length}`);
           console.log(`MEASUREMENT Autotrophs: ${Array.from(this.organisms).filter(org => org instanceof Autotroph).length}`);
@@ -90,11 +96,11 @@ class Scene {
 
     create(this);
 
-    const worker = new Worker(new URL('./utils/collisions.worker.ts', import.meta.url))
 
     const redraw = (timePassed: number) => {
       Object.keys(this.measurements).forEach(measurement => { this.measurements[measurement] = 0 });
 
+      let count = this.workerPool.length;
       const sync = () => {
         stats.begin();
         this.timePassed = timePassed;
@@ -102,16 +108,23 @@ class Scene {
         app.ticker.stop();
         console.log('-----------------------') 
         return new Promise<void>((resolve, reject) => {
-          this.organisms.forEach(organism => organism.animate());
+            this.organisms.forEach(organism => { 
+              const worker = this.workerPool[count % 4];
 
-          Object.keys(this.measurements).forEach(measurement => {
-            if (this.measurements[measurement] > 5) {
-              console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
-            }
-          });
+              worker.postMessage(count);
 
+              worker.onmessage = (data) => {
+                organism.animate()
+              };
+            });
 
-              resolve();
+            Object.keys(this.measurements).forEach(measurement => {
+              if (this.measurements[measurement] > 5) {
+                console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
+              }
+            });
+
+            resolve();
           });
         };
 

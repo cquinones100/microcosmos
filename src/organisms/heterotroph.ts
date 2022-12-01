@@ -44,6 +44,9 @@ class HeteroTroph extends Organism {
     if (x !== undefined && y !== undefined) {
       this.setPosition({ x, y });
     }
+
+    this.maxEnergy = 10000;
+    this.energy = 10000;
   }
 
   animate() {

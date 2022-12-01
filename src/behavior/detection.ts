@@ -18,19 +18,9 @@ class Detection extends Behavior {
 
   call({ organism }: { organism: Organism }): void {
     const call = () => {
-      let cancel = false;
-
-      const { getPositionRows, getPositionCols  } = organism.scene;
-      const { x: objX, y: objY } = organism.scene.getPosition(organism.getPosition());
-      const radius = this.getOrganismRadius(organism);
-
-      const numRows = getPositionRows.bind(organism.scene)();
-      const numCols = getPositionCols.bind(organism.scene)();
-
       organism.scene.measure("For loop", () => {
         for (let obj of Array.from(organism.scene.organisms)) {
           if (obj === organism) continue;
-
           this.onDetect(obj, () => {});
         }
       })

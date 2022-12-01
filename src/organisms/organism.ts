@@ -113,7 +113,7 @@ class Organism extends WorldObject {
   }
 
   canEat(organism: Organism) {
-    return organism.canBeEatenBy(this);
+    return this.scene.organisms.has(organism) && organism.canBeEatenBy(this);
   }
   canBeEatenBy<Organism>(arg0: this) {
     return false;

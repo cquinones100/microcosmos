@@ -99,9 +99,11 @@ class Movement extends Behavior implements IDirected {
 
   call({ organism }: { organism: Organism }): void {
     if (this.speed > 0) {
-      Physics.Collision.update(organism, Movement.for(organism))
-        .onClear(() => { this.move({ organism }) })
-        .onCollision(Physics.avoid);
+      // Physics.Collision.update(organism, Movement.for(organism))
+      //   .onClear(() => { this.move({ organism }) })
+        // .onCollision(Physics.avoid);
+
+        this.move({ organism })
     }
   }
 
@@ -148,7 +150,7 @@ class Movement extends Behavior implements IDirected {
     }
   }
 
-  directTo({ organism, x, y }: { organism: HeteroTroph, x: number, y: number }) {
+  directTo({ organism, x, y }: { organism: Organism, x: number, y: number }) {
     const { x: objX, y: objY } = organism.getPosition();
 
     const dx = objX - x;
@@ -158,9 +160,9 @@ class Movement extends Behavior implements IDirected {
       if (delta === 0) return 0;
 
       if (delta > 0) {
-        return -1;
+        return Math.random() * -1;
       } else {
-        return 1;
+        return Math.random();
       }
     }
 

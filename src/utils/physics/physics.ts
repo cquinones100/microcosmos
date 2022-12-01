@@ -12,8 +12,8 @@ export interface IDirected {
 type ICollisionHandler = {
   onCollision: (
     cb: (
-      collider: WorldObject,
-      collided: WorldObject,
+      collider: ICollisionObject,
+      collided: ICollisionObject,
       directionHandler: IDirected
     )
     => void
@@ -22,9 +22,14 @@ type ICollisionHandler = {
   onClear: (cb: () => void) => ICollisionHandler;
 };
 
+export interface ICollisionObject {
+  getPosition: () => Coords;
+  getDimensions: () => { width: number; height: number; };
+}
+
 class Collision implements ICollisionHandler {
-  private static grid: Set<WorldObject> = new Set();
-  public static update(collider: WorldObject, directionHandler: IDirected): ICollisionHandler {
+  private static grid: Set<ICollisionObject> = new Set();
+  public static update(collider: ICollisionObject, directionHandler: IDirected): ICollisionHandler {
 
     const { grid } = Collision;
 
@@ -49,13 +54,25 @@ class Collision implements ICollisionHandler {
     }
   }
 
-  collided: WorldObject;
-  collider: WorldObject;
+  public static collides(collider: ICollisionObject, collided: ICollisionObject): boolean {
+      const { x, y } = collider.getPosition();
+      const { width, height } = collider.getDimensions();
+      const { x: collidedX, y: collidedY } = collided.getPosition();
+
+      return collided !== collider
+        && collidedX > x - width
+        && collidedX < x + width
+        && collidedY > y - width
+        && collidedY < y + height;
+  }
+
+  collided: ICollisionObject;
+  collider: ICollisionObject;
   directionHandler: IDirected;
   clearCb?: () => void;
-  collisionCb?: (collider: WorldObject, collided: WorldObject) => void;
+  collisionCb?: (collider: ICollisionObject, collided: ICollisionObject) => void;
 
-  constructor(collider: WorldObject, collided: WorldObject, directionHandler: IDirected) {
+  constructor(collider: ICollisionObject, collided: ICollisionObject, directionHandler: IDirected) {
     this.collider = collider;
     this.collided = collided;
     this.directionHandler = directionHandler;
@@ -67,7 +84,7 @@ class Collision implements ICollisionHandler {
     return this;
   }
 
-  onCollision(cb: (collider: WorldObject, collided: WorldObject, directionHandler: IDirected) => void) {
+  onCollision(cb: (collider: ICollisionObject, collided: ICollisionObject, directionHandler: IDirected) => void) {
     cb(this.collider, this.collided, this.directionHandler);
 
     return Collision.update(this.collider, this.directionHandler);
@@ -75,12 +92,12 @@ class Collision implements ICollisionHandler {
 }
 
 class NoCollision implements ICollisionHandler {
-  collider: WorldObject;
+  collider: ICollisionObject;
   collisionCb: () => void;
   clearCb?: () => void;
   directionHandler: IDirected;
 
-  constructor(collider: WorldObject, directionHandler: IDirected) {
+  constructor(collider: ICollisionObject, directionHandler: IDirected) {
     this.collider = collider;
     this.collisionCb = () => {};
     this.clearCb = undefined;
@@ -98,7 +115,7 @@ class NoCollision implements ICollisionHandler {
   }
 }
 
-const avoid = (hugger: WorldObject, hugged: WorldObject, directionHandler: IDirected) => {
+const avoid = (hugger: ICollisionObject & WorldObject, hugged: ICollisionObject, directionHandler: IDirected) => {
   const { x: huggerX, y: huggerY } = hugger.getPosition();
   const { width: huggerWidth, height: huggerHeight } = hugger.getDimensions();
 
@@ -132,9 +149,9 @@ class Movement {
     // (new Movement({ obj })).move();;
   // }
 
-  obj: WorldObject;
+  obj: ICollisionObject;
 
-  constructor({ obj }: { obj: WorldObject }) {
+  constructor({ obj }: { obj: ICollisionObject }) {
     this.obj = obj;
   }
 }
