@@ -1,7 +1,5 @@
-import { getDistance } from "geolib";
 import Behavior, { BehaviorProps } from "../behavior";
 import { Coords } from "../organisms/autotroph";
-import HeteroTroph from "../organisms/heterotroph";
 import Organism from "../organisms/organism";
 import Scene from "../scene";
 import Physics, { IDirected } from "../utils/physics/physics";
@@ -14,9 +12,9 @@ export type Direction = {
 }
 
 type MovementProps = {
-  speed?: number,
-  defaultSpeed?: number,
-  energy?: number,
+  speed?: number;
+  defaultSpeed?: number;
+  energy?: number;
 } & Partial<Direction>;
 
 class Movement extends Behavior implements IDirected {
@@ -30,11 +28,13 @@ class Movement extends Behavior implements IDirected {
     { x: objX, y: objY, xDirection, yDirection, speed, scene }
     : Direction & Coords & { speed: number, scene: Scene }
   ) {
-    const xVelocity = (speed * xDirection)
-    const yVelocity = (speed * yDirection)
+    const xVelocity = (speed);
+    const yVelocity = (speed);
 
-    const x = objX + xVelocity * scene.timePassed;
-    const y = objY + yVelocity * scene.timePassed;
+    const vector = {x: (objX + xVelocity * scene.timePassed), y: (objY + yVelocity * scene.timePassed) }
+
+    const x = objX + vector.x
+    const y = objY + vector.y
 
     return { x, y };
   }
@@ -85,6 +85,7 @@ class Movement extends Behavior implements IDirected {
   defaultSpeed: number;
   xDirection: IDirected["xDirection"];
   yDirection: IDirected["yDirection"];
+  target: Coords;
 
   constructor(args?: BehaviorProps & MovementProps) {
     const { speed, defaultSpeed, xDirection, yDirection, ...superArgs } = args || {};
@@ -96,6 +97,7 @@ class Movement extends Behavior implements IDirected {
     this.xDirection = xDirection || 0;
     this.yDirection = yDirection || 0;
     this.energy = 0.05
+    this.target = { x: 0, y: 0 }
   }
 
   call({ organism }: { organism: Organism }): void {
@@ -109,21 +111,14 @@ class Movement extends Behavior implements IDirected {
   }
 
   move({ organism }: { organism : Organism }): void {
-    const { x: objX, y: objY } = organism.getPosition();
-    const { xDirection, yDirection } = this.getDirection();
-    const { speed } = this;
-    const { scene } = organism;
+    const { x, y } = organism.getPosition();
+    const vector = Physics.Vector.getVector({ x, y , targetX: this.target.x, targetY: this.target.y })
 
-    const coordinates = Movement.calculatedCoordinate({
-      x: objX,
-      y: objY,
-      xDirection,
-      yDirection,
-      speed,
-      scene
-    })
+    const newVector = Physics.Vector.scaledVector(vector, this.speed);
 
-    organism.setPosition(coordinates);
+    debugger;
+
+    organism.setPosition({ x: vector.x * this.speed, y: vector.y * this.speed });
   }
 
   duplicate() {
@@ -152,23 +147,7 @@ class Movement extends Behavior implements IDirected {
   }
 
   directTo({ organism, x, y }: { organism: Organism, x: number, y: number }) {
-    const { x: objX, y: objY } = organism.getPosition();
-
-    const dx = objX - x;
-    const dy = objY - y;
-
-    const normalizedValue = (delta: number) => {
-      if (delta === 0) return 0;
-
-      if (delta > 0) {
-        return -1;
-      } else {
-        return 1;
-      }
-    }
-
-    this.xDirection = normalizedValue(Math.round(dx) + 5);
-    this.yDirection = normalizedValue(Math.round(dy) + 5);
+    this.target = { x, y };
   }
 
   randomDirectionValue() {

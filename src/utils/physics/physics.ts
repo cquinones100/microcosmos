@@ -1,5 +1,6 @@
 import WorldObject, { IWorkerObject } from "../../worldObject";
 import { Coords } from "../../organisms/autotroph";
+import { Vector2 } from "three";
 
 export interface IDirected {
   xDirection: number;
@@ -152,10 +153,46 @@ class Movement {
   }
 }
 
+type VectorProps = { x: number; y: number; targetX: number; targetY: number; }
+
+class Vector {
+  x: number;
+  y: number;
+  magnitude: number;
+
+  constructor({ x, y, targetX, targetY }: VectorProps ) {
+    this.x = targetX - x;
+    this.y = targetY - y;
+    this.magnitude = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+  }
+
+  getDistance() {
+    return Math.pow(this.x, 2) + Math.pow(this.y, 2);
+  }
+}
+
 const Physics = {
   Movement,
   Collision,
-  avoid
+  avoid,
+  Vector: {
+    getVector(args: VectorProps) {
+      return new Vector(args);
+    },
+    getClosest(a: Vector, b: Vector) {
+      if (a.getDistance() < b.getDistance()) {
+        return a;
+      } else {
+        return b;
+      }
+    },
+    scaledVector(vector: Vector, speed: number) {
+      const x = vector.x * speed;
+      const y = vector.y * speed;
+
+      return { magnitude: Math.hypot(x, y), x, y };
+    }
+  }
 }
 
 export default Physics;

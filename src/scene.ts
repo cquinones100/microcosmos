@@ -97,7 +97,6 @@ class Scene {
 
     create(this);
 
-
     const redraw = (timePassed: number) => {
       Object.keys(this.measurements).forEach(measurement => { this.measurements[measurement] = 0 });
 
