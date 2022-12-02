@@ -7,7 +7,7 @@ import TextureOrganism from "./textureOrganism";
 import TextureAutotroph from "./textureAutotroph";
 import Autotroph, { Coords } from "./organisms/autotroph";
 import HeteroTroph from "./organisms/heterotroph";
-import { create } from "./scenarios/default";
+import { create } from "./scenarios/movement";
 
 export const MUTATION_FACTOR = 1;
 
@@ -218,7 +218,9 @@ class Scene {
   }
 
   getDimensions() {
-    return { width: this.app.screen.width, height: this.app.screen.width };
+    const { width, height } = this.app.screen
+
+    return { width, height };
   }
 
   setPosition({ x: objX, y: objY }: Coords, object: WorldObject) {

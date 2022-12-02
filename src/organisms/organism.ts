@@ -1,5 +1,5 @@
 import { Text } from "pixi.js";
-import Behavior from "../behavior";
+import Behavior, { IBehavior } from "../behavior";
 import Movement from "../behavior/movement";
 import GeneticCode from "../geneticCode";
 import WorldObject, { IWorkerObject, WorldObjectProps } from "../worldObject";
@@ -22,6 +22,7 @@ class Organism extends WorldObject {
   color: number = Organism.color;
   text: Text;
   consumed: boolean;
+  scenarioBehaviors: IBehavior[];
 
   constructor({ energySources = [], geneticCode, generation, x, y, color, ...args }: OrganismProps) {
     super({ x, y, ...args });
@@ -49,6 +50,8 @@ class Organism extends WorldObject {
 
     this.scene.container.addChild(this.text);
     this.consumed = false;
+
+    this.scenarioBehaviors = [];
   }
 
   updateEnergyText() {
@@ -67,7 +70,9 @@ class Organism extends WorldObject {
 
     this.geneticCode!.animate();
 
-    this.behaviors.forEach(behavior => this.act(behavior));
+    // this.behaviors.forEach(behavior => this.act(behavior));
+
+    this.scenarioBehaviors.forEach(behavior => behavior.call());
   }
 
   setBehavior(behavior: Behavior) {

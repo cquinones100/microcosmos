@@ -8,7 +8,7 @@ import { IWorkerObject } from "../worldObject";
 import Physics from "./physics/physics";
 
 type WorkerResolverResult = 
-  | { action: 'NULLIFY_TARGET' | 'BEGIN_MOVING'; }
+  | { action: 'BEGIN_MOVING'; }
   | {
     action: 'MOVE';
     params: { id: number; x: number, y: number };

@@ -1,6 +1,5 @@
-import WorldObject, { IWorkerObject } from "../../worldObject";
+import WorldObject, { IWorkerObject }  from "../../worldObject";
 import { Coords } from "../../organisms/autotroph";
-import { Vector2 } from "three";
 
 export interface IDirected {
   xDirection: number;
@@ -155,19 +154,44 @@ class Movement {
 
 type VectorProps = { x: number; y: number; targetX: number; targetY: number; }
 
-class Vector {
-  x: number;
-  y: number;
-  magnitude: number;
+export interface IVector {
+  readonly x: number;
+  readonly y: number;
+  readonly length: number;
+  readonly targetX: number;
+  readonly targetY: number;
+  normalized: () => Coords;
+}
+
+class Vector implements IVector {
+  readonly x: number;
+  readonly y: number;
+  readonly length: number;
+  readonly targetX: number;
+  readonly targetY: number;
+  originalX: number;
+  originalY: number;
 
   constructor({ x, y, targetX, targetY }: VectorProps ) {
+    this.originalX = x;
+    this.originalY = y;
+    this.targetX = targetX;
+    this.targetY = targetY;
     this.x = targetX - x;
     this.y = targetY - y;
-    this.magnitude = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    this.length = Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
   }
 
-  getDistance() {
-    return Math.pow(this.x, 2) + Math.pow(this.y, 2);
+  divide() {
+    return {
+    }
+  }
+
+  normalized() {
+    return {
+      x: this.x / this.length,
+      y: this.y / this.length,
+    }
   }
 }
 
@@ -180,18 +204,13 @@ const Physics = {
       return new Vector(args);
     },
     getClosest(a: Vector, b: Vector) {
-      if (a.getDistance() < b.getDistance()) {
-        return a;
-      } else {
-        return b;
-      }
     },
     scaledVector(vector: Vector, speed: number) {
       const x = vector.x * speed;
       const y = vector.y * speed;
 
       return { magnitude: Math.hypot(x, y), x, y };
-    }
+    },
   }
 }
 

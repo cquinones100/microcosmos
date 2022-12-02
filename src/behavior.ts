@@ -1,6 +1,10 @@
 import Organism from "./organisms/organism";
 const DEFAULT_ENERGY = 0.01;
 
+export interface IBehavior {
+  call: () => void;
+}
+
 export type BehaviorProps = {
   energy?: number;
 }

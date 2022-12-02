@@ -1,9 +1,8 @@
 import Detection from "../behavior/detection";
-import Movement from "../behavior/movement";
 import Gene from "../gene";
 import Organism from "../organisms/organism";
 import { WorkerResolver } from "../utils/collisions.worker";
-import Physics from "../utils/physics/physics";
+import Physics, { IVector } from "../utils/physics/physics";
 import { IWorkerObject } from "../worldObject";
 export const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
 
@@ -14,6 +13,8 @@ class SeeksEnergy extends Gene {
   targetPosition: { x: number; y: number; } | {};
   turns: number = 0;
   radius: number;
+  vector: IVector | undefined;
+  speed: number;
 
   constructor(args: Organism) {
     super(args);
@@ -23,6 +24,7 @@ class SeeksEnergy extends Gene {
     this.target = undefined;
     this.targetPosition = {};
     this.radius = 200;
+    this.speed = 5;
   }
 
   animate() {
@@ -30,98 +32,102 @@ class SeeksEnergy extends Gene {
   }
 
   resolve() {
-    const movement = Movement.for<Movement>(this.organism);
+    // const movement = Movement.for<Movement>(this.organism);
 
+    // if (this.target !== undefined) {
+    //   if (!this.target!.canBeEatenBy(this.organism)) {
+    //     this.target = undefined;
+    //     this.vector = undefined;
 
-    if (this.target !== undefined) {
-      if (!this.target!.canBeEatenBy(this.organism)) {
-        this.target = undefined;
-      } else {
-        const { x, y } = this.target.getPosition();
+    //     return this.detect();
+    //   }
 
-        if (Physics.Collision.collides(this.organism.toWorkerObject(), this.target.toWorkerObject())) {
-          this.organism.consume(this.target)
-          movement.speed = 0;
-        } else {
-          const { x: objX, y: objY } = this.organism.getPosition();
+    //   if (Physics.Collision.collides(this.organism.toWorkerObject(), this.target.toWorkerObject())) {
+    //     this.organism.consume(this.target)
 
-          movement.directTo({
-            organism: this.organism,
-            x,
-            y
-          });
-        }
+    //     this.vector = undefined;
+    //     return;
+    //   }
+    // }
+
+    // this.detect();
+
+    let lines = 25;
+    const interval = 360 / 25;
+
+    while (lines === 0) {
+    }
+  }
+
+  detect() {
+    const workerObjects: IWorkerObject[] = [];
+    const organismMap: Organism[] = [];
+
+    Array.from(this.organism.scene.organisms).forEach((org, id) => {
+      if (org === this.organism) return this.organism.toWorkerObject(-1);
+
+      const workerObject = org.toWorkerObject(organismMap.length);
+
+      if (org.canBeEatenBy(this.organism)) {
+        workerObject.canBeEaten = true;
       }
 
-      return;
-    }
-
-    if (this.target === undefined) {
-      const workerObjects: IWorkerObject[] = [];
-      const organismMap: Organism[] = [];
-
-      Array.from(this.organism.scene.organisms).forEach((org, id) => {
-        if (org === this.organism) return this.organism.toWorkerObject(-1);
-
-        const { x, y } = org.getPosition();
-        const { x: orgX, x: orgY } = this.organism.getPosition();
-
-        const workerObject = org.toWorkerObject(organismMap.length);
-
-        if (org.canBeEatenBy(this.organism)) {
-          workerObject.canBeEaten = true;
-        }
-
-        // if (Math.abs(orgX) - Math.abs(x) < this.radius && Math.abs(orgY) - Math.abs(y) < this.radius) {
-          workerObjects.push(workerObject);
-
-          organismMap.push(org);
-        // }
+      const vector = Physics.Vector.getVector({
+        x: this.organism.getPosition().x,
+        y: this.organism.getPosition().y,
+        targetX: workerObject.position.x,
+        targetY: workerObject.position.y
       });
 
-      const organism = this.organism.toWorkerObject(-1);
-      const result = WorkerResolver.detect(organism, workerObjects, this.radius);
+      if (vector.length < this.radius) {
+        workerObjects.push(workerObject);
 
-      switch (result.action) {
-        case 'MOVE':
-          const { x, y } = result.params;
-
-          movement.directTo({
-            organism: this.organism,
-            x,
-            y
-          });
-
-          this.target = organismMap[result.params.id];
-          this.targetPosition = { x, y }
-
-          break;
-        case 'SET_AS_FOOD':
-          this.target = organismMap[result.params.id];
-
-          break;
-        case 'NULLIFY_TARGET':
-          this.target = undefined;
-
-          break;
-        case 'CONSUME':
-          const target = organismMap[result.params.id];
-          movement.speed = 0;
-
-          this.target = target;
-
-          break;
-        case 'BEGIN_MOVING':
-          if (this.interval <= 0) {
-            if (movement.speed === 0) movement.speed = movement.defaultSpeed;
-            if (movement.xDirection === 0) movement.xDirection = negatableRandom(1);
-            if (movement.yDirection === 0) movement.yDirection = negatableRandom(1);
-          }
-
-          break;
+        organismMap.push(org);
       }
+    });
 
+    const organism = this.organism.toWorkerObject(-1);
+    const result = WorkerResolver.detect(organism, workerObjects, this.radius);
+
+    switch (result.action) {
+      case 'MOVE':
+        this.target = organismMap[result.params.id];
+
+        this.move();
+
+        break;
+      case 'CONSUME':
+        const target = organismMap[result.params.id];
+        this.speed = 0;
+
+        this.target = target;
+
+        break;
+      case 'BEGIN_MOVING':
+        this.target = undefined;
+
+        this.move();
+
+        break;
     }
+  }
+
+  move(): void {
+    const { x, y } = this.organism.getPosition();
+
+    this.vector ||= Physics.Vector.getVector({
+      x,
+      y,
+      targetX: this.target?.getPosition()?.x || Math.random() * this.organism.scene.getBounds().width,
+      targetY: this.target?.getPosition()?.y || Math.random() * this.organism.scene.getBounds().height
+    });
+
+    const { x: nX, y: nY } = this.vector.normalized();
+
+    this.organism.setPosition({
+      x: x + nX * this.speed * this.organism.scene.timePassed,
+      y: y + nY * this.speed * this.organism.scene.timePassed
+    });
   }
 
   increase() {}

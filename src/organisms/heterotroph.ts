@@ -26,7 +26,7 @@ class HeteroTroph extends Organism {
       organism.geneticCode = geneticCode;
     } else {
       organism.geneticCode = new GeneticCode([
-        new Reproduces(organism),
+        // new Reproduces(organism),
         new MovementGene(organism),
         new SeeksEnergy(organism),
       ]);
@@ -74,7 +74,7 @@ class HeteroTroph extends Organism {
   }
 
   canBeEatenBy(organism: HeteroTroph) {
-    return this.dead();
+    return this.dead() && !this.consumed;
   }
 
   onIntersection({ x, y }: Coords, intersectionObject: WorldObject, ignoreIntersection: () => void): void {

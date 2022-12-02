@@ -2,7 +2,7 @@ import Behavior, { BehaviorProps } from "../behavior";
 import { Coords } from "../organisms/autotroph";
 import Organism from "../organisms/organism";
 import Scene from "../scene";
-import Physics, { IDirected } from "../utils/physics/physics";
+import Physics, { IDirected, IVector } from "../utils/physics/physics";
 
 const DEFAULT_SPEED = 5;
 
@@ -86,6 +86,7 @@ class Movement extends Behavior implements IDirected {
   xDirection: IDirected["xDirection"];
   yDirection: IDirected["yDirection"];
   target: Coords;
+  vector: IVector | undefined;
 
   constructor(args?: BehaviorProps & MovementProps) {
     const { speed, defaultSpeed, xDirection, yDirection, ...superArgs } = args || {};
@@ -101,24 +102,27 @@ class Movement extends Behavior implements IDirected {
   }
 
   call({ organism }: { organism: Organism }): void {
-    if (this.speed > 0) {
-      // Physics.Collision.update(organism, Movement.for(organism))
-      //   .onClear(() => { this.move({ organism }) })
-        // .onCollision(Physics.avoid);
-
-        this.move({ organism })
-    }
+    // if (this.speed > 0) {
+    //   this.move({ organism })
+    // }
   }
 
   move({ organism }: { organism : Organism }): void {
     const { x, y } = organism.getPosition();
-    const vector = Physics.Vector.getVector({ x, y , targetX: this.target.x, targetY: this.target.y })
 
-    const newVector = Physics.Vector.scaledVector(vector, this.speed);
+    this.vector ||= Physics.Vector.getVector({
+      x,
+      y,
+      targetX: this.target.x,
+      targetY: this.target.y
+    });
 
-    debugger;
+    const { x: nX, y: nY } = this.vector.normalized();
 
-    organism.setPosition({ x: vector.x * this.speed, y: vector.y * this.speed });
+    organism.setPosition({
+      x: x + nX * this.speed * organism.scene.timePassed,
+      y: y + nY * this.speed * organism.scene.timePassed
+    });
   }
 
   duplicate() {
