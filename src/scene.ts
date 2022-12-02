@@ -8,6 +8,8 @@ import TextureAutotroph from "./textureAutotroph";
 import Autotroph, { Coords } from "./organisms/autotroph";
 import HeteroTroph from "./organisms/heterotroph";
 import { create } from "./scenarios/movement";
+import Physics from "./utils/physics/physics";
+import Time from "./utils/time";
 
 export const MUTATION_FACTOR = 1;
 
@@ -65,6 +67,9 @@ class Scene {
       new Worker(new URL('./utils/collisions.worker.ts', import.meta.url)),
       new Worker(new URL('./utils/collisions.worker.ts', import.meta.url)),
     ];
+
+    Physics.setScene(this);
+    Time.setScene(this);
   }
 
   draw() {

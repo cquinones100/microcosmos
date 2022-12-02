@@ -1,5 +1,6 @@
 import WorldObject, { IWorkerObject }  from "../../worldObject";
 import { Coords } from "../../organisms/autotroph";
+import Scene from "../../scene";
 
 export interface IDirected {
   xDirection: number;
@@ -141,10 +142,6 @@ const avoid = (hugger: WorldObject, hugged: WorldObject, directionHandler: IDire
 };
 
 class Movement {
-  // public static move({ obj }) {
-    // (new Movement({ obj })).move();;
-  // }
-
   obj: ICollisionObject;
 
   constructor({ obj }: { obj: ICollisionObject }) {
@@ -161,6 +158,18 @@ export interface IVector {
   readonly targetX: number;
   readonly targetY: number;
   normalized: () => Coords;
+}
+
+type Physics = {
+  Movement: typeof Movement;
+  Collision: typeof Collision;
+  avoid: typeof avoid;
+  Vector: {
+    getVector: (args: VectorProps) => Vector;
+  };
+  randomLocation: () => Coords;
+  setScene: (scene: Scene) => void;
+  scene: Scene | undefined,
 }
 
 class Vector implements IVector {
@@ -195,7 +204,7 @@ class Vector implements IVector {
   }
 }
 
-const Physics = {
+const Physics: Physics = {
   Movement,
   Collision,
   avoid,
@@ -203,15 +212,25 @@ const Physics = {
     getVector(args: VectorProps) {
       return new Vector(args);
     },
-    getClosest(a: Vector, b: Vector) {
-    },
-    scaledVector(vector: Vector, speed: number) {
-      const x = vector.x * speed;
-      const y = vector.y * speed;
+  },
+  randomLocation() {
+    if (!this.scene) {
+      throw new Error('Scene is not defined, make sure to set the scene with Physics#setScene');
+    }
 
-      return { magnitude: Math.hypot(x, y), x, y };
-    },
-  }
+    const normalized = (value: number) => {
+      return Math.max(Math.min(value));
+    }
+
+    return {
+      x: normalized(Math.random() * this.scene.getDimensions().width - 10),
+      y: normalized(Math.random() * this.scene.getDimensions().height - 10)
+    }
+  },
+  setScene(scene: Scene) {
+    this.scene = scene;
+  },
+  scene: undefined,
 }
 
 export default Physics;

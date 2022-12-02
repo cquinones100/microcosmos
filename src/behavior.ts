@@ -3,6 +3,7 @@ const DEFAULT_ENERGY = 0.01;
 
 export interface IBehavior {
   call: () => void;
+  organism: Organism;
 }
 
 export type BehaviorProps = {

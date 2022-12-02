@@ -1,10 +1,10 @@
 import { IBehavior } from "../behavior";
-import Gene from "../gene";
 import GeneticCode from "../geneticCode";
 import { Coords } from "../organisms/autotroph";
 import Organism from "../organisms/organism";
 import Scene from "../scene";
-import Physics from "../utils/physics/physics";
+import Physics, { IVector } from "../utils/physics/physics";
+import Time from "../utils/time";
 
 class NonOrganism {
   dimensions: { width: number, height: number };
@@ -16,16 +16,7 @@ class NonOrganism {
       height: 10
     }
 
-    const normalized = (value: number) => {
-      return Math.max(Math.min(value));
-    }
-
-    const randomLocation = {
-      x: normalized(Math.random() * organism.scene.app.screen.width - 10),
-      y: normalized(Math.random() * organism.scene.app.screen.height - 10)
-    }
-
-    this.position = randomLocation;
+    this.position = Physics.randomLocation();
   }
 
   getPosition() {
@@ -42,18 +33,103 @@ class NonOrganism {
 }
 
 class Movement implements IBehavior {
-  target: Organism | NonOrganism | undefined;
+  vector: IVector | undefined;
+  organism: Organism;
   speed: number;
+  x: number;
+  y: number;
+
+  public static for(organism: Organism) {
+    let movement =
+        organism.scenarioBehaviors
+        .find(behavior => behavior instanceof Movement) as Movement;
+
+    if (!movement) {
+      movement = new Movement(organism);
+
+      organism.scenarioBehaviors.push(movement);
+    }
+
+    return movement;
+  }
+
+  constructor(organism: Organism) {
+    this.organism = organism;
+    this.speed = 1;
+    const { x, y } = Physics.randomLocation();
+
+    this.x = x;
+    this.y = y;
+    this.vector = this.createVector();
+  }
+
+  call() {
+    const vector = this.createVector();
+
+    const { x: nX, y: nY } = vector.normalized();
+    const { x, y } = this.organism.getPosition();
+
+    this.organism.setPosition({
+      x: x + nX * this.speed * this.organism.scene.timePassed,
+      y: y + nY * this.speed * this.organism.scene.timePassed
+    });
+  }
+
+  createVector() {
+    const { x: targetX, y: targetY } = this;
+    const { x, y } = this.organism.getPosition();
+
+    return Physics.Vector.getVector({ x, y, targetX, targetY });
+  }
+
+  moveTo({ x, y, speed = this.speed }: Coords & { speed?: number }) {
+    this.x = x;
+    this.y = y;
+    this.speed = speed;
+  }
+}
+
+class MovesRandomly implements IBehavior {
   organism: Organism;
   interval: number;
   maxIntervals: number;
 
+  constructor(organism: Organism) {
+    this.organism = organism;
+    this.interval = 0;
+    this.maxIntervals = 5;
+  }
+
+  call() {
+    Time.track('call', this);
+
+    Time.every('call', this, { seconds: 5 }, () => {
+      if (this.interval * this.organism.scene.timePassed * 1000 > this.maxIntervals) {
+        const movement = Movement.for(this.organism);
+
+        movement.moveTo(Physics.randomLocation());
+
+        this.interval = 0;
+      }
+
+      this.interval += 1;
+    })
+  }
+}
+
+class PersuesTarget implements IBehavior {
+  target: Organism | NonOrganism | undefined;
+  organism: Organism;
+  interval: number;
+  maxIntervals: number;
+  speed: number;
+
   constructor (organism: Organism) {
     this.organism = organism;
     this.target = undefined;
-    this.speed = 10;
     this.interval = 0;
     this.maxIntervals = 2;
+    this.speed = 5;
   }
 
   collides() {
@@ -65,16 +141,6 @@ class Movement implements IBehavior {
   }
 
   call() {
-    const { width, height } = this.organism.scene.getDimensions();
-    const normalized = (value: number) => {
-      return Math.max(Math.min(value));
-    }
-
-    const randomLocation = {
-      x: normalized(Math.random() * width - this.organism.getDimensions().width),
-      y: normalized(Math.random() * height - this.organism.getDimensions().height)
-    }
-
     if (!this.target || this.target instanceof NonOrganism) {
       if (this.interval * this.organism.scene.timePassed > this.maxIntervals) {
         this.target = new NonOrganism(this.organism);
@@ -85,8 +151,7 @@ class Movement implements IBehavior {
       this.interval = 0;
 
       if (this.collides()) {
-        this.organism.setPosition(randomLocation);
-        this.target.setPosition(randomLocation);
+        this.target.setPosition(Physics.randomLocation());
       }
 
       const { x, y } = this.target.getPosition();
@@ -95,22 +160,12 @@ class Movement implements IBehavior {
     }
   }
 
-  moveTo({ x: targetX, y: targetY }: Coords) {
-    const { x, y } = this.organism.getPosition();
+  moveTo({ x, y }: Coords) {
+    const movement = Movement.for(this.organism);
 
-    const vector = Physics.Vector.getVector({
-      x,
-      y,
-      targetX,
-      targetY 
-    });
+    const { speed } = this;
 
-    const { x: nX, y: nY } = vector.normalized();
-
-    this.organism.setPosition({
-      x: x + nX * this.speed * this.organism.scene.timePassed,
-      y: y + nY * this.speed * this.organism.scene.timePassed
-    });
+    movement.moveTo({ x, y, speed });
   }
 }
 
@@ -124,13 +179,14 @@ export const create = (scene: Scene) => {
 
   secondOrganism.shape.shape.tint = 0x1ECEE6;
   secondOrganism.geneticCode = new GeneticCode([]);
+  secondOrganism.scenarioBehaviors.push(new MovesRandomly(secondOrganism));
 
   const organism = scene.createHeterotroph({ x: width / 2, y: height / 2 });
-  const movement = new Movement(organism);
+  const movement = new PersuesTarget(organism);
 
   organism.scenarioBehaviors.push(movement);
 
   movement.target = secondOrganism;
 
-  secondOrganism.scenarioBehaviors.push(new Movement(secondOrganism));
+  secondOrganism.scenarioBehaviors.push(new PersuesTarget(secondOrganism));
 };
