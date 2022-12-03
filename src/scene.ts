@@ -112,13 +112,7 @@ class Scene {
         app.ticker.stop();
         return new Promise<void>((resolve, reject) => {
             this.organisms.forEach(organism => { 
-              // const worker = this.workerPool[count % 4];
-
-              // worker.postMessage(count);
-
-              // worker.onmessage = (data) => {
               organism.animate();
-              // };
             });
 
             Object.keys(this.measurements).forEach(measurement => {
@@ -157,6 +151,10 @@ class Scene {
 
     const organism = HeteroTroph.create({ texture, scene: this });
 
+    if (color) {
+      organism.shape.shape.tint = color;
+    }
+
     this.organisms.add(organism);
 
     return organism;
@@ -178,7 +176,6 @@ class Scene {
 
   add(organism: Organism) {
     this.organisms.add(organism);
-    // this.allObjects.add(organism);
   }
 
   killOrganism(organism: Organism) {
@@ -186,7 +183,6 @@ class Scene {
   }
 
   remove(organism: Organism) {
-    // this.allObjects.delete(organism);
     this.organisms.delete(organism);
     this.container.removeChild(organism.shape.shape);
   }

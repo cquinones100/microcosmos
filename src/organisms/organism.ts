@@ -2,6 +2,7 @@ import { Text } from "pixi.js";
 import Behavior, { IBehavior } from "../behavior";
 import Movement from "../behavior/movement";
 import GeneticCode from "../geneticCode";
+import Physics from "../utils/physics/physics";
 import WorldObject, { IWorkerObject, WorldObjectProps } from "../worldObject";
 
 export type OrganismProps = {
@@ -46,7 +47,9 @@ class Organism extends WorldObject {
     });
 
     this.text.position.set(x, y);
-    this.text.zIndex = 2;
+    this.text.zIndex = 3;
+
+    this.otherShapes.push(this.text);
 
     this.scene.container.addChild(this.text);
     this.consumed = false;
@@ -100,7 +103,9 @@ class Organism extends WorldObject {
   }
 
   die() {
-    this.scene.container.removeChild(this.text);
+    super.die();
+
+    Physics.scene!.organisms.delete(this);
   }
 
   disappear() {
@@ -120,8 +125,9 @@ class Organism extends WorldObject {
   canEat(organism: Organism) {
     return this.scene.organisms.has(organism) && organism.canBeEatenBy(this);
   }
+
   canBeEatenBy<Organism>(arg0: this) {
-    return false;
+    return true;
   }
 
   setEnergy(value: number) {

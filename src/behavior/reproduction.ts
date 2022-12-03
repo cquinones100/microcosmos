@@ -52,7 +52,7 @@ class Reproduction extends Behavior {
 
     const movement = Movement.for(organism);
 
-    if (movement) Physics.avoid(organism, obj, Movement.for(organism));
+    // if (movement) Physics.avoid(organism, obj, Movement.for(organism));
   }
 }
 

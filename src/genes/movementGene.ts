@@ -10,7 +10,7 @@ class MovementGene extends Gene {
   constructor(organism: Organism, movement?: Movement) {
     super(organism);
 
-    this.movement = movement || new Movement();
+    this.movement = movement || new Movement(organism);
   }
 
   animate() {
@@ -18,7 +18,7 @@ class MovementGene extends Gene {
   }
 
   resolve() {
-    this.organism.setBehavior(this.movement);
+    // this.organism.setBehavior(this.movement);
   }
 
   increase() {}
@@ -32,7 +32,7 @@ class MovementGene extends Gene {
   duplicate(newOrganism: Organism): MovementGene {
     const gene = new MovementGene(newOrganism);
 
-    gene.movement = this.movement.duplicate() || new Movement();
+    // gene.movement = this.movement.duplicate() || new Movement(this.organism);
 
     return gene;
   }

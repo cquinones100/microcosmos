@@ -1,9 +1,10 @@
+import { Sprite } from "pixi.js";
 import Movement from "./behavior/movement";
 import { Coords } from "./organisms/autotroph";
 import Organism from "./organisms/organism";
 import Scene from "./scene";
 import TextureOrganism from "./textureOrganism";
-import { ICollidableObject } from "./utils/physics/physics";
+import Physics, { ICollidableObject } from "./utils/physics/physics";
 
 export type WorldObjectProps = {
   scene: Scene;
@@ -27,6 +28,7 @@ class WorldObject implements ICollidableObject {
   shape: TextureOrganism;
   x: number = 0;
   y: number = 0;
+  otherShapes: Sprite[];
 
   public static screenBasedPosition({ x, y, scene }: { x: number; y: number; scene: Scene }) {
     const { width, height } = scene.app.screen;
@@ -39,6 +41,7 @@ class WorldObject implements ICollidableObject {
   constructor({ shape, scene, color, x, y }: WorldObjectProps) {
     this.scene = scene;
     this.shape = shape;
+    this.otherShapes = [];
   }
 
   setPosition({ x, y }: { x: number, y: number }) {
@@ -114,6 +117,13 @@ class WorldObject implements ICollidableObject {
 
   onIntersection({ x, y }: Coords, intersectionObject: WorldObject, cb: () => void) { }
 
+  die() {
+    this.remove();
+  }
+
+  remove() {
+    this.otherShapes.forEach(shape => Physics.scene!.container.removeChild(shape));
+  }
 }
 
 export default WorldObject;

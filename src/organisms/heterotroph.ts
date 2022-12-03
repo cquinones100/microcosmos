@@ -1,6 +1,5 @@
 import MovementGene from "../genes/movementGene";
 import Reproduces from "../genes/reproduces";
-import SeeksEnergy from "../genes/seeksEnergy";
 import GeneticCode from "../geneticCode";
 import { OrganismProps } from "./organism";
 import TextureOrganism from "../textureOrganism";
@@ -28,7 +27,6 @@ class HeteroTroph extends Organism {
       organism.geneticCode = new GeneticCode([
         // new Reproduces(organism),
         new MovementGene(organism),
-        new SeeksEnergy(organism),
       ]);
     }
 
@@ -77,39 +75,6 @@ class HeteroTroph extends Organism {
     return this.dead() && !this.consumed;
   }
 
-  onIntersection({ x, y }: Coords, intersectionObject: WorldObject, ignoreIntersection: () => void): void {
-    if (intersectionObject instanceof Organism && this.canEat(intersectionObject)) {
-      ignoreIntersection();
-    } else {
-      const movement = this.movement();
-
-      if (movement) {
-        const move = () => {
-          const { xDirection, yDirection, speed } = movement;
-          const { scene } = this;
-
-          const { x, y } = Movement.calculatedCoordinate({
-            xDirection: xDirection! * -1,
-            yDirection: yDirection! * -1,
-            speed,
-            scene,
-            x: this.getPosition().x,
-            y: this.getPosition().y
-          });
-
-          const { width, height } = this.getDimensions();
-
-          this.shape.shape.position.x = x + width / 2;
-          this.shape.shape.position.y = y + height / 2;
-        }
-
-        if (!(intersectionObject instanceof Organism) || this.energy < intersectionObject.energy) {
-          move();
-        }
-      }
-    }
-  }
-
   duplicate(): Organism {
     const { width, height } = this.shape.getDimensions();
     const { scene } = this.shape;
@@ -124,7 +89,7 @@ class HeteroTroph extends Organism {
   }
 
   die() {
-    this.shape.shape.zIndex = 0;
+    this.shape.shape.zIndex = 1;
     this.shape.shape.tint = 0x663633; 
 
     super.die();

@@ -28,6 +28,7 @@ export interface ICollidableObject {
   getPosition: () => Coords;
   getDimensions: () => { width: number; height: number };
   setPosition: (coords: Coords) => void;
+  die: () => void;
 }
 
 export class Point implements ICollidableObject {
@@ -53,6 +54,8 @@ export class Point implements ICollidableObject {
     this.x = x;
     this.y = y;
   }
+
+  die() {}
 }
 
 type ICollisionObject = IWorkerObject;
@@ -183,15 +186,6 @@ class Movement {
 
 type VectorProps = { x: number; y: number; targetX: number; targetY: number; }
 
-export interface IVector {
-  readonly x: number;
-  readonly y: number;
-  readonly length: number;
-  targetX: number;
-  targetY: number;
-  normalized: () => Coords;
-}
-
 type Physics = {
   Movement: typeof Movement;
   Collision: typeof Collision;
@@ -204,14 +198,25 @@ type Physics = {
   scene: Scene | undefined,
 }
 
+export interface IVector {
+  readonly x: number;
+  readonly y: number;
+  targetX: number;
+  targetY: number;
+  normalized: () => Coords;
+  getLength: () => number;
+  getLengthSquared: () => number;
+}
+
 class Vector implements IVector {
   readonly x: number;
   readonly y: number;
-  readonly length: number;
+  private length: number | undefined;
   readonly targetX: number;
   readonly targetY: number;
   originalX: number;
   originalY: number;
+  private lengthSquared: number | undefined;
 
   constructor({ x, y, targetX, targetY }: VectorProps ) {
     this.originalX = x;
@@ -220,19 +225,25 @@ class Vector implements IVector {
     this.targetY = targetY;
     this.x = targetX - x;
     this.y = targetY - y;
-    this.length = Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
-  }
-
-  divide() {
-    return {
-    }
   }
 
   normalized() {
     return {
-      x: this.x / this.length,
-      y: this.y / this.length,
+      x: this.x / this.getLength(),
+      y: this.y / this.getLength(),
     }
+  }
+
+  getLength() {
+    this.length ||= Math.sqrt(this.x * this.x + this.y * this.y) 
+
+    return this.length;
+  }
+
+  getLengthSquared() {
+    this.lengthSquared ||= this.x * this.x + this.y * this.y
+
+    return this.lengthSquared;
   }
 }
 
