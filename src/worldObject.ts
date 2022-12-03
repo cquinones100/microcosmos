@@ -3,6 +3,7 @@ import { Coords } from "./organisms/autotroph";
 import Organism from "./organisms/organism";
 import Scene from "./scene";
 import TextureOrganism from "./textureOrganism";
+import { ICollidableObject } from "./utils/physics/physics";
 
 export type WorldObjectProps = {
   scene: Scene;
@@ -20,7 +21,7 @@ export interface IWorkerObject {
   canBeEaten?: boolean;
 }
 
-class WorldObject {
+class WorldObject implements ICollidableObject {
   scene: Scene;
   color?: number;
   shape: TextureOrganism;

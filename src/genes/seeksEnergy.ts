@@ -1,7 +1,7 @@
 import Detection from "../behavior/detection";
 import Gene from "../gene";
 import Organism from "../organisms/organism";
-import { WorkerResolver } from "../utils/collisions.worker";
+// import { WorkerResolver } from "../utils/collisions.worker";
 import Physics, { IVector } from "../utils/physics/physics";
 import { IWorkerObject } from "../worldObject";
 export const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
@@ -87,29 +87,29 @@ class SeeksEnergy extends Gene {
     });
 
     const organism = this.organism.toWorkerObject(-1);
-    const result = WorkerResolver.detect(organism, workerObjects, this.radius);
+    // const result = WorkerResolver.detect(organism, workerObjects, this.radius);
 
-    switch (result.action) {
-      case 'MOVE':
-        this.target = organismMap[result.params.id];
+    // switch (result.action) {
+    //   case 'MOVE':
+    //     this.target = organismMap[result.params.id];
 
-        this.move();
+    //     this.move();
 
-        break;
-      case 'CONSUME':
-        const target = organismMap[result.params.id];
-        this.speed = 0;
+    //     break;
+    //   case 'CONSUME':
+    //     const target = organismMap[result.params.id];
+    //     this.speed = 0;
 
-        this.target = target;
+    //     this.target = target;
 
-        break;
-      case 'BEGIN_MOVING':
-        this.target = undefined;
+    //     break;
+    //   case 'BEGIN_MOVING':
+    //     this.target = undefined;
 
-        this.move();
+    //     this.move();
 
-        break;
-    }
+    //     break;
+    // }
   }
 
   move(): void {

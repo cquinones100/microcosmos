@@ -3,34 +3,7 @@ import GeneticCode from "../geneticCode";
 import { Coords } from "../organisms/autotroph";
 import Organism from "../organisms/organism";
 import Scene from "../scene";
-import Physics, { IVector } from "../utils/physics/physics";
-import Time from "../utils/time";
-
-class NonOrganism {
-  dimensions: { width: number, height: number };
-  position: { x: number, y: number }
-
-  constructor(organism: Organism) {
-    this.dimensions = {
-      width: 10,
-      height: 10
-    }
-
-    this.position = Physics.randomLocation();
-  }
-
-  getPosition() {
-    return this.position;
-  }
-
-  getDimension() {
-    return this.dimensions;
-  }
-
-  setPosition(position: Coords) {
-    this.position = position;
-  }
-}
+import Physics, { ICollidableObject, IVector, Point } from "../utils/physics/physics";
 
 class Movement implements IBehavior {
   vector: IVector | undefined;
@@ -93,32 +66,44 @@ class MovesRandomly implements IBehavior {
   organism: Organism;
   interval: number;
   maxIntervals: number;
+  speed: number;
 
   constructor(organism: Organism) {
     this.organism = organism;
     this.interval = 0;
-    this.maxIntervals = 5;
+    this.maxIntervals = 5000;
+    this.speed = 10;
+
+    const movement = Movement.for(this.organism);
+    movement.speed = this.speed;
+
+    this.move();
   }
 
   call() {
-    Time.track('call', this);
+    const movement = Movement.for(this.organism);
 
-    Time.every('call', this, { seconds: 5 }, () => {
-      if (this.interval * this.organism.scene.timePassed * 1000 > this.maxIntervals) {
-        const movement = Movement.for(this.organism);
+    if (
+      this.interval > this.maxIntervals
+      || Physics.Collision.collides(this.organism, new Point(movement.x, movement.y))
+    ) {
+      this.move();
 
-        movement.moveTo(Physics.randomLocation());
+      this.interval = 0;
+    } else {
+      this.interval += this.organism.scene.timePassedMS;
+    }
+  }
 
-        this.interval = 0;
-      }
+  move() {
+    const movement = Movement.for(this.organism);
 
-      this.interval += 1;
-    })
+    movement.moveTo({ ...Physics.randomLocation(), speed: this.speed });
   }
 }
 
 class PersuesTarget implements IBehavior {
-  target: Organism | NonOrganism | undefined;
+  target: ICollidableObject | undefined;
   organism: Organism;
   interval: number;
   maxIntervals: number;
@@ -137,13 +122,15 @@ class PersuesTarget implements IBehavior {
 
     return this.target 
       && this.target instanceof Organism
-      && Physics.Collision.collides(organism.toWorkerObject(), this.target.toWorkerObject());
+      && Physics.Collision.collides(organism, this.target);
   }
 
   call() {
-    if (!this.target || this.target instanceof NonOrganism) {
+    if (!this.target) {
       if (this.interval * this.organism.scene.timePassed > this.maxIntervals) {
-        this.target = new NonOrganism(this.organism);
+        const { x, y } = Physics.randomLocation();
+
+        this.target = new Point(x, y);
       }
 
       this.interval++;
@@ -183,10 +170,6 @@ export const create = (scene: Scene) => {
 
   const organism = scene.createHeterotroph({ x: width / 2, y: height / 2 });
   const movement = new PersuesTarget(organism);
-
-  organism.scenarioBehaviors.push(movement);
-
   movement.target = secondOrganism;
-
-  secondOrganism.scenarioBehaviors.push(new PersuesTarget(secondOrganism));
+  organism.scenarioBehaviors.push(movement);
 };

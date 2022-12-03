@@ -1,6 +1,7 @@
 import WorldObject, { IWorkerObject }  from "../../worldObject";
 import { Coords } from "../../organisms/autotroph";
 import Scene from "../../scene";
+import Organism from "../../organisms/organism";
 
 export interface IDirected {
   xDirection: number;
@@ -22,6 +23,37 @@ type ICollisionHandler = {
   => ICollisionHandler;
   onClear: (cb: () => void) => ICollisionHandler;
 };
+
+export interface ICollidableObject {
+  getPosition: () => Coords;
+  getDimensions: () => { width: number; height: number };
+  setPosition: (coords: Coords) => void;
+}
+
+export class Point implements ICollidableObject {
+  x: number;
+  y: number;
+
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+
+  getPosition() {
+    const { x, y } = this;
+
+    return { x, y };
+  }
+
+  getDimensions() {
+    return { width: 0, height: 0 };
+  }
+
+  setPosition({ x, y }: Coords) {
+    this.x = x;
+    this.y = y;
+  }
+}
 
 type ICollisionObject = IWorkerObject;
 class Collision implements ICollisionHandler {
@@ -51,10 +83,10 @@ class Collision implements ICollisionHandler {
     }
   }
 
-  public static collides(collider: ICollisionObject, collided: ICollisionObject): boolean {
-      const { x, y } = collider.position;
-      const { width, height } = collider.dimensions;
-      const { x: collidedX, y: collidedY } = collided.position;
+  public static collides(collider: ICollidableObject, collided: ICollidableObject): boolean {
+      const { x, y } = collider.getPosition();
+      const { width, height } = collider.getDimensions();
+      const { x: collidedX, y: collidedY } = collided.getPosition();
 
       return collided !== collider
         && collidedX > x - width
@@ -155,8 +187,8 @@ export interface IVector {
   readonly x: number;
   readonly y: number;
   readonly length: number;
-  readonly targetX: number;
-  readonly targetY: number;
+  targetX: number;
+  targetY: number;
   normalized: () => Coords;
 }
 

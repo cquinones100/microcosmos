@@ -7,9 +7,8 @@ import TextureOrganism from "./textureOrganism";
 import TextureAutotroph from "./textureAutotroph";
 import Autotroph, { Coords } from "./organisms/autotroph";
 import HeteroTroph from "./organisms/heterotroph";
-import { create } from "./scenarios/movement";
 import Physics from "./utils/physics/physics";
-import Time from "./utils/time";
+import { create } from "./scenarios/movement";
 
 export const MUTATION_FACTOR = 1;
 
@@ -33,7 +32,7 @@ class Scene {
   stop: boolean;
   allObjects: Set<WorldObject>[][];
   workerPool: Worker[];
-
+  timePassedMS: number = 0;
 
   constructor() {
     this.organisms = new Set<Organism>();
@@ -69,7 +68,6 @@ class Scene {
     ];
 
     Physics.setScene(this);
-    Time.setScene(this);
   }
 
   draw() {
@@ -109,6 +107,7 @@ class Scene {
       const sync = () => {
         stats.begin();
         this.timePassed = timePassed;
+        this.timePassedMS = app.ticker.deltaMS;
 
         app.ticker.stop();
         return new Promise<void>((resolve, reject) => {
