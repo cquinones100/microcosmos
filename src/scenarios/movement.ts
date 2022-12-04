@@ -8,7 +8,7 @@ import Physics from "../utils/physics/physics";
 export const create = (scene: Scene) => {
   const { width, height } = scene.getDimensions();
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 1000; i++) {
     const secondOrganism = scene.createHeterotroph({
       x: Math.random() * width - 60,
       y: Math.random() * height,
@@ -19,7 +19,7 @@ export const create = (scene: Scene) => {
     secondOrganism.scenarioBehaviors.push(new MovesRandomly(secondOrganism));
   }
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 10; i++) {
     const organism = scene.createHeterotroph({
       ...Physics.randomLocation(),
     });

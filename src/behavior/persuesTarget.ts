@@ -6,7 +6,7 @@ import DetectsTarget from "./detectsTarget";
 import Movement from "./movement";
 
 class PersuesTarget implements IBehavior {
-  target: ICollidableObject | undefined;
+  target: ICollidableObject & Organism | undefined;
   organism: Organism;
   interval: number;
   speed: number;
@@ -29,6 +29,12 @@ class PersuesTarget implements IBehavior {
 
   call() {
     if (this.target) {
+      if (Physics.Collision.collides(this.organism, this.target)) {
+        this.target = undefined;
+
+        return;
+      }
+
       if (this.detectedTarget() === this.target) {
         this.moveTo(this.target.getPosition());
       } else {
@@ -38,7 +44,7 @@ class PersuesTarget implements IBehavior {
       if (this.detectedTarget()) {
         this.target = this.detectedTarget();
       } else {
-        this.stop();
+        // this.stop();
       }
     }
   }
@@ -64,7 +70,25 @@ class PersuesTarget implements IBehavior {
   private detectedTarget() {
     const detection = this.getDetection();
 
-    return detection.targets[0];
+    const { x, y } = this.organism.getPosition();
+
+    return detection.targets.sort((a: ICollidableObject, b: ICollidableObject) => {
+      const { x: targetAX, y: targetAY } = a.getPosition();
+      const { x: targetBX, y: targetBY } = b.getPosition();
+
+      const vectorA = Physics.Vector.getVector({ x, y, targetX: targetAX, targetY: targetAY });
+      const vectorB = Physics.Vector.getVector({ x, y, targetX: targetBX, targetY: targetBY });
+
+      if (vectorA.getLengthSquared() < vectorB.getLengthSquared()) {
+        return - 1;
+      } 
+
+      if (vectorA.getLengthSquared() > vectorB.getLengthSquared()) {
+        return 1;
+      }
+
+      return 0;
+    })[0];
   }
 }
 

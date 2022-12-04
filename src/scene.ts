@@ -8,7 +8,7 @@ import TextureAutotroph from "./textureAutotroph";
 import Autotroph, { Coords } from "./organisms/autotroph";
 import HeteroTroph from "./organisms/heterotroph";
 import Physics from "./utils/physics/physics";
-import { create } from "./scenarios/movement";
+import { create } from "./scenarios/default";
 
 export const MUTATION_FACTOR = 1;
 
@@ -114,7 +114,7 @@ class Scene {
             this.organisms.forEach(organism => { 
               organism.animate();
             });
-
+            
             Object.keys(this.measurements).forEach(measurement => {
               if (this.measurements[measurement] > 5) {
                 console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);

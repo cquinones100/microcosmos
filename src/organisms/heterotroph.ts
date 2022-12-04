@@ -1,12 +1,12 @@
-import MovementGene from "../genes/movementGene";
-import Reproduces from "../genes/reproduces";
 import GeneticCode from "../geneticCode";
 import { OrganismProps } from "./organism";
 import TextureOrganism from "../textureOrganism";
-import WorldObject from "../worldObject";
 import { Coords } from "./autotroph";
 import Organism from "./organism";
-import Movement from "../behavior/movement";
+import PersuesTarget from "../behavior/persuesTarget";
+import DetectsTarget from "../behavior/detectsTarget";
+import MovesRandomly from "../behavior/movesRandomly";
+import ConsumesOrganisms from "../behavior/consumesOrganisms";
 
 type HeteroTrophProps = {
   texture: TextureOrganism;
@@ -21,14 +21,14 @@ class HeteroTroph extends Organism {
 
     const organism = new HeteroTroph({ x, y, shape: texture, ...args});
 
-    if (geneticCode) {
-      organism.geneticCode = geneticCode;
-    } else {
-      organism.geneticCode = new GeneticCode([
-        // new Reproduces(organism),
-        new MovementGene(organism),
-      ]);
-    }
+    const moves = new MovesRandomly(organism)
+    const pursuit = new PersuesTarget(organism);
+    const detection = new DetectsTarget(organism);
+    const consumes = new ConsumesOrganisms(organism);
+
+    organism.geneticCode = new GeneticCode();
+
+    organism.scenarioBehaviors.push(moves, pursuit, detection, consumes);
 
     organism.shape.shape.zIndex = 1;
     return organism;
