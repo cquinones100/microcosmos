@@ -1,26 +1,42 @@
-import { IBehavior } from "../behavior";
+import { DEFAULT_ENERGY, IBehavior } from "../behavior";
 import Organism from "../organisms/organism";
 import Physics from "../utils/physics/physics";
 import Movement from "./movement";
 import { Point } from '../utils/physics/physics';
+import { initializeDuplicateBehavior } from "../duplication";
 
 class MovesRandomly implements IBehavior {
   organism: Organism;
   interval: number;
   maxIntervals: number;
   speed: number;
+  energy: number;
 
   constructor(organism: Organism) {
     this.organism = organism;
     this.interval = 0;
     this.maxIntervals = 5000;
     this.speed = 10;
+    this.energy = DEFAULT_ENERGY;
 
     const movement = Movement.for(this.organism);
     movement.speed = this.speed;
 
     this.move();
   }
+
+  duplicate(duplicateOrganism: Organism): MovesRandomly {
+    return initializeDuplicateBehavior(
+      this,
+      new MovesRandomly(duplicateOrganism),
+      (duplicate) => {
+        duplicate.speed = this.speed;
+        duplicate.interval = this.interval;
+        duplicate.maxIntervals = this.maxIntervals;
+      });
+  }
+
+  mutate() {}
 
   call() {
     const movement = Movement.for(this.organism);

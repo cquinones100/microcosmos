@@ -1,54 +1,63 @@
-import Behavior, { BehaviorProps } from "../behavior";
+import IBehavior from "../behavior";
+import { initializeDuplicateBehavior } from "../duplication";
 import Mutator from "../mutator";
 import Organism from "../organisms/organism";
-import Physics from "../utils/physics/physics";
-import Movement from "./movement";
 
-class Reproduction extends Behavior {
+class Reproduction implements IBehavior {
+  public static for(organism: Organism) {
+    return organism.behaviors.find(behavior => behavior instanceof Reproduction);
+  }
+
   timePassed: number;
   cycles: number;
   interval: number;
   maxCycles: number;
+  organism: Organism;
+  energy: number;
 
-  constructor(args?: BehaviorProps) {
-    super(args);
+  constructor(organism: Organism) {
+    this.organism = organism;
     this.timePassed = 0;
     this.cycles = 0;
     this.interval = 100;
     this.maxCycles = 10;
+    this.energy = 0;
   }
 
-  call({ organism }: { organism: Organism }) {
+  duplicate(newOrganism: Organism): Reproduction {
+    return initializeDuplicateBehavior(this, new Reproduction(newOrganism));
+  };
+
+  mutate() {
+  }
+
+  call() {
+    this.energy = this.organism.energy / 2;
     this.timePassed += 1;
 
-    if (this.shouldReproduce(organism)) {
-      this.reproduce(organism);
+    if (this.shouldReproduce()) {
+      this.reproduce();
 
       this.cycles += 1;
     }
   }
 
-  private shouldReproduce(organism: Organism) {
+  private shouldReproduce() {
     return this.timePassed % this.interval === 0
       && this.cycles < this.maxCycles
-      && organism.energy > organism.maxEnergy * 0.4;
+      && this.organism.energy > this.organism.maxEnergy * 0.4;
   }
 
-  private reproduce(obj: Organism) {
-    if (!obj.geneticCode) return;
+  private reproduce() {
+    const organism = this.organism.duplicate();
 
-    const organism = obj.duplicate();
+    this.organism.behaviors.forEach(behavior => behavior.duplicate(organism));
 
-    const geneticCode = obj.geneticCode.duplicate(organism);
+    this.organism.energy = this.organism.energy / 2;
+    organism.energy = this.organism.energy / 2;
 
-    organism.energy = obj.energy / 2;
-    obj.energy = obj.energy / 2;
-
-    organism.geneticCode = geneticCode;
-
-    organism.geneticCode.forEach(gene => gene.resolve());
-    organism.geneticCode.forEach(Mutator.conditionallyMutate)
-    organism.generation = obj.generation + 1;
+    organism.behaviors.forEach(Mutator.conditionallyMutate)
+    organism.generation = this.organism.generation + 1;
   }
 }
 

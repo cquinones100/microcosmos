@@ -1,13 +1,22 @@
 import { IBehavior } from "../behavior";
+import { initializeDuplicateBehavior } from "../duplication";
 import Organism from "../organisms/organism";
 import Physics from "../utils/physics/physics";
 
 class Solid implements IBehavior {
   organism: Organism;
+  energy: number;
 
   constructor(organism: Organism) {
     this.organism = organism;
+    this.energy = 0;
   }
+
+  duplicate(duplicateOrganism: Organism): IBehavior {
+    return initializeDuplicateBehavior(this, new Solid(duplicateOrganism));
+  }
+
+  mutate(): void {}
 
   call() {
     const { x, y } = this.organism.getPosition();

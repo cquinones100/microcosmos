@@ -1,13 +1,11 @@
 import { Text } from "pixi.js";
 import Behavior, { IBehavior } from "../behavior";
 import Movement from "../behavior/movement";
-import GeneticCode from "../geneticCode";
 import Physics from "../utils/physics/physics";
 import WorldObject, { IWorkerObject, WorldObjectProps } from "../worldObject";
 
 export type OrganismProps = {
   energySources?: (any)[];
-  geneticCode?: GeneticCode;
   generation?: number;
 } & WorldObjectProps;
 
@@ -15,22 +13,19 @@ class Organism extends WorldObject {
   public static color = 0xEFA8B1;
 
   energySource: OrganismProps["energySources"];
-  geneticCode?: OrganismProps["geneticCode"];
-  behaviors: Set<Behavior>;
+  behaviors: IBehavior[];
   maxEnergy: number;
   energy: number;
   generation: number;
   color: number = Organism.color;
   text: Text;
   consumed: boolean;
-  scenarioBehaviors: IBehavior[];
 
-  constructor({ energySources = [], geneticCode, generation, x, y, color, ...args }: OrganismProps) {
+  constructor({ energySources = [], generation, x, y, color, ...args }: OrganismProps) {
     super({ x, y, ...args });
 
     this.energySource = energySources;
-    this.geneticCode = geneticCode;
-    this.behaviors = new Set<Behavior>();
+    this.behaviors = [];
     this.maxEnergy = 100;
     this.energy = this.maxEnergy;
     this.generation = generation || 0;
@@ -54,7 +49,7 @@ class Organism extends WorldObject {
     this.scene.container.addChild(this.text);
     this.consumed = false;
 
-    this.scenarioBehaviors = [];
+    this.behaviors = [];
   }
 
   updateEnergyText() {
@@ -71,35 +66,15 @@ class Organism extends WorldObject {
 
     this.updateEnergyText();
 
-    this.geneticCode!.animate();
-
-    // this.behaviors.forEach(behavior => this.act(behavior));
-
-    this.scenarioBehaviors.forEach(behavior => behavior.call());
+    this.behaviors.forEach(behavior => this.act(behavior));
   }
 
   setBehavior(behavior: Behavior) {
-    this.behaviors.add(behavior);
-  }
-
-  resolveGeneticCode() {
-    if (!this.geneticCode) return false;
-
-    this.geneticCode.forEach(gene => {
-      gene.resolve();
-    });
-  }
-
-  resolveBehavior() {
-    if (!this.geneticCode) return false;
-
-    this.geneticCode.forEach(gene => {
-      gene.animate();
-    });
+    this.behaviors.push(behavior);
   }
 
   removeBehavior(behavior: Behavior) {
-    this.behaviors.delete(behavior);
+    this.behaviors = this.behaviors.filter(theBehavior => theBehavior !== behavior);
   }
 
   die() {
@@ -113,9 +88,9 @@ class Organism extends WorldObject {
   }
 
   act(behavior: Behavior) {
-    this.energy -= behavior.getEnergy();
+    this.energy -= behavior.energy;
 
-    behavior.call({ organism: this });
+    behavior.call();
   }
 
   hungry() {

@@ -1,5 +1,3 @@
-import MovementGene from "../genes/movementGene";
-import GeneticCode from "../geneticCode";
 import Scene from "../scene";
 
 export const create = (scene: Scene) => {

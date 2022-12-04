@@ -1,9 +1,7 @@
-import Reproduces from "../genes/reproduces";
 import WorldObject from "../worldObject";
 import Organism from "./organism";
 import { OrganismProps } from "../organisms/organism";
 import TextureAutotroph from "../textureAutotroph";
-import GeneticCode from "../geneticCode";
 
 export type Coords = {
   x: number;
@@ -14,18 +12,13 @@ type AutotrophProps = {
   texture: TextureAutotroph;
 }
 & Partial<Coords>
-& Pick<OrganismProps, "scene" | "generation" | "color">
-& Partial<Pick<OrganismProps, "geneticCode">>
+& Pick<OrganismProps, "scene" | "generation" | "color">;
 
 class Autotroph extends Organism {
-  public static create({ texture, geneticCode, ...args }: AutotrophProps) {
+  public static create({ texture, ...args }: AutotrophProps) {
     const { x, y } = texture.getPosition();
 
     const organism = new Autotroph({ x, y, shape: texture, ...args});
-
-    organism.geneticCode = new GeneticCode([
-      new Reproduces(organism),
-    ]);
 
     organism.setPosition({ x, y });
     organism.shape.shape.zIndex = 0;
@@ -44,16 +37,6 @@ class Autotroph extends Organism {
   updateEnergyText(): void {}
 
   animate() {
-    this.geneticCode?.forEach(gene => {
-      if (gene instanceof Reproduces) {
-        gene.onMutateMaxCycles = (gene: Reproduces) => {}
-        gene.onMutateIntervals = (gene: Reproduces) => {}
-
-        gene.behavior.interval = 3;
-        gene.behavior.maxCycles = 1;
-      }
-    })
-
     super.animate();
 
     this.setEnergy(this.energy + 200);

@@ -1,4 +1,3 @@
-import GeneticCode from "../geneticCode";
 import { OrganismProps } from "./organism";
 import TextureOrganism from "../textureOrganism";
 import { Coords } from "./autotroph";
@@ -12,11 +11,10 @@ type HeteroTrophProps = {
   texture: TextureOrganism;
 }
 & Partial<Coords>
-& Pick<OrganismProps, "scene" | "generation" | "color">
-& Partial<Pick<OrganismProps, "geneticCode">>
+& Pick<OrganismProps, "scene" | "generation" | "color">;
 
 class HeteroTroph extends Organism {
-  public static create({ texture, geneticCode, ...args }: HeteroTrophProps) {
+  public static create({ texture, ...args }: HeteroTrophProps) {
     const { x, y } = texture.getPosition();
 
     const organism = new HeteroTroph({ x, y, shape: texture, ...args});
@@ -26,9 +24,7 @@ class HeteroTroph extends Organism {
     const detection = new DetectsTarget(organism);
     const consumes = new ConsumesOrganisms(organism);
 
-    organism.geneticCode = new GeneticCode();
-
-    organism.scenarioBehaviors.push(moves, pursuit, detection, consumes);
+    organism.behaviors.push(moves, pursuit, detection, consumes);
 
     organism.shape.shape.zIndex = 1;
     return organism;

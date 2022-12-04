@@ -1,4 +1,5 @@
-import { IBehavior } from "../behavior";
+import { DEFAULT_ENERGY, IBehavior } from "../behavior";
+import { initializeDuplicateBehavior } from "../duplication";
 import { Coords } from "../organisms/autotroph";
 import Organism from "../organisms/organism";
 import Physics, { ICollidableObject } from "../utils/physics/physics";
@@ -8,16 +9,26 @@ import Movement from "./movement";
 class PersuesTarget implements IBehavior {
   target: ICollidableObject & Organism | undefined;
   organism: Organism;
-  interval: number;
   speed: number;
   detection: DetectsTarget | undefined;
+  energy: number;
 
   constructor (organism: Organism) {
     this.organism = organism;
     this.target = undefined;
-    this.interval = 0;
     this.speed = 5;
+    this.energy = DEFAULT_ENERGY;
   }
+
+  duplicate(duplicateOrganism: Organism): PersuesTarget {
+    const duplicate = initializeDuplicateBehavior(this, new PersuesTarget(duplicateOrganism));
+
+    duplicate.speed = this.speed;
+
+    return duplicate;
+  }
+
+  mutate() {}
 
   collides() {
     const { organism } = this;

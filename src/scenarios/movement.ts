@@ -1,7 +1,6 @@
 import DetectsTarget from "../behavior/detectsTarget";
 import MovesRandomly from "../behavior/movesRandomly";
 import PersuesTarget from "../behavior/persuesTarget";
-import GeneticCode from "../geneticCode";
 import Scene from "../scene";
 import Physics from "../utils/physics/physics";
 
@@ -15,8 +14,7 @@ export const create = (scene: Scene) => {
       color: 0x1ECEE6,
     });
 
-    secondOrganism.geneticCode = new GeneticCode([]);
-    secondOrganism.scenarioBehaviors.push(new MovesRandomly(secondOrganism));
+    secondOrganism.behaviors.push(new MovesRandomly(secondOrganism));
   }
 
   for (let i = 0; i < 10; i++) {
@@ -26,6 +24,6 @@ export const create = (scene: Scene) => {
 
     const pursuit = new PersuesTarget(organism);
     const detection = new DetectsTarget(organism);
-    organism.scenarioBehaviors.push(pursuit, detection);
+    organism.behaviors.push(pursuit, detection);
   }
 };

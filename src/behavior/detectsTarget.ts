@@ -1,5 +1,6 @@
 import { Graphics, Matrix, MSAA_QUALITY, Renderer, RenderTexture, Sprite } from "pixi.js";
-import { IBehavior } from "../behavior";
+import { DEFAULT_ENERGY, IBehavior } from "../behavior";
+import { initializeDuplicateBehavior } from "../duplication";
 import Organism from "../organisms/organism";
 import Physics from "../utils/physics/physics";
 
@@ -9,22 +10,25 @@ class DetectsTarget implements IBehavior {
   target: Organism | undefined;
   shape: any;
   targets: Organism[] = [];
+  energy: number;
 
   public static for(organism: Organism) {
-    let movement =
-      organism.scenarioBehaviors
-      .find(behavior => behavior instanceof DetectsTarget) as DetectsTarget;
+    let detectsTarget =
+      organism
+        .behaviors
+        .find(behavior => behavior instanceof DetectsTarget);
 
-    if (!movement) {
-      movement = new DetectsTarget(organism);
+    if (!detectsTarget) {
+      detectsTarget = new DetectsTarget(organism);
 
-      organism.scenarioBehaviors.push(movement);
+      organism.behaviors.push(detectsTarget);
     }
 
-    return movement;
+    return detectsTarget as DetectsTarget;
   }
 
   constructor(organism: Organism) {
+    this.energy = DEFAULT_ENERGY
     this.organism = organism;
     this.radius = 100;
     const { x, y } = this.organism.getPosition();
@@ -43,8 +47,6 @@ class DetectsTarget implements IBehavior {
     });
 
     const { app, container } = Physics.scene!;
-
-    console.log(app, container);
  
     app.renderer.render(templateShape, {
       renderTexture,
@@ -63,6 +65,17 @@ class DetectsTarget implements IBehavior {
 
     this.organism.otherShapes.push(this.shape);
   }
+
+  duplicate(duplicateOrganism: Organism): DetectsTarget {
+    const duplicate =
+      initializeDuplicateBehavior(this, new DetectsTarget(duplicateOrganism));
+
+    duplicate.radius = this.radius;
+
+    return duplicate;
+  }
+
+  mutate() {}
 
   call() {
     const { x, y } = this.organism.getPosition();

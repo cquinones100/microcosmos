@@ -18,7 +18,7 @@ class TextureOrganism {
     const templateShape = new Graphics()
       .beginFill(0xffffff)
       .lineStyle({ width: 1, color: 0x333333, alignment: 0 })
-      .drawCircle(0, 0, 20);
+      .drawCircle(0, 0, 10);
 
     const { width, height } = templateShape;
 

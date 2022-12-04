@@ -1,4 +1,5 @@
-import { IBehavior } from "../behavior";
+import { DEFAULT_ENERGY, IBehavior } from "../behavior";
+import { initializeDuplicateBehavior } from "../duplication";
 import { Coords } from "../organisms/autotroph";
 import Organism from "../organisms/organism";
 import Physics, { IVector } from "../utils/physics/physics";
@@ -10,16 +11,17 @@ class Movement implements IBehavior {
   x: number;
   y: number;
   defaultSpeed: number;
+  energy: number;
 
   public static for(organism: Organism) {
     let movement =
-      organism.scenarioBehaviors
+      organism.behaviors
       .find(behavior => behavior instanceof Movement) as Movement;
 
     if (!movement) {
       movement = new Movement(organism);
 
-      organism.scenarioBehaviors.push(movement);
+      organism.behaviors.push(movement);
     }
 
     return movement;
@@ -34,7 +36,21 @@ class Movement implements IBehavior {
     this.x = x;
     this.y = y;
     this.vector = this.createVector();
+    this.energy = DEFAULT_ENERGY;
   }
+
+  duplicate(duplicateOrganism: Organism): Movement {
+    return initializeDuplicateBehavior(
+      this,
+      new Movement(duplicateOrganism),
+      duplicate => {
+        duplicate.defaultSpeed = this.defaultSpeed;
+        duplicate.speed = this.speed;
+      }
+    );
+  };
+
+  mutate() {}
 
   call() {
     const vector = this.createVector();
