@@ -23,13 +23,9 @@ class Autotroph extends Organism {
 
     const organism = new Autotroph({ x, y, shape: texture, ...args});
 
-    if (geneticCode) {
-      organism.geneticCode = geneticCode;
-    } else {
-      organism.geneticCode = new GeneticCode([
-        new Reproduces(organism),
-      ]);
-    }
+    organism.geneticCode = new GeneticCode([
+      new Reproduces(organism),
+    ]);
 
     organism.setPosition({ x, y });
     organism.shape.shape.zIndex = 0;
