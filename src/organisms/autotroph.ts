@@ -2,6 +2,7 @@ import WorldObject from "../worldObject";
 import Organism from "./organism";
 import { OrganismProps } from "../organisms/organism";
 import TextureAutotroph from "../textureAutotroph";
+import Reproduction from "../behavior/reproduction";
 
 export type Coords = {
   x: number;
@@ -19,6 +20,13 @@ class Autotroph extends Organism {
     const { x, y } = texture.getPosition();
 
     const organism = new Autotroph({ x, y, shape: texture, ...args});
+
+    const reproduction = new Reproduction(organism);
+
+    reproduction.maxCycles = Infinity;
+    reproduction.maxInterval = 10;
+
+    organism.behaviors.push(reproduction);
 
     organism.setPosition({ x, y });
     organism.shape.shape.zIndex = 0;

@@ -9,11 +9,41 @@ export type OrganismProps = {
   generation?: number;
 } & WorldObjectProps;
 
+class Behaviors {
+  array: IBehavior[];
+  length: number;
+
+  constructor () {
+    this.array = [];
+    this.length = 0;
+  }
+
+  push(...args: IBehavior[]) {
+    this.array.push(...args);
+
+    this.length = this.array.length;
+  }
+
+  find(cb: (behavior: IBehavior, index: number) => boolean) {
+    return this.array.find(cb);
+  }
+
+  forEach(cb: (behavior: IBehavior, index: number) => void) {
+    return this.array.forEach(cb);
+  }
+
+  filter(cb: (behavior: IBehavior, index: number) => boolean) {
+    this.array = this.array.filter(cb);
+
+    return this;
+  }
+}
+
 class Organism extends WorldObject {
   public static color = 0xEFA8B1;
 
   energySource: OrganismProps["energySources"];
-  behaviors: IBehavior[];
+  behaviors: Behaviors;
   maxEnergy: number;
   energy: number;
   generation: number;
@@ -25,7 +55,7 @@ class Organism extends WorldObject {
     super({ x, y, ...args });
 
     this.energySource = energySources;
-    this.behaviors = [];
+    this.behaviors = new Behaviors();
     this.maxEnergy = 100;
     this.energy = this.maxEnergy;
     this.generation = generation || 0;
@@ -48,8 +78,6 @@ class Organism extends WorldObject {
 
     this.scene.container.addChild(this.text);
     this.consumed = false;
-
-    this.behaviors = [];
   }
 
   updateEnergyText() {
@@ -123,11 +151,9 @@ class Organism extends WorldObject {
     return this.energy <= 0;
   }
 
-  movement() {
-    return Array.from(this.behaviors).find((behavior) => behavior instanceof Movement) as Movement | undefined;
-  }
-
   setPosition({ x, y }: { x: number; y: number; }): void {
+    this.x = x;
+    this.y = y;
     super.setPosition({ x, y });
 
     this.text.position.set(x + 3, y + this.getDimensions().height / 2 - 3);
