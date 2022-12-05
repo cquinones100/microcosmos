@@ -3,6 +3,7 @@ import Organism from "./organism";
 import { OrganismProps } from "../organisms/organism";
 import TextureAutotroph from "../textureAutotroph";
 import Reproduction from "../behavior/reproduction";
+import Physics from "../utils/physics/physics";
 
 export type Coords = {
   x: number;

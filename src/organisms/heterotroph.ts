@@ -46,7 +46,6 @@ class HeteroTroph extends Organism {
 
   consume(organism: Organism) {
     this.scene.predators.add(this);
-    this.scene.prey.add(organism);
 
     if (organism.dead()) {
       if (!organism.consumed) {

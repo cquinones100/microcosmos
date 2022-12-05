@@ -7,7 +7,7 @@ import TextureOrganism from "./textureOrganism";
 import TextureAutotroph from "./textureAutotroph";
 import Autotroph, { Coords } from "./organisms/autotroph";
 import HeteroTroph from "./organisms/heterotroph";
-import Physics from "./utils/physics/physics";
+import Physics, { Point } from "./utils/physics/physics";
 import { create } from "./scenarios/default";
 
 export const MUTATION_FACTOR = 1;
@@ -18,31 +18,24 @@ class Scene {
   app: PIXI.Application;
   organisms: Set<Organism>;
   predators: Set<Organism>;
-  prey: Set<Organism>;
-  naturalDeaths: Set<Organism>;
   paused: boolean;
   center: { x: number; y: number; };
   coordinates: Set<WorldObject>[][];
   measurements: {
     [key: string]: number
   }
-  onAnimates: (() => void)[];
   timePassed: number;
   container: PIXI.Container<PIXI.DisplayObject>;
   stop: boolean;
-  allObjects: Set<WorldObject>[][];
   workerPool: Worker[];
   timePassedMS: number = 0;
 
   constructor() {
     this.organisms = new Set<Organism>();
     this.predators = new Set();
-    this.prey = new Set();
-    this.naturalDeaths = new Set();
     this.paused = false;
     this.coordinates = [];
     this.measurements = {};
-    this.onAnimates = [];
     this.timePassed = 0;
     this.container = new Container();
     this.app = new Application({
@@ -55,9 +48,6 @@ class Scene {
       resolution: window.devicePixelRatio
     });
     this.center = { x: this.app.screen.width / 2, y: this.app.screen.height / 2 };
-    this.allObjects = Array.from(Array(Math.ceil(this.app.screen.width / CHUNK_SIZE))).map(() => {
-      return Array.from(Array(Math.ceil(this.app.screen.height / CHUNK_SIZE))).map(() => new Set());
-    });
     this.stop = false;
     this.container.sortableChildren = true;
     this.workerPool = [
@@ -68,6 +58,10 @@ class Scene {
     ];
 
     Physics.setScene(this);
+
+    this.container.on("click", (event) => {
+      console.log({ x: event.clientX, y: event.clientY });
+    });
   }
 
   draw() {
@@ -211,51 +205,92 @@ class Scene {
     return result
   }
 
-  onAnimate(db: () => void) {
-    this.onAnimates ||= [];
-
-    this.onAnimates.push(db);
-  }
-
   getDimensions() {
     const { width, height } = this.app.screen
 
     return { width, height };
   }
 
-  setPosition({ x: objX, y: objY }: Coords, object: WorldObject) {
-    const { x, y } = this.getPosition({ x: objX, y: objY });
+  addObject(object: WorldObject) {
+    const { x: objX, y: objY } = object.getPosition();
+    const { width, height } = object.getDimensions();
 
-    try {
-      this.allObjects[x][y].delete(object);
-      this.allObjects[x][y].add(object);
-    } catch (e) {
+    const roundedX = Math.round(objX);
+    const roundedY = Math.round(objY);
+
+    for (let x = roundedX; x < roundedX + width; x++) {
+      for (let y = roundedY; y < roundedY + height; y++) {
+        this.coordinates[x] ||= [];
+        this.coordinates[x][y] ||= new Set();
+
+        this.coordinates[x][y].add(object);
+      }
     }
   }
 
-  getPositionCell({ x, y }: Coords) {
-    return this.allObjects[x][y];
+  removeObject(object: WorldObject) {
+    const { x: objX, y: objY } = object.getPosition();
+    const { width, height } = object.getDimensions();
+
+    const x = Math.round(objX);
+    const y = Math.round(objY);
+    const roundedX = Math.round(objX);
+    const roundedY = Math.round(objY);
+
+    for (let x = roundedX; x < roundedX + width; x++) {
+      for (let y = roundedY; y < roundedY + height; y++) {
+        this.coordinates[x] ||= [];
+        this.coordinates[x][y] ||= new Set();
+
+        this.coordinates[x][y].delete(object);
+      }
+    }
   }
 
-  getAtPosition({ x: objX, y: objY }: Coords) {
-    const { x, y } = this.getPosition({ x: objX, y: objY });
+  getSurrounding(object: WorldObject): [Point, Set<WorldObject>][] {
+    const { x: objX, y: objY } = object.getPosition();
+    const { width, height } = object.getDimensions();
 
-    return this.getPositionCell({ x, y });
-  }
+    const x = Math.round(objX);
+    const y = Math.round(objY);
 
-  getPosition({ x: objX, y: objY }: Coords) {
-    const x = Math.round(objX / CHUNK_SIZE);
-    const y = Math.round(objY / CHUNK_SIZE);
+    const left = new Point(x - width - 1, y);
+    const up = new Point(x,  y - height - 1);
+    const right = new Point(x + width + 1, y);
+    const down = new Point(x,  y + height + 1);
 
-    return { x, y };
-  }
+    return [left, up, right, down].map((point, index) => {
+      const { x, y } = point;
+      const roundedX = Math.round(x);
+      const roundedY = Math.round(y);
 
-  getPositionRows() {
-    return this.allObjects.length;
-  }
+      let found = new Set<WorldObject>();
 
-  getPositionCols() {
-    return this.allObjects[0].length;
+      for (let x = roundedX; x < roundedX + width; x++) {
+        for (let y = roundedY; y < roundedY + height; y++) {
+          const set = this.coordinates[x]?.[y];
+
+          if (set?.size > 0) found = set;
+        }
+      }
+
+      switch (index) {
+        case 0:
+          point.setPosition({ x: x + width / 2, y });
+          break;
+        case 1:
+          point.setPosition({ x, y: y + height / 2 });
+          break;
+        case 2:
+          point.setPosition({ x: x - width / 2, y });
+          break;
+        case 3:
+          point.setPosition({ x: x, y: y - height / 2 });
+          break;
+      }
+
+      return [point, found];
+    });
   }
 }
 

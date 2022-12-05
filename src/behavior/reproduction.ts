@@ -61,42 +61,28 @@ class Reproduction implements IBehavior {
   }
 
   private reproduce() {
-    const { x, y } = this.organism.getPosition();
-    const { width, height } = this.organism.getDimensions();
-    const left = new Point(x - width, y);
-    const up = new Point(x,  y - height);
-    const right = new Point(x + width, y);
-    const down = new Point(x,  y + height);
-    
-    const collisions: Organism[][] = [[], [], [], []];
-
-    Physics.scene?.organisms.forEach((organism) => {
-      if (organism === this.organism) return;
-
-      [left, up, right, down].forEach((point, index) => {
-         if(Physics.Collision.collides(organism, point))
-          collisions[index].push(organism);
-      });
+    const surrounding = Physics.scene!.getSurrounding(this.organism);
+    const openSpaces = surrounding.filter(([_, space]) => {
+      return space.size === 0;
     });
 
-    const openSpaces = [left, right, up, down].filter((space, index) => {
-      return collisions[index].length === 0;
-    });
-
-    const openSpace = openSpaces[Math.floor(Math.random() * openSpaces.length)];
+    const openSpace = openSpaces[Math.floor(Math.random() * openSpaces.length)]?.[0];
 
     if (openSpace) {
       const newOrganism = this.organism.duplicate();
 
-      this.organism.behaviors.forEach(behavior => behavior.duplicate(newOrganism));
+      this.organism.behaviors
+        .forEach(behavior => behavior.duplicate(newOrganism));
 
       this.organism.energy = this.organism.energy / 2;
       newOrganism.energy = this.organism.energy / 2;
 
-      newOrganism.behaviors.forEach(Mutator.conditionallyMutate)
+      newOrganism.behaviors.forEach(Mutator.conditionallyMutate);
       newOrganism.generation = this.organism.generation + 1;
 
-      newOrganism.setPosition(openSpace.getPosition())
+      const { x, y } = openSpace.getPosition()
+
+      newOrganism.setPosition({ x, y });
     }
   }
 }

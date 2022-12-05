@@ -63,7 +63,8 @@ class Organism extends WorldObject {
     this.shape.shape.interactive = true
     this.shape.shape.on("click", () => {
       console.log(this);
-    })
+      console.log("surrounded?", this.surrounded())
+    });
 
     this.text = new Text("", {
       fill: "white",
@@ -86,7 +87,6 @@ class Organism extends WorldObject {
 
   animate() {
     if (this.energy <= 0) {
-      this.scene.naturalDeaths.add(this);
       this.die();
 
       return;

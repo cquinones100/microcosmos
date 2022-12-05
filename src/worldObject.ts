@@ -38,10 +38,12 @@ class WorldObject implements ICollidableObject {
     return { x: newX, y: newY };
   }
 
-  constructor({ shape, scene, color, x, y }: WorldObjectProps) {
+  constructor({ shape, scene }: WorldObjectProps) {
     this.scene = scene;
     this.shape = shape;
     this.otherShapes = [];
+
+    Physics.scene!.addObject(this);
   }
 
   setPosition({ x, y }: { x: number, y: number }) {
@@ -68,6 +70,9 @@ class WorldObject implements ICollidableObject {
     if (newY < 0) {
       newY = sceneHeight;
     }
+
+    Physics.scene!.coordinates[x]?.[y]?.delete(this);
+    Physics.scene!.addObject(this);
 
     this.shape.shape.position.x = newX
     this.shape.shape.position.y = newY
@@ -123,6 +128,14 @@ class WorldObject implements ICollidableObject {
 
   remove() {
     this.otherShapes.forEach(shape => Physics.scene!.container.removeChild(shape));
+  }
+
+  surrounded() {
+    const surrounding = Physics.scene!.getSurrounding(this);
+
+    return surrounding.filter(([_, space]) => {
+      return space.size === 0;
+    }).length > 0;
   }
 }
 
