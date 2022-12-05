@@ -1,6 +1,7 @@
 import { Text } from "pixi.js";
 import Behavior, { IBehavior } from "../behavior";
 import Movement from "../behavior/movement";
+import Reproduction from "../behavior/reproduction";
 import Physics from "../utils/physics/physics";
 import WorldObject, { IWorkerObject, WorldObjectProps } from "../worldObject";
 
@@ -63,7 +64,9 @@ class Organism extends WorldObject {
     this.shape.shape.interactive = true
     this.shape.shape.on("click", () => {
       console.log(this);
-      console.log("surrounded?", this.surrounded())
+      console.log("surrounded?", this.surrounded());
+      console.log("reproduction", Reproduction.for(this));
+      console.log("should reproduce", Reproduction.for(this).shouldReproduce());
     });
 
     this.text = new Text("", {
@@ -109,6 +112,7 @@ class Organism extends WorldObject {
     super.die();
 
     Physics.scene!.organisms.delete(this);
+    Physics.scene!.removeObject(this);
   }
 
   disappear() {

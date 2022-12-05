@@ -1,6 +1,7 @@
 import IBehavior from "../behavior";
 import { initializeDuplicateBehavior } from "../duplication";
 import Mutator from "../mutator";
+import Autotroph from "../organisms/autotroph";
 import Organism from "../organisms/organism";
 import Physics, { Point } from "../utils/physics/physics";
 
@@ -54,7 +55,7 @@ class Reproduction implements IBehavior {
     }
   }
 
-  private shouldReproduce() {
+  shouldReproduce() {
     return this.interval >= this.maxInterval
       && this.cycles < this.maxCycles
       && this.organism.energy > this.minEnergy;
@@ -62,11 +63,18 @@ class Reproduction implements IBehavior {
 
   private reproduce() {
     const surrounding = Physics.scene!.getSurrounding(this.organism);
+
     const openSpaces = surrounding.filter(([_, space]) => {
       return space.size === 0;
     });
 
-    const openSpace = openSpaces[Math.floor(Math.random() * openSpaces.length)]?.[0];
+    let openSpace;
+
+    if (this.organism instanceof Autotroph) {
+      openSpace = openSpaces[Math.floor(Math.random() * openSpaces.length)]?.[0];
+    } else {
+      openSpace = surrounding[0][0];
+    }
 
     if (openSpace) {
       const newOrganism = this.organism.duplicate();

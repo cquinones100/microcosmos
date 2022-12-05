@@ -61,9 +61,9 @@ class DetectsTarget implements IBehavior {
     this.shape = new Sprite(renderTexture);
 
     this.shape.zIndex = 1;
-    container.addChild(this.shape);
+    // container.addChild(this.shape);
 
-    this.organism.otherShapes.push(this.shape);
+    // this.organism.otherShapes.push(this.shape);
   }
 
   duplicate(duplicateOrganism: Organism): DetectsTarget {

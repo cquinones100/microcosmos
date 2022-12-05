@@ -6,6 +6,7 @@ import PersuesTarget from "../behavior/persuesTarget";
 import DetectsTarget from "../behavior/detectsTarget";
 import MovesRandomly from "../behavior/movesRandomly";
 import ConsumesOrganisms from "../behavior/consumesOrganisms";
+import Reproduction from "../behavior/reproduction";
 
 type HeteroTrophProps = {
   texture: TextureOrganism;
@@ -23,8 +24,10 @@ class HeteroTroph extends Organism {
     const pursuit = new PersuesTarget(organism);
     const detection = new DetectsTarget(organism);
     const consumes = new ConsumesOrganisms(organism);
+    const reproduction = new Reproduction(organism);
+    reproduction.maxInterval = 500;
 
-    organism.behaviors.push(moves, pursuit, detection, consumes);
+    organism.behaviors.push(moves, pursuit, detection, consumes, reproduction);
 
     organism.shape.shape.zIndex = 1;
     return organism;
@@ -67,7 +70,7 @@ class HeteroTroph extends Organism {
   }
 
   canBeEatenBy(organism: HeteroTroph) {
-    return this.dead() && !this.consumed;
+    return this.dead();
   }
 
   duplicate(): Organism {
@@ -84,10 +87,8 @@ class HeteroTroph extends Organism {
   }
 
   die() {
-    this.shape.shape.zIndex = 1;
+    this.shape.shape.zIndex = 0;
     this.shape.shape.tint = 0x663633; 
-
-    super.die();
   }
 }
 

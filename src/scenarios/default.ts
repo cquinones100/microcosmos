@@ -1,6 +1,6 @@
 import Scene from "../scene";
 
 export const create = (scene: Scene) => {
-  // scene.createHeterotroph();
+  scene.createHeterotroph();
   scene.createAutotroph();
 }

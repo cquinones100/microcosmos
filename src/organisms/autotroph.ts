@@ -17,6 +17,8 @@ type AutotrophProps = {
 & Pick<OrganismProps, "scene" | "generation" | "color">;
 
 class Autotroph extends Organism {
+  interval: number;
+  maxIntervals: any;
   public static create({ texture, ...args }: AutotrophProps) {
     const { x, y } = texture.getPosition();
 
@@ -41,6 +43,9 @@ class Autotroph extends Organism {
     if (x !== undefined && y !== undefined) {
       this.setPosition({ x, y });
     }
+
+    this.interval = 0;
+    this.maxIntervals = 100;
   }
 
   updateEnergyText(): void {}
@@ -48,7 +53,9 @@ class Autotroph extends Organism {
   animate() {
     super.animate();
 
-    this.setEnergy(this.energy + 200);
+    this.interval += 1;
+
+    if (this.interval < this.maxIntervals) this.setEnergy(this.energy + 1);
   }
 
   duplicate() {
@@ -82,6 +89,7 @@ class Autotroph extends Organism {
 
   die() {
     this.scene.remove(this);
+    this.disappear();
     super.die();
   }
 }

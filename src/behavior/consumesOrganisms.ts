@@ -26,8 +26,7 @@ class ConsumesOrganisms implements IBehavior {
     detection.targets.forEach(target => {
       if (this.organism.canEat(target)) {
         if (Physics.Collision.collides(this.organism, target)) {
-          target.die();
-          target.disappear();
+          if (this.organism.canEat(target)) this.organism.consume(target);
         }
       }
     });

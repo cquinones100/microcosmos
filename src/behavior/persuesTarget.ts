@@ -99,7 +99,7 @@ class PersuesTarget implements IBehavior {
       }
 
       return 0;
-    })[0];
+    }).filter(target => this.organism.canEat(target))[0];
   }
 }
 
