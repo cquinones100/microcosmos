@@ -3,7 +3,7 @@ import Behavior, { IBehavior } from "../behavior";
 import Movement from "../behavior/movement";
 import Reproduction from "../behavior/reproduction";
 import Physics from "../utils/physics/physics";
-import WorldObject, { IWorkerObject, WorldObjectProps } from "../worldObject";
+import WorldObject, { WorldObjectProps } from "../worldObject";
 
 export type OrganismProps = {
   energySources?: (any)[];
@@ -43,7 +43,6 @@ class Behaviors {
 class Organism extends WorldObject {
   public static color = 0xEFA8B1;
 
-  energySource: OrganismProps["energySources"];
   behaviors: Behaviors;
   maxEnergy: number;
   energy: number;
@@ -52,10 +51,9 @@ class Organism extends WorldObject {
   text: Text;
   consumed: boolean;
 
-  constructor({ energySources = [], generation, x, y, color, ...args }: OrganismProps) {
-    super({ x, y, ...args });
+  constructor({ shape, generation, color, ...args }: OrganismProps) {
+    super({ shape, ...args });
 
-    this.energySource = energySources;
     this.behaviors = new Behaviors();
     this.maxEnergy = 100;
     this.energy = this.maxEnergy;
@@ -69,6 +67,7 @@ class Organism extends WorldObject {
       fontSize: 8
     });
 
+    const { x, y } = shape.getPosition();
     this.text.position.set(x, y);
     this.text.zIndex = 3;
 
@@ -154,16 +153,7 @@ class Organism extends WorldObject {
     this.y = y;
     super.setPosition({ x, y });
 
-    this.text.position.set(x + 3, y + this.getDimensions().height / 2 - 3);
-  }
-
-  toWorkerObject(id?: number): IWorkerObject {
-    return {
-      id,
-      position: this.getPosition(),
-      dimensions: this.getDimensions(),
-      hungry: this.hungry(),
-    }
+    this.text?.position.set(x + 3, y + this.getDimensions().height / 2 - 3);
   }
 }
 

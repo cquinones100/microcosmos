@@ -11,14 +11,13 @@ import Reproduction from "../behavior/reproduction";
 type HeteroTrophProps = {
   texture: TextureOrganism;
 }
-& Partial<Coords>
 & Pick<OrganismProps, "scene" | "generation" | "color">;
 
 class HeteroTroph extends Organism {
   public static create({ texture, ...args }: HeteroTrophProps) {
     const { x, y } = texture.getPosition();
 
-    const organism = new HeteroTroph({ x, y, shape: texture, ...args});
+    const organism = new HeteroTroph({ shape: texture, ...args});
 
     const moves = new MovesRandomly(organism)
     const pursuit = new PersuesTarget(organism);
@@ -35,12 +34,8 @@ class HeteroTroph extends Organism {
 
   prey: Organism | undefined;
 
-  constructor({ x, y, ...args }: OrganismProps) {
-    super({ x, y, ...args });
-
-    if (x !== undefined && y !== undefined) {
-      this.setPosition({ x, y });
-    }
+  constructor({ ...args }: OrganismProps) {
+    super({ ...args });
 
     this.defaultColor = 0xEFA8B1;
     this.shape.shape.tint = this.defaultColor;

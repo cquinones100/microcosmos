@@ -2,6 +2,8 @@ import { Graphics, Matrix, MSAA_QUALITY, Renderer, RenderTexture, Sprite } from 
 import { Coords } from "./organisms/autotroph";
 import Scene from "./scene";
 
+const WIDTH = 20;
+
 type TextureOrganismProps = {
   renderTexture: RenderTexture;
   scene: Scene;
@@ -18,7 +20,7 @@ class TextureAutotroph {
 
     const templateShape = new Graphics()
       .beginFill(0xffffff)
-      .drawRect(0, 0, 20, 20);
+      .drawRect(0, 0, WIDTH, WIDTH);
 
     const { width, height } = templateShape;
 
@@ -36,7 +38,7 @@ class TextureAutotroph {
     // make sure to apply a transform Matrix
     app.renderer.render(templateShape, {
       renderTexture,
-      transform: new Matrix(1, 0, 0, 1, width / 2, height / 2)
+      transform: new Matrix(1, 0, 0, 1, 0, 0)
     });
 
     // Required for MSAA, WebGL 2 only
@@ -56,8 +58,11 @@ class TextureAutotroph {
     this.shape = new Sprite(renderTexture);
     this.renderTexture = renderTexture;
     this.scene = scene;
-    this.shape.position.x = x || this.scene.app.screen.width / 2;
-    this.shape.position.y = y || this.scene.app.screen.height / 2;
+    this.shape.position.x = x === undefined ? this.scene.app.screen.width / 2 : x;
+    this.shape.position.y = y === undefined ? this.scene.app.screen.height / 2 : y;
+
+    this.shape.position.x -= WIDTH / 2;
+    this.shape.position.y -= WIDTH / 2;
     this.scene.container.addChild(this.shape);
   }
 

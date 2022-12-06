@@ -59,10 +59,6 @@ class Scene {
     ];
 
     Physics.setScene(this);
-
-    this.container.on("click", (event) => {
-      console.log({ x: event.clientX, y: event.clientY });
-    });
   }
 
   draw() {
@@ -89,6 +85,8 @@ class Scene {
           Object.keys(this.measurements).forEach(measurement => {
             console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
           });
+
+          debugger;
         }
       }
     })
@@ -98,6 +96,15 @@ class Scene {
         DetectsTarget.showRadius = !DetectsTarget.showRadius;
       }
     })
+
+    this.container.interactive = true;
+
+    this.app.stage.interactive = true;
+    this.app.stage.hitArea = new PIXI.Rectangle(0, 0, app.screen.width, app.screen.height);
+
+    this.app.stage.on('click', (event) => {
+      console.log(event.clientX, event.clientY);
+    });
 
     create(this);
 
@@ -225,12 +232,15 @@ class Scene {
     const roundedX = Math.round(objX);
     const roundedY = Math.round(objY);
 
-    for (let x = roundedX; x < roundedX + width; x++) {
-      for (let y = roundedY; y < roundedY + height; y++) {
-        this.coordinates[x] ||= [];
-        this.coordinates[x][y] ||= new Set();
+    for (let x = roundedX - (width / 2); x < roundedX + (width / 2); x++) {
+      for (let y = roundedY - -(height / 2); y < roundedY + (height / 2); y++) {
+        debugger;
+        if (x > 0 && y > 0) {
+          this.coordinates[x] ||= [];
+          this.coordinates[x][y] ||= new Set();
 
-        this.coordinates[x][y].add(object);
+          this.coordinates[x][y].add(object);
+        }
       }
     }
 

@@ -1,4 +1,4 @@
-import WorldObject, { IWorkerObject }  from "../../worldObject";
+import WorldObject from "../../worldObject";
 import { Coords } from "../../organisms/autotroph";
 import Scene from "../../scene";
 import Organism from "../../organisms/organism";
@@ -10,19 +10,6 @@ export interface IDirected {
   setDirection: ({ x, y, }: Coords) => void;
   randomDirectionValue: () => number;
 }
-
-type ICollisionHandler = {
-  onCollision: (
-    cb: (
-      collider: ICollisionObject,
-      collided: ICollisionObject,
-      directionHandler: IDirected
-    )
-    => void
-  )
-  => ICollisionHandler;
-  onClear: (cb: () => void) => ICollisionHandler;
-};
 
 export interface ICollidableObject {
   getPosition: () => Coords;
@@ -86,34 +73,7 @@ export class Point implements ICollidableObject {
   }
 }
 
-type ICollisionObject = IWorkerObject;
-class Collision implements ICollisionHandler {
-  private static grid: Set<ICollisionObject> = new Set();
-  public static update(collider: ICollisionObject, directionHandler: IDirected): ICollisionHandler {
-
-    const { grid } = Collision;
-
-    grid.add(collider);
-
-    const collisionObjects = Array.from(grid).filter(object => {
-      const { x, y } = collider.position;
-      const { x: objectX, y: objectY } = object.position;
-      const { width, height } = collider.dimensions;
-
-      return object !== collider
-        && objectX > x - width
-        && objectX < x + width
-        && objectY > y - width
-        && objectY < y + height;
-    });
-
-    if (collisionObjects.length > 0) {
-      return new Collision(collider, collisionObjects[0], directionHandler);
-    } else {
-      return new NoCollision(collider, directionHandler);
-    }
-  }
-
+class Collision {
   public static collides(collider: ICollidableObject, collided: ICollidableObject): boolean {
       const { x, y } = collider.getPosition();
       const { width, height } = collider.getDimensions();
@@ -124,54 +84,6 @@ class Collision implements ICollisionHandler {
         && collidedX < x + width
         && collidedY > y - width
         && collidedY < y + height;
-  }
-
-  collided: ICollisionObject;
-  collider: ICollisionObject;
-  directionHandler: IDirected;
-  clearCb?: () => void;
-  collisionCb?: (collider: ICollisionObject, collided: ICollisionObject) => void;
-
-  constructor(collider: ICollisionObject, collided: ICollisionObject, directionHandler: IDirected) {
-    this.collider = collider;
-    this.collided = collided;
-    this.directionHandler = directionHandler;
-    this.clearCb = () => {};
-    this.collisionCb = undefined;
-  }
-
-  onClear(cb: () => void) {
-    return this;
-  }
-
-  onCollision(cb: (collider: ICollisionObject, collided: ICollisionObject, directionHandler: IDirected) => void) {
-    cb(this.collider, this.collided, this.directionHandler);
-
-    return Collision.update(this.collider, this.directionHandler);
-  }
-}
-
-class NoCollision implements ICollisionHandler {
-  collider: ICollisionObject;
-  collisionCb: () => void;
-  clearCb?: () => void;
-  directionHandler: IDirected;
-
-  constructor(collider: ICollisionObject, directionHandler: IDirected) {
-    this.collider = collider;
-    this.collisionCb = () => {};
-    this.clearCb = undefined;
-    this.directionHandler = directionHandler;
-  }
-
-  onCollision() {
-    return this;
-  }
-
-  onClear(cb: () => void) {
-    cb()
-
-    return Collision.update(this.collider, this.directionHandler);
   }
 }
 
@@ -204,18 +116,9 @@ const avoid = (hugger: WorldObject, hugged: WorldObject, directionHandler: IDire
   hugger.setPosition({ x, y });
 };
 
-class Movement {
-  obj: ICollisionObject;
-
-  constructor({ obj }: { obj: ICollisionObject }) {
-    this.obj = obj;
-  }
-}
-
 type VectorProps = { x: number; y: number; targetX: number; targetY: number; }
 
 type Physics = {
-  Movement: typeof Movement;
   Collision: typeof Collision;
   avoid: typeof avoid;
   Vector: {
@@ -276,7 +179,6 @@ class Vector implements IVector {
 }
 
 const Physics: Physics = {
-  Movement,
   Collision,
   avoid,
   Vector: {

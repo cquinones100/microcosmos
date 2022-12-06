@@ -10,16 +10,6 @@ export type WorldObjectProps = {
   scene: Scene;
   shape: TextureOrganism;
   color?: number;
-  x: number;
-  y: number;
-}
-
-export interface IWorkerObject {
-  id?: number;
-  position: Coords;
-  dimensions: { width: number; height: number; };
-  hungry: boolean;
-  canBeEaten?: boolean;
 }
 
 class WorldObject implements ICollidableObject {
@@ -35,6 +25,10 @@ class WorldObject implements ICollidableObject {
     this.scene = scene;
     this.shape = shape;
     this.otherShapes = [];
+
+    const { x, y } = this.shape.getPosition();
+
+    this.setPosition({ x, y });
 
     Physics.scene!.addObject(this);
   }
@@ -64,14 +58,14 @@ class WorldObject implements ICollidableObject {
       newY = sceneHeight;
     }
 
-    Physics.scene!.removeObject(this);
+    // Physics.scene!.removeObject(this);
     this.shape.shape.position.x = newX;
     this.shape.shape.position.y = newY;
 
-    const { x: sceneX, y: sceneY }  = Physics.scene!.addObject(this);
+    // const { x: sceneX, y: sceneY }  = Physics.scene!.addObject(this);
 
-    this.shape.shape.position.x = sceneX;
-    this.shape.shape.position.y = sceneY;
+    // this.shape.shape.position.x = sceneX;
+    // this.shape.shape.position.y = sceneY;
   }
 
   canEat(organism: Organism) {
@@ -110,8 +104,6 @@ class WorldObject implements ICollidableObject {
 
     return this.intersects(x, y);
   }
-
-  onIntersection({ x, y }: Coords, intersectionObject: WorldObject, cb: () => void) { }
 
   die() {
     this.remove();

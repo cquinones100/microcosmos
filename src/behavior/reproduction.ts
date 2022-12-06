@@ -117,7 +117,6 @@ class Reproduction implements IBehavior {
     const openSpaceIndex = Math.floor(Math.random() * spaces.length);
 
     if (this.organism instanceof Autotroph) {
-      debugger;
       openSpace = spaces[openSpaceIndex];
     } else {
       openSpace = spaces[0];
