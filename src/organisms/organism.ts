@@ -61,13 +61,7 @@ class Organism extends WorldObject {
     this.energy = this.maxEnergy;
     this.generation = generation || 0;
 
-    this.shape.shape.interactive = true
-    this.shape.shape.on("click", () => {
-      console.log(this);
-      console.log("surrounded?", this.surrounded());
-      console.log("reproduction", Reproduction.for(this));
-      console.log("should reproduce", Reproduction.for(this).shouldReproduce());
-    });
+     this.shape.shape.interactive = true
 
     this.text = new Text("", {
       fill: "white",

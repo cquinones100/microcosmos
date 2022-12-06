@@ -12,6 +12,8 @@ class DetectsTarget implements IBehavior {
   targets: Organism[] = [];
   energy: number;
 
+  static showRadius = false;
+
   public static for(organism: Organism) {
     let detectsTarget =
       organism
@@ -61,9 +63,6 @@ class DetectsTarget implements IBehavior {
     this.shape = new Sprite(renderTexture);
 
     this.shape.zIndex = 1;
-    // container.addChild(this.shape);
-
-    // this.organism.otherShapes.push(this.shape);
   }
 
   duplicate(duplicateOrganism: Organism): DetectsTarget {
@@ -78,6 +77,13 @@ class DetectsTarget implements IBehavior {
   mutate() {}
 
   call() {
+    if (DetectsTarget.showRadius) {
+      Physics.scene!.container.addChild(this.shape)
+      this.organism.otherShapes.push(this.shape);
+    } else {
+      Physics.scene!.container.removeChild(this.shape)
+    }
+
     const { x, y } = this.organism.getPosition();
     const { width, height } = this.organism.getDimensions();
 

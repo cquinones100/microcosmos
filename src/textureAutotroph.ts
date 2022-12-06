@@ -58,7 +58,6 @@ class TextureAutotroph {
     this.scene = scene;
     this.shape.position.x = x || this.scene.app.screen.width / 2;
     this.shape.position.y = y || this.scene.app.screen.height / 2;
-    this.shape.tint = 0x50B959;
     this.scene.container.addChild(this.shape);
   }
 

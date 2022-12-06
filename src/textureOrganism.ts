@@ -59,7 +59,6 @@ class TextureOrganism {
   constructor({ shape, scene, x, y }: TextureOrganismProps) {
     this.shape = shape;
     this.scene = scene;
-    this.shape.tint = 0xEFA8B1;
     this.scene.container.addChild(this.shape);
   }
 

@@ -19,6 +19,7 @@ type AutotrophProps = {
 class Autotroph extends Organism {
   interval: number;
   maxIntervals: any;
+  static defaultColor: number;
   public static create({ texture, ...args }: AutotrophProps) {
     const { x, y } = texture.getPosition();
 
@@ -46,6 +47,9 @@ class Autotroph extends Organism {
 
     this.interval = 0;
     this.maxIntervals = 100;
+    this.defaultColor = 0x50B959;
+    this.shape.shape.tint = this.defaultColor;
+
   }
 
   updateEnergyText(): void {}

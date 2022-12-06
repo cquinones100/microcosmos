@@ -41,6 +41,9 @@ class HeteroTroph extends Organism {
     if (x !== undefined && y !== undefined) {
       this.setPosition({ x, y });
     }
+
+    this.defaultColor = 0xEFA8B1;
+    this.shape.shape.tint = this.defaultColor;
   }
 
   animate() {

@@ -8,7 +8,8 @@ import TextureAutotroph from "./textureAutotroph";
 import Autotroph, { Coords } from "./organisms/autotroph";
 import HeteroTroph from "./organisms/heterotroph";
 import Physics, { Point } from "./utils/physics/physics";
-import { create } from "./scenarios/default";
+import { create } from "./scenarios/reproduction";
+import DetectsTarget from "./behavior/detectsTarget";
 
 export const MUTATION_FACTOR = 1;
 
@@ -89,6 +90,12 @@ class Scene {
             console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
           });
         }
+      }
+    })
+
+    document.addEventListener('keydown', ({ key }) => {
+      if (key === 'r') {
+        DetectsTarget.showRadius = !DetectsTarget.showRadius;
       }
     })
 
@@ -226,6 +233,8 @@ class Scene {
         this.coordinates[x][y].add(object);
       }
     }
+
+    return { x: roundedX, y: roundedY };
   }
 
   removeObject(object: WorldObject) {
@@ -248,48 +257,21 @@ class Scene {
   }
 
   getSurrounding(object: WorldObject): [Point, Set<WorldObject>][] {
-    const { x: objX, y: objY } = object.getPosition();
+    const { x, y } = object.getPosition();
     const { width, height } = object.getDimensions();
 
-    const x = Math.round(objX);
-    const y = Math.round(objY);
+    const left = new Point(Math.floor(x - (width / 2)) - 1, Math.floor(y));
+    const right = new Point(Math.floor(x + (width / 2)) + 1, Math.floor(y));
 
-    const left = new Point(x - width - 1, y);
-    const up = new Point(x,  y - height - 1);
-    const right = new Point(x + width + 1, y);
-    const down = new Point(x,  y + height + 1);
+    const up = new Point(Math.floor(x), Math.floor(y - (height / 2)) + 1);
+    const down = new Point(Math.floor(x), Math.floor(y + (height / 2)) - 1);
 
-    return [left, up, right, down].map((point, index) => {
-      const { x, y } = point;
-      const roundedX = Math.round(x);
-      const roundedY = Math.round(y);
+    const points = [];
 
-      let found = new Set<WorldObject>();
+    return [left, up, right, down].map((point) => {
+      const { x, y } = point.getPosition();
 
-      for (let x = roundedX; x < roundedX + width; x++) {
-        for (let y = roundedY; y < roundedY + height; y++) {
-          const set = this.coordinates[x]?.[y];
-
-          if (set?.size > 0) found = set;
-        }
-      }
-
-      switch (index) {
-        case 0:
-          point.setPosition({ x: x + width / 2, y });
-          break;
-        case 1:
-          point.setPosition({ x, y: y + height / 2 });
-          break;
-        case 2:
-          point.setPosition({ x: x - width / 2, y });
-          break;
-        case 3:
-          point.setPosition({ x: x, y: y - height / 2 });
-          break;
-      }
-
-      return [point, found];
+      return [point, this.coordinates[x]?.[y]];
     });
   }
 }

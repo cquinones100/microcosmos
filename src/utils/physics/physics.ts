@@ -56,6 +56,34 @@ export class Point implements ICollidableObject {
   }
 
   die() {}
+
+  roundLeft() {
+    this.x = Math.floor(this.x);
+    this.y = Math.round(this.y)
+
+    return this;
+  }
+
+  roundUp() {
+    this.x = Math.round(this.x);
+    this.y = Math.floor(this.y);
+
+    return this;
+  }
+
+  roundRight() {
+    this.x = Math.ceil(this.x);
+    this.y = Math.floor(this.y);
+
+    return this;
+  }
+
+  roundDown() {
+    this.x = Math.round(this.x);
+    this.y = Math.ceil(this.y);
+
+    return this;
+  }
 }
 
 type ICollisionObject = IWorkerObject;

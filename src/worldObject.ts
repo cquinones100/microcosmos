@@ -29,14 +29,7 @@ class WorldObject implements ICollidableObject {
   x: number = 0;
   y: number = 0;
   otherShapes: Sprite[];
-
-  public static screenBasedPosition({ x, y, scene }: { x: number; y: number; scene: Scene }) {
-    const { width, height } = scene.app.screen;
-    const newX = (width / 2 + x);
-    const newY = (height / 2 + y);
-
-    return { x: newX, y: newY };
-  }
+  defaultColor: number | undefined;
 
   constructor({ shape, scene }: WorldObjectProps) {
     this.scene = scene;
@@ -71,11 +64,14 @@ class WorldObject implements ICollidableObject {
       newY = sceneHeight;
     }
 
-    Physics.scene!.coordinates[x]?.[y]?.delete(this);
-    Physics.scene!.addObject(this);
+    Physics.scene!.removeObject(this);
+    this.shape.shape.position.x = newX;
+    this.shape.shape.position.y = newY;
 
-    this.shape.shape.position.x = newX
-    this.shape.shape.position.y = newY
+    const { x: sceneX, y: sceneY }  = Physics.scene!.addObject(this);
+
+    this.shape.shape.position.x = sceneX;
+    this.shape.shape.position.y = sceneY;
   }
 
   canEat(organism: Organism) {
@@ -113,11 +109,6 @@ class WorldObject implements ICollidableObject {
     const { x, y } = obj.getPosition();
 
     return this.intersects(x, y);
-  }
-
-  screenBasedPosition() {
-    return WorldObject
-      .screenBasedPosition({ ...this.getAbsolutePosition(), scene: this.scene });
   }
 
   onIntersection({ x, y }: Coords, intersectionObject: WorldObject, cb: () => void) { }

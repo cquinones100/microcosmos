@@ -6,6 +6,8 @@ import Organism from "../organisms/organism";
 import Physics, { Point } from "../utils/physics/physics";
 
 class Reproduction implements IBehavior {
+  debuggerTrack: boolean = false;
+
   public static for(organism: Organism) {
     return organism.behaviors.find(behavior => behavior instanceof Reproduction) as Reproduction;
   }
@@ -32,6 +34,16 @@ class Reproduction implements IBehavior {
     this.maxInterval = 100;
     this.energy = 0;
     this.minEnergy = this.organism.maxEnergy * 0.4
+
+    this.organism.shape.shape.interactive = true
+    this.organism.shape.shape.on("click", () => {
+      console.log(this);
+      this.debuggerTrack = true;
+      console.log("surrounded?", this.organism.surrounded());
+      console.log("Reproduction: reached max interval", this.reachedIntervalMax());
+      console.log("Reproduction: below max cycles", !this.reachedCycleMax());
+      console.log("Reproduction: has enough energy", this.hasEnoughEnergy());
+    });
   }
 
   duplicate(newOrganism: Organism): Reproduction {
@@ -45,6 +57,11 @@ class Reproduction implements IBehavior {
   mutate() { }
 
   call() {
+    if (!this.debuggerTrack) {
+      this.organism.shape.shape.tint = this.organism.defaultColor!;
+    } else {
+      this.organism.shape.shape.tint = 0xE0AF6B;
+    }
     this.interval += 1
 
     if (this.shouldReproduce()) {
@@ -56,24 +73,58 @@ class Reproduction implements IBehavior {
   }
 
   shouldReproduce() {
-    return this.interval >= this.maxInterval
-      && this.cycles < this.maxCycles
-      && this.organism.energy > this.minEnergy;
+    return this.reachedIntervalMax()
+      && !this.reachedCycleMax()
+      && this.hasEnoughEnergy()
+  }
+
+  reachedIntervalMax() {
+    return this.interval >= this.maxInterval;
+  }
+
+  reachedCycleMax() {
+    return this.cycles >= this.maxCycles;
+  }
+
+  hasEnoughEnergy() {
+    return this.organism.energy > this.minEnergy;
   }
 
   private reproduce() {
     const surrounding = Physics.scene!.getSurrounding(this.organism);
+    const { x, y } = this.organism.getPosition();
+    console.log(x, y)
+    const { width, height } = this.organism.getDimensions();
 
-    const openSpaces = surrounding.filter(([_, space]) => {
-      return space.size === 0;
+    const left = new Point(Math.floor(x - (width / 2)) - 1, Math.floor(y));
+    const right = new Point(Math.floor(x + (width / 2)) + 1, Math.floor(y));
+
+    const up = new Point(Math.floor(x), Math.floor(y - (height / 2)) + 1);
+    const down = new Point(Math.floor(x), Math.floor(y + (height / 2)) - 1);
+
+    const points = [left, right, up, down];
+
+    if (this.debuggerTrack) debugger;
+
+    const spaces: string | any[] = [];
+
+    surrounding.forEach(([point, space], index) => {
+      if (space?.size === 0) spaces[index] = points[index];
     });
 
     let openSpace;
 
+    const openSpaceIndex = Math.floor(Math.random() * spaces.length);
+
     if (this.organism instanceof Autotroph) {
-      openSpace = openSpaces[Math.floor(Math.random() * openSpaces.length)]?.[0];
+      debugger;
+      openSpace = spaces[openSpaceIndex];
     } else {
-      openSpace = surrounding[0][0];
+      openSpace = spaces[0];
+    }
+
+    if (this.debuggerTrack && this.reachedIntervalMax()) {
+      debugger;
     }
 
     if (openSpace) {
@@ -88,7 +139,9 @@ class Reproduction implements IBehavior {
       newOrganism.behaviors.forEach(Mutator.conditionallyMutate);
       newOrganism.generation = this.organism.generation + 1;
 
-      const { x, y } = openSpace.getPosition()
+      Reproduction.for(newOrganism).maxCycles = -Infinity;
+
+      const { x, y } = down.getPosition()
 
       newOrganism.setPosition({ x, y });
     }
