@@ -118,18 +118,6 @@ const avoid = (hugger: WorldObject, hugged: WorldObject, directionHandler: IDire
 
 type VectorProps = { x: number; y: number; targetX: number; targetY: number; }
 
-type Physics = {
-  Collision: typeof Collision;
-  avoid: typeof avoid;
-  Vector: {
-    getVector: (args: VectorProps) => Vector;
-  };
-  randomLocation: () => Coords;
-  setScene: (scene: Scene) => void;
-  scene: Scene | undefined,
-  negatableRandom: (max: number) => number;
-}
-
 export interface IVector {
   readonly x: number;
   readonly y: number;
@@ -179,6 +167,43 @@ class Vector implements IVector {
   }
 }
 
+class Coordinates {
+  public static coordinates: Set<WorldObject>[][] = [];
+
+  public static withinObject(object: WorldObject, cb: (cell: Set<WorldObject>) => void) {
+    const { x: centerX, y: centerY } = this.snappedPosition(object);
+    const { width, height } = object.getDimensions();
+
+    for (let x = Math.floor(centerX - (width / 2)); x <= Math.floor(centerX + (width / 2)); x++) {
+      for (let y = Math.floor(centerY - (height / 2)); y <= Math.floor(centerY + (height / 2)); y++) {
+        this.coordinates[x] ||= [];
+        this.coordinates[x][y] ||= new Set();
+
+        cb(this.coordinates[x][y]);
+      }
+    }
+  }
+
+  public static snappedPosition(object: WorldObject) {
+    const { x, y } = object.getPosition();
+
+    return { x: Math.floor(x), y: Math.floor(y) }
+  }
+}
+
+type Physics = {
+  Collision: typeof Collision;
+  avoid: typeof avoid;
+  Vector: {
+    getVector: (args: VectorProps) => Vector;
+  };
+  randomLocation: () => Coords;
+  setScene: (scene: Scene) => void;
+  scene: Scene | undefined,
+  negatableRandom: (max: number) => number;
+  Coordinates: typeof Coordinates;
+}
+
 const Physics: Physics = {
   Collision,
   avoid,
@@ -206,6 +231,7 @@ const Physics: Physics = {
   },
   scene: undefined,
   negatableRandom: (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1,
+  Coordinates,
 }
 
 export default Physics;

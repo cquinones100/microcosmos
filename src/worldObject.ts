@@ -1,6 +1,4 @@
 import { Sprite } from "pixi.js";
-import Movement from "./behavior/movement";
-import { Coords } from "./organisms/autotroph";
 import Organism from "./organisms/organism";
 import Scene from "./scene";
 import TextureOrganism from "./textureOrganism";

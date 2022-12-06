@@ -94,7 +94,7 @@ class Reproduction implements IBehavior {
 
     for (let x = Math.floor(roundedX - width - (width / 2)); x < Math.floor(roundedX - (width / 2) - 1); x++) {
       for (let y = Math.floor(roundedY - (height / 2)); y < Math.floor(roundedY + (height / 2)); y++) {
-        const curr = Physics.scene!.coordinates[x]?.[y]
+        const curr = Physics.Coordinates.coordinates[x]?.[y]
 
         if (curr?.size > 0) {
           left = false;
@@ -109,7 +109,7 @@ class Reproduction implements IBehavior {
 
     for (let x = Math.floor(roundedX - (width / 2)); x < Math.floor(roundedX - (width / 2)); x++) {
       for (let y = Math.floor(roundedX - (height / 2)); y < Math.floor(roundedX + (height / 2)); y++) {
-        const curr = Physics.scene!.coordinates[x]?.[y]
+        const curr = Physics.Coordinates.coordinates[x]?.[y]
 
         if (curr?.size > 0) {
           up = false;
@@ -124,7 +124,7 @@ class Reproduction implements IBehavior {
 
     for (let x = Math.floor(roundedX + width + (width / 2)); x < Math.floor(roundedX + (width / 2) + 1); x++) {
       for (let y = Math.floor(roundedY - (height / 2)); y < Math.floor(roundedY + (height / 2)); y++) {
-        const curr = Physics.scene!.coordinates[x]?.[y]
+        const curr = Physics.Coordinates.coordinates[x]?.[y]
 
         if (curr?.size > 0) {
           right = false;
@@ -139,7 +139,7 @@ class Reproduction implements IBehavior {
 
     for (let x = Math.floor(roundedX - (width / 2)); x < Math.floor(roundedX - (width / 2)); x++) {
       for (let y = Math.floor(roundedX + (height / 2)); y < Math.floor(roundedX + height + (height / 2)); y++) {
-        const curr = Physics.scene!.coordinates[x]?.[y]
+        const curr = Physics.Coordinates.coordinates[x]?.[y]
 
         if (curr?.size > 0) {
           down = false;
@@ -149,7 +149,6 @@ class Reproduction implements IBehavior {
       }
     }
 
-    console.log(left || up || right || down)
     if (left || up || right || down) {
       const newOrganism = this.organism.duplicate();
 
@@ -166,25 +165,25 @@ class Reproduction implements IBehavior {
 
       if (left) {
         callbacks.push(() => {
-          newOrganism.setPosition({ x: Math.floor(roundedX - width - (width / 2)), y: roundedY });
+          newOrganism.setPosition({ x: Math.floor(roundedX - width), y: roundedY });
         })
       }
 
       if (up) {
         callbacks.push(() => {
-          newOrganism.setPosition({ x: Math.floor(roundedX - (width / 2)), y: roundedY - height - (height / 2) });
+          newOrganism.setPosition({ x: Math.floor(roundedX), y: roundedY - height });
         })
       }
 
       if (right) {
         callbacks.push(() => {
-          newOrganism.setPosition({ x: Math.floor(roundedX + width + (width / 2)), y: roundedY });
+          newOrganism.setPosition({ x: Math.floor(roundedX + width), y: roundedY });
         })
       }
 
       if (down) {
         callbacks.push(() => {
-          newOrganism.setPosition({ x: Math.floor(roundedX - (width / 2)), y: roundedY + height + (height / 2) });
+          newOrganism.setPosition({ x: Math.floor(roundedX), y: roundedY + height });
         })
       }
 

@@ -21,7 +21,6 @@ class Scene {
   predators: Set<Organism>;
   paused: boolean;
   center: { x: number; y: number; };
-  coordinates: Set<WorldObject>[][];
   measurements: {
     [key: string]: number
   }
@@ -35,7 +34,6 @@ class Scene {
     this.organisms = new Set<Organism>();
     this.predators = new Set();
     this.paused = false;
-    this.coordinates = [];
     this.measurements = {};
     this.timePassed = 0;
     this.container = new Container();
@@ -225,55 +223,16 @@ class Scene {
   }
 
   addObject(object: WorldObject) {
-    const { x: objX, y: objY } = object.getPosition();
-    const { width, height } = object.getDimensions();
+    Physics.Coordinates.withinObject(object, (cell) => {
+      cell.add(object)
+    });
 
-    const roundedX = Math.floor(objX);
-    const roundedY = Math.floor(objY);
-
-    for (let x = Math.floor(roundedX - (width / 2)); x < Math.floor(roundedX + (width / 2)); x++) {
-      for (let y = Math.floor(roundedY - (height / 2)); y < Math.floor(roundedY + (height / 2)); y++) {
-        this.coordinates[x] ||= [];
-        this.coordinates[x][y] ||= new Set();
-
-        this.coordinates[x][y].add(object);
-      }
-    }
-
-    return { x: roundedX, y: roundedY };
+    return Physics.Coordinates.snappedPosition(object);
   }
 
   removeObject(object: WorldObject) {
-    const { x: objX, y: objY } = object.getPosition();
-    const { width, height } = object.getDimensions();
-
-    const roundedX = Math.round(objX);
-    const roundedY = Math.round(objY);
-
-    for (let x = Math.floor(roundedX - (width / 2)); x < Math.floor(roundedX + (width / 2)); x++) {
-      for (let y = Math.floor(roundedY - (height / 2)); y < Math.floor(roundedY + (height / 2)); y++) {
-        this.coordinates[x] ||= [];
-        this.coordinates[x][y] ||= new Set();
-
-        this.coordinates[x][y].delete(object);
-      }
-    }
-  }
-
-  getSurrounding(object: WorldObject): [Point, Set<WorldObject>][] {
-    const { x, y } = object.getPosition();
-    const { width, height } = object.getDimensions();
-
-    const left = new Point(Math.floor(x - (width / 2) - 1), Math.floor(y));
-    const right = new Point(Math.floor(x + (width / 2) + 1), Math.floor(y));
-
-    const up = new Point(Math.floor(x), Math.floor(y - (height / 2) - 1));
-    const down = new Point(Math.floor(x), Math.floor(y + height + (height / 2) + 1));
-
-    return [left, up, right, down].map((point) => {
-      const { x, y } = point.getPosition();
-
-      return [point, this.coordinates[x]?.[y] || new Set()];
+    Physics.Coordinates.withinObject(object, (cell) => {
+      cell.delete(object)
     });
   }
 }
