@@ -50,7 +50,10 @@ class Movement implements IBehavior {
     );
   };
 
-  mutate() {}
+  mutate() {
+    this.defaultSpeed += Math.max(Physics.negatableRandom(0.5), 0);
+    this.speed = this.defaultSpeed;
+  }
 
   call() {
     const vector = this.createVector();

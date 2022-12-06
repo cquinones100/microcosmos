@@ -1,7 +1,5 @@
 import { Text } from "pixi.js";
 import Behavior, { IBehavior } from "../behavior";
-import Movement from "../behavior/movement";
-import Reproduction from "../behavior/reproduction";
 import Physics from "../utils/physics/physics";
 import WorldObject, { WorldObjectProps } from "../worldObject";
 

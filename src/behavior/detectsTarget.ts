@@ -74,7 +74,9 @@ class DetectsTarget implements IBehavior {
     return duplicate;
   }
 
-  mutate() {}
+  mutate() {
+    this.radius = Math.min(10, this.radius + Physics.negatableRandom(50))
+  }
 
   call() {
     if (DetectsTarget.showRadius) {

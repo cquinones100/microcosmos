@@ -8,7 +8,7 @@ import TextureAutotroph from "./textureAutotroph";
 import Autotroph, { Coords } from "./organisms/autotroph";
 import HeteroTroph from "./organisms/heterotroph";
 import Physics, { Point } from "./utils/physics/physics";
-import { create } from "./scenarios/reproduction";
+import { create } from "./scenarios/default";
 import DetectsTarget from "./behavior/detectsTarget";
 
 export const MUTATION_FACTOR = 1;
@@ -85,8 +85,6 @@ class Scene {
           Object.keys(this.measurements).forEach(measurement => {
             console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
           });
-
-          debugger;
         }
       }
     })
@@ -144,6 +142,7 @@ class Scene {
 
     app.ticker.add(redraw);
     app.ticker.start();
+    console.log(this.app.screen.width, this.app.screen.height);
   }
 
   createHeterotroph(
@@ -229,18 +228,15 @@ class Scene {
     const { x: objX, y: objY } = object.getPosition();
     const { width, height } = object.getDimensions();
 
-    const roundedX = Math.round(objX);
-    const roundedY = Math.round(objY);
+    const roundedX = Math.floor(objX);
+    const roundedY = Math.floor(objY);
 
-    for (let x = roundedX - (width / 2); x < roundedX + (width / 2); x++) {
-      for (let y = roundedY - -(height / 2); y < roundedY + (height / 2); y++) {
-        debugger;
-        if (x > 0 && y > 0) {
-          this.coordinates[x] ||= [];
-          this.coordinates[x][y] ||= new Set();
+    for (let x = Math.floor(roundedX - (width / 2)); x < Math.floor(roundedX + (width / 2)); x++) {
+      for (let y = Math.floor(roundedY - (height / 2)); y < Math.floor(roundedY + (height / 2)); y++) {
+        this.coordinates[x] ||= [];
+        this.coordinates[x][y] ||= new Set();
 
-          this.coordinates[x][y].add(object);
-        }
+        this.coordinates[x][y].add(object);
       }
     }
 
@@ -251,13 +247,11 @@ class Scene {
     const { x: objX, y: objY } = object.getPosition();
     const { width, height } = object.getDimensions();
 
-    const x = Math.round(objX);
-    const y = Math.round(objY);
     const roundedX = Math.round(objX);
     const roundedY = Math.round(objY);
 
-    for (let x = roundedX; x < roundedX + width; x++) {
-      for (let y = roundedY; y < roundedY + height; y++) {
+    for (let x = Math.floor(roundedX - (width / 2)); x < Math.floor(roundedX + (width / 2)); x++) {
+      for (let y = Math.floor(roundedY - (height / 2)); y < Math.floor(roundedY + (height / 2)); y++) {
         this.coordinates[x] ||= [];
         this.coordinates[x][y] ||= new Set();
 
@@ -270,18 +264,16 @@ class Scene {
     const { x, y } = object.getPosition();
     const { width, height } = object.getDimensions();
 
-    const left = new Point(Math.floor(x - (width / 2)) - 1, Math.floor(y));
-    const right = new Point(Math.floor(x + (width / 2)) + 1, Math.floor(y));
+    const left = new Point(Math.floor(x - (width / 2) - 1), Math.floor(y));
+    const right = new Point(Math.floor(x + (width / 2) + 1), Math.floor(y));
 
-    const up = new Point(Math.floor(x), Math.floor(y - (height / 2)) + 1);
-    const down = new Point(Math.floor(x), Math.floor(y + (height / 2)) - 1);
-
-    const points = [];
+    const up = new Point(Math.floor(x), Math.floor(y - (height / 2) - 1));
+    const down = new Point(Math.floor(x), Math.floor(y + height + (height / 2) + 1));
 
     return [left, up, right, down].map((point) => {
       const { x, y } = point.getPosition();
 
-      return [point, this.coordinates[x]?.[y]];
+      return [point, this.coordinates[x]?.[y] || new Set()];
     });
   }
 }

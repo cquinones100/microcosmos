@@ -15,8 +15,6 @@ type HeteroTrophProps = {
 
 class HeteroTroph extends Organism {
   public static create({ texture, ...args }: HeteroTrophProps) {
-    const { x, y } = texture.getPosition();
-
     const organism = new HeteroTroph({ shape: texture, ...args});
 
     const moves = new MovesRandomly(organism)
@@ -39,6 +37,9 @@ class HeteroTroph extends Organism {
 
     this.defaultColor = 0xEFA8B1;
     this.shape.shape.tint = this.defaultColor;
+    this.shape.shape.on("click", () => {
+      console.log(this);
+    });
   }
 
   animate() {
@@ -51,12 +52,13 @@ class HeteroTroph extends Organism {
     if (organism.dead()) {
       if (!organism.consumed) {
         organism.consumed = true;
-        this.setEnergy(this.energy + organism.maxEnergy * 0.1)
+        this.setEnergy(this.energy + organism.maxEnergy * 0.5)
         organism.scene.container.removeChild(organism.text);
         this.scene.remove(organism);
       }
     } else {
-      const energyFromPrey = Math.min(this.maxEnergy - this.energy, organism.energy);
+      const energyFromPrey =
+        Math.min(this.maxEnergy - this.energy, Math.max(organism.energy, organism.maxEnergy * 0.5));
 
       organism.setEnergy(organism.energy - energyFromPrey);
       this.setEnergy(this.energy + energyFromPrey);

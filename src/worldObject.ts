@@ -34,9 +34,7 @@ class WorldObject implements ICollidableObject {
   }
 
   setPosition({ x, y }: { x: number, y: number }) {
-    const { x: thisX, y: thisY } = this.getPosition();
     const { scene } = this.shape;
-    const { width, height } = this.shape.getDimensions();
     const { width: sceneWidth, height: sceneHeight } = scene.getDimensions();
 
     let newX = x;
@@ -58,14 +56,14 @@ class WorldObject implements ICollidableObject {
       newY = sceneHeight;
     }
 
-    // Physics.scene!.removeObject(this);
+    Physics.scene!.removeObject(this);
     this.shape.shape.position.x = newX;
     this.shape.shape.position.y = newY;
 
-    // const { x: sceneX, y: sceneY }  = Physics.scene!.addObject(this);
+    const { x: sceneX, y: sceneY } = Physics.scene!.addObject(this);
 
-    // this.shape.shape.position.x = sceneX;
-    // this.shape.shape.position.y = sceneY;
+    this.shape.shape.position.x = sceneX;
+    this.shape.shape.position.y = sceneY;
   }
 
   canEat(organism: Organism) {
@@ -88,37 +86,12 @@ class WorldObject implements ICollidableObject {
 
   onHover() { }
 
-  intersects(otherX: number, otherY: number) {
-    const { x, y } = this.getPosition();
-    const { width, height } = this.getDimensions();
-
-    return otherX > x - width
-      && otherX < x + width
-      && otherY > y - width
-      && otherY < y + height;
-  }
-
-  intersectsObject(obj: WorldObject) {
-    if (obj === this) return;
-    const { x, y } = obj.getPosition();
-
-    return this.intersects(x, y);
-  }
-
   die() {
     this.remove();
   }
 
   remove() {
     this.otherShapes.forEach(shape => Physics.scene!.container.removeChild(shape));
-  }
-
-  surrounded() {
-    const surrounding = Physics.scene!.getSurrounding(this);
-
-    return surrounding.filter(([_, space]) => {
-      return space.size === 0;
-    }).length > 0;
   }
 }
 

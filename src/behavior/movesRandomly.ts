@@ -36,7 +36,9 @@ class MovesRandomly implements IBehavior {
       });
   }
 
-  mutate() {}
+  mutate() {
+    this.speed += Math.max(Physics.negatableRandom(0.5), 0);
+  }
 
   call() {
     const movement = Movement.for(this.organism);

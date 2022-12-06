@@ -28,7 +28,9 @@ class PersuesTarget implements IBehavior {
     return duplicate;
   }
 
-  mutate() {}
+  mutate() {
+    this.speed += Math.max(Physics.negatableRandom(0.5), 0);
+  }
 
   collides() {
     const { organism } = this;

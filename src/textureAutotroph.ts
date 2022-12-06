@@ -2,7 +2,7 @@ import { Graphics, Matrix, MSAA_QUALITY, Renderer, RenderTexture, Sprite } from 
 import { Coords } from "./organisms/autotroph";
 import Scene from "./scene";
 
-const WIDTH = 20;
+const WIDTH = 10;
 
 type TextureOrganismProps = {
   renderTexture: RenderTexture;

@@ -22,8 +22,8 @@ class Autotroph extends Organism {
 
     const reproduction = new Reproduction(organism);
 
-    reproduction.maxCycles = -Infinity;
-    reproduction.maxInterval = 10;
+    reproduction.maxCycles = 1;
+    reproduction.maxInterval = 1;
 
     organism.behaviors.push(reproduction);
 
@@ -52,13 +52,9 @@ class Autotroph extends Organism {
   }
 
   duplicate() {
-    const { width, height } = this.shape.getDimensions();
     const { scene } = this.shape;
-    const { x, y } = this.getPosition();
 
-    const negatableRandom = (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1;
-
-    const texture = TextureAutotroph.create({ scene, x: x + negatableRandom(10), y: y + negatableRandom(10) });
+    const texture = TextureAutotroph.create({ scene });
     const organism = Autotroph.create({ texture, scene })
 
     scene.organisms.add(organism);

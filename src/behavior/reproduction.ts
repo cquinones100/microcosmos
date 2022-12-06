@@ -1,7 +1,6 @@
 import IBehavior from "../behavior";
 import { initializeDuplicateBehavior } from "../duplication";
 import Mutator from "../mutator";
-import Autotroph from "../organisms/autotroph";
 import Organism from "../organisms/organism";
 import Physics, { Point } from "../utils/physics/physics";
 
@@ -36,14 +35,6 @@ class Reproduction implements IBehavior {
     this.minEnergy = this.organism.maxEnergy * 0.4
 
     this.organism.shape.shape.interactive = true
-    this.organism.shape.shape.on("click", () => {
-      console.log(this);
-      this.debuggerTrack = true;
-      console.log("surrounded?", this.organism.surrounded());
-      console.log("Reproduction: reached max interval", this.reachedIntervalMax());
-      console.log("Reproduction: below max cycles", !this.reachedCycleMax());
-      console.log("Reproduction: has enough energy", this.hasEnoughEnergy());
-    });
   }
 
   duplicate(newOrganism: Organism): Reproduction {
@@ -62,6 +53,7 @@ class Reproduction implements IBehavior {
     } else {
       this.organism.shape.shape.tint = 0xE0AF6B;
     }
+
     this.interval += 1
 
     if (this.shouldReproduce()) {
@@ -91,42 +83,74 @@ class Reproduction implements IBehavior {
   }
 
   private reproduce() {
-    const surrounding = Physics.scene!.getSurrounding(this.organism);
-    const { x, y } = this.organism.getPosition();
-    console.log(x, y)
+    const { x: objX, y: objY } = this.organism.getPosition();
     const { width, height } = this.organism.getDimensions();
 
-    const left = new Point(Math.floor(x - (width / 2)) - 1, Math.floor(y));
-    const right = new Point(Math.floor(x + (width / 2)) + 1, Math.floor(y));
+    const roundedX = Math.floor(objX);
+    const roundedY = Math.floor(objY);
 
-    const up = new Point(Math.floor(x), Math.floor(y - (height / 2)) + 1);
-    const down = new Point(Math.floor(x), Math.floor(y + (height / 2)) - 1);
+    // try left
+    let left = true;
 
-    const points = [left, right, up, down];
+    for (let x = Math.floor(roundedX - width - (width / 2)); x < Math.floor(roundedX - (width / 2) - 1); x++) {
+      for (let y = Math.floor(roundedY - (height / 2)); y < Math.floor(roundedY + (height / 2)); y++) {
+        const curr = Physics.scene!.coordinates[x]?.[y]
 
-    if (this.debuggerTrack) debugger;
-
-    const spaces: string | any[] = [];
-
-    surrounding.forEach(([point, space], index) => {
-      if (space?.size === 0) spaces[index] = points[index];
-    });
-
-    let openSpace;
-
-    const openSpaceIndex = Math.floor(Math.random() * spaces.length);
-
-    if (this.organism instanceof Autotroph) {
-      openSpace = spaces[openSpaceIndex];
-    } else {
-      openSpace = spaces[0];
+        if (curr?.size > 0) {
+          left = false;
+        }
+        
+        break;
+      }
     }
 
-    if (this.debuggerTrack && this.reachedIntervalMax()) {
-      debugger;
+    // try up
+    let up = true;
+
+    for (let x = Math.floor(roundedX - (width / 2)); x < Math.floor(roundedX - (width / 2)); x++) {
+      for (let y = Math.floor(roundedX - (height / 2)); y < Math.floor(roundedX + (height / 2)); y++) {
+        const curr = Physics.scene!.coordinates[x]?.[y]
+
+        if (curr?.size > 0) {
+          up = false;
+        }
+        
+        break;
+      }
     }
 
-    if (openSpace) {
+    // try right
+    let right = true;
+
+    for (let x = Math.floor(roundedX + width + (width / 2)); x < Math.floor(roundedX + (width / 2) + 1); x++) {
+      for (let y = Math.floor(roundedY - (height / 2)); y < Math.floor(roundedY + (height / 2)); y++) {
+        const curr = Physics.scene!.coordinates[x]?.[y]
+
+        if (curr?.size > 0) {
+          right = false;
+        }
+        
+        break;
+      }
+    }
+
+    // try down
+    let down = true;
+
+    for (let x = Math.floor(roundedX - (width / 2)); x < Math.floor(roundedX - (width / 2)); x++) {
+      for (let y = Math.floor(roundedX + (height / 2)); y < Math.floor(roundedX + height + (height / 2)); y++) {
+        const curr = Physics.scene!.coordinates[x]?.[y]
+
+        if (curr?.size > 0) {
+          down = false;
+        }
+        
+        break;
+      }
+    }
+
+    console.log(left || up || right || down)
+    if (left || up || right || down) {
       const newOrganism = this.organism.duplicate();
 
       this.organism.behaviors
@@ -138,11 +162,33 @@ class Reproduction implements IBehavior {
       newOrganism.behaviors.forEach(Mutator.conditionallyMutate);
       newOrganism.generation = this.organism.generation + 1;
 
-      Reproduction.for(newOrganism).maxCycles = -Infinity;
+      const callbacks = [];
 
-      const { x, y } = down.getPosition()
+      if (left) {
+        callbacks.push(() => {
+          newOrganism.setPosition({ x: Math.floor(roundedX - width - (width / 2)), y: roundedY });
+        })
+      }
 
-      newOrganism.setPosition({ x, y });
+      if (up) {
+        callbacks.push(() => {
+          newOrganism.setPosition({ x: Math.floor(roundedX - (width / 2)), y: roundedY - height - (height / 2) });
+        })
+      }
+
+      if (right) {
+        callbacks.push(() => {
+          newOrganism.setPosition({ x: Math.floor(roundedX + width + (width / 2)), y: roundedY });
+        })
+      }
+
+      if (down) {
+        callbacks.push(() => {
+          newOrganism.setPosition({ x: Math.floor(roundedX - (width / 2)), y: roundedY + height + (height / 2) });
+        })
+      }
+
+      callbacks[Math.floor(Math.random() * callbacks.length)]?.();
     }
   }
 }

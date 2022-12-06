@@ -127,6 +127,7 @@ type Physics = {
   randomLocation: () => Coords;
   setScene: (scene: Scene) => void;
   scene: Scene | undefined,
+  negatableRandom: (max: number) => number;
 }
 
 export interface IVector {
@@ -204,6 +205,7 @@ const Physics: Physics = {
     this.scene = scene;
   },
   scene: undefined,
+  negatableRandom: (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1,
 }
 
 export default Physics;
