@@ -1,17 +1,14 @@
 import { Sprite } from "pixi.js";
 import Organism from "./organisms/organism";
-import Scene from "./scene";
 import TextureOrganism from "./textureOrganism";
 import Physics, { ICollidableObject } from "./utils/physics/physics";
 
 export type WorldObjectProps = {
-  scene: Scene;
   shape: TextureOrganism;
   color?: number;
 }
 
 class WorldObject implements ICollidableObject {
-  scene: Scene;
   color?: number;
   shape: TextureOrganism;
   x: number = 0;
@@ -19,8 +16,7 @@ class WorldObject implements ICollidableObject {
   otherShapes: Sprite[];
   defaultColor: number | undefined;
 
-  constructor({ shape, scene }: WorldObjectProps) {
-    this.scene = scene;
+  constructor({ shape }: WorldObjectProps) {
     this.shape = shape;
     this.otherShapes = [];
 
@@ -32,8 +28,8 @@ class WorldObject implements ICollidableObject {
   }
 
   setPosition({ x, y }: { x: number, y: number }) {
-    const { scene } = this.shape;
-    const { width: sceneWidth, height: sceneHeight } = scene.getDimensions();
+    const { scene } = Physics;
+    const { width: sceneWidth, height: sceneHeight } = scene!.getDimensions();
 
     let newX = x;
     let newY = y;
@@ -55,13 +51,13 @@ class WorldObject implements ICollidableObject {
     }
 
     Physics.scene!.removeObject(this);
-    this.shape.shape.position.x = newX;
-    this.shape.shape.position.y = newY;
+    this.shape.setPosition({ x: newX, y: newY });
 
     const { x: sceneX, y: sceneY } = Physics.scene!.addObject(this);
 
-    this.shape.shape.position.x = sceneX;
-    this.shape.shape.position.y = sceneY;
+    this.shape.setPosition({ x: sceneX, y: sceneY });
+    this.x = sceneX;
+    this.y = sceneY;
   }
 
   canEat(organism: Organism) {
@@ -70,10 +66,6 @@ class WorldObject implements ICollidableObject {
 
   getPosition() {
     return this.shape.getPosition();
-  }
-
-  getAbsolutePosition() {
-    return this.shape.getGlobalPosition();
   }
 
   getDimensions() {

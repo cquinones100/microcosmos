@@ -4,7 +4,6 @@ import Physics from "../utils/physics/physics";
 import WorldObject, { WorldObjectProps } from "../worldObject";
 
 export type OrganismProps = {
-  energySources?: (any)[];
   generation?: number;
 } & WorldObjectProps;
 
@@ -57,7 +56,7 @@ class Organism extends WorldObject {
     this.energy = this.maxEnergy;
     this.generation = generation || 0;
 
-     this.shape.shape.interactive = true
+    this.shape.shape.interactive = true
 
     this.text = new Text("", {
       fill: "white",
@@ -65,13 +64,12 @@ class Organism extends WorldObject {
       fontSize: 8
     });
 
-    const { x, y } = shape.getPosition();
-    this.text.position.set(x, y);
+    this.setTextPosition();
     this.text.zIndex = 3;
 
     this.otherShapes.push(this.text);
 
-    this.scene.container.addChild(this.text);
+    Physics.scene!.container.addChild(this.text);
     this.consumed = false;
   }
 
@@ -107,7 +105,7 @@ class Organism extends WorldObject {
   }
 
   disappear() {
-    this.scene.remove(this);
+    Physics.scene!.remove(this);
   }
 
   act(behavior: Behavior) {
@@ -117,11 +115,11 @@ class Organism extends WorldObject {
   }
 
   hungry() {
-    return this.energy < this.maxEnergy;
+    return this.energy < this.maxEnergy * 0.8;
   }
 
   canEat(organism: Organism) {
-    return this.scene.organisms.has(organism) && organism.canBeEatenBy(this);
+    return Physics.scene!.organisms.has(organism) && organism.canBeEatenBy(this);
   }
 
   canBeEatenBy<Organism>(arg0: this) {
@@ -133,7 +131,7 @@ class Organism extends WorldObject {
   }
 
   duplicate(): Organism {
-    return this.scene.createHeterotroph()
+    return Physics.scene!.createHeterotroph()
   }
 
   onHover() {
@@ -151,7 +149,14 @@ class Organism extends WorldObject {
     this.y = y;
     super.setPosition({ x, y });
 
-    this.text?.position.set(x + 3, y + this.getDimensions().height / 2 - 3);
+    this.setTextPosition();
+  }
+
+  setTextPosition() {
+    const { x, y } = this.getPosition();
+    const { width, height } = this.getDimensions();
+
+    this.text?.position.set(x - width / 2, y - height);
   }
 }
 

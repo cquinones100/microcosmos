@@ -1,7 +1,6 @@
 import WorldObject from "../../worldObject";
 import { Coords } from "../../organisms/autotroph";
 import Scene from "../../scene";
-import Organism from "../../organisms/organism";
 
 export interface IDirected {
   xDirection: number;
@@ -192,6 +191,7 @@ class Coordinates {
 }
 
 type Physics = {
+  time: number;
   Collision: typeof Collision;
   avoid: typeof avoid;
   Vector: {
@@ -202,6 +202,10 @@ type Physics = {
   scene: Scene | undefined,
   negatableRandom: (max: number) => number;
   Coordinates: typeof Coordinates;
+  timePassed: number;
+  speed: (pixelsPerSecond: number) => number;
+  setTime(timePassed: number): void;
+  center(): { width: number, height: number };
 }
 
 const Physics: Physics = {
@@ -230,8 +234,16 @@ const Physics: Physics = {
     this.scene = scene;
   },
   scene: undefined,
+  setTime(timePassed: number) {
+    this.timePassed = timePassed;
+    this.time += timePassed;
+  },
+  timePassed: 0,
+  time: 0,
   negatableRandom: (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1,
   Coordinates,
+  speed(pixelsPerSecond: number) { return pixelsPerSecond / 60 * this.timePassed; },
+  center() { return this.scene!.getDimensions() },
 }
 
 export default Physics;

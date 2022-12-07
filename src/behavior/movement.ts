@@ -29,7 +29,7 @@ class Movement implements IBehavior {
 
   constructor(organism: Organism) {
     this.organism = organism;
-    this.defaultSpeed = 1;
+    this.defaultSpeed = 500;
     this.speed = this.defaultSpeed;
     const { x, y } = Physics.randomLocation();
 
@@ -57,13 +57,15 @@ class Movement implements IBehavior {
 
   call() {
     const vector = this.createVector();
-
+    
     const { x: nX, y: nY } = vector.normalized();
     const { x, y } = this.organism.getPosition();
 
+    const speed = Physics.speed(this.speed);
+
     this.organism.setPosition({
-      x: x + nX * this.speed * this.organism.scene.timePassed,
-      y: y + nY * this.speed * this.organism.scene.timePassed
+      x: x + nX * speed,
+      y: y + nY * speed,
     });
   }
 

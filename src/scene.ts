@@ -28,7 +28,6 @@ class Scene {
   container: PIXI.Container<PIXI.DisplayObject>;
   stop: boolean;
   workerPool: Worker[];
-  timePassedMS: number = 0;
 
   constructor() {
     this.organisms = new Set<Organism>();
@@ -98,20 +97,19 @@ class Scene {
     this.app.stage.interactive = true;
     this.app.stage.hitArea = new PIXI.Rectangle(0, 0, app.screen.width, app.screen.height);
 
+    const texture = create();
+
     this.app.stage.on('click', (event) => {
+      const { width, height } = this.getDimensions();
+      console.log(width, height)
       console.log(event.clientX, event.clientY);
     });
-
-    create(this);
 
     const redraw = (timePassed: number) => {
       Object.keys(this.measurements).forEach(measurement => { this.measurements[measurement] = 0 });
 
-      let count = this.workerPool.length;
       const sync = () => {
-        stats.begin();
-        this.timePassed = timePassed;
-        this.timePassedMS = app.ticker.deltaMS;
+        Physics.setTime(timePassed);
 
         app.ticker.stop();
         return new Promise<void>((resolve, reject) => {
@@ -120,6 +118,7 @@ class Scene {
             });
             
             Object.keys(this.measurements).forEach(measurement => {
+
               if (this.measurements[measurement] > 5) {
                 console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
               }
@@ -140,40 +139,32 @@ class Scene {
 
     app.ticker.add(redraw);
     app.ticker.start();
-    console.log(this.app.screen.width, this.app.screen.height);
   }
 
   createHeterotroph(
-    { x, y, color }
-      : { x?: number, y?: number, color?: number }
-      = {}
+    { x, y, color }: { x: number, y: number, color?: number } = { x: 0, y: 0}
   ) {
-    const texture = TextureOrganism.create({
-      scene: this,
-      x: x === undefined ? Math.random() * this.app.screen.width : x,
-      y: y === undefined ? Math.random() * this.app.screen.height : y
-    });
+    const texture = TextureOrganism.create();
 
-    const organism = HeteroTroph.create({ texture, scene: this });
+    const organism = HeteroTroph.create({ texture });
 
     if (color) {
       organism.shape.shape.tint = color;
     }
+
+    organism.setPosition({ x, y });
 
     this.organisms.add(organism);
 
     return organism;
   }
 
-  createAutotroph({ x, y }: Partial<Coords> = {}) {
-    const texture = TextureAutotroph.create({
-      scene: this,
-      x: x === undefined ? Math.random() * this.app.screen.width : x,
-      y: y === undefined ? Math.random() * this.app.screen.height : y
-    });
+  createAutotroph({ x, y }: Coords = { x: 0, y: 0 }) {
+    const texture = TextureAutotroph.create();
 
-    const organism = Autotroph.create({ texture, scene: this })
+    const organism = Autotroph.create({ texture });
 
+    organism.setPosition({ x, y });
     this.organisms.add(organism);
 
     return organism;

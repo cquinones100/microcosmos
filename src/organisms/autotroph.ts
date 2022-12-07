@@ -2,23 +2,19 @@ import Organism from "./organism";
 import { OrganismProps } from "../organisms/organism";
 import TextureAutotroph from "../textureAutotroph";
 import Reproduction from "../behavior/reproduction";
+import Physics from "../utils/physics/physics";
 
 export type Coords = {
   x: number;
   y: number;
 };
 
-type AutotrophProps = {
-  texture: TextureAutotroph;
-}
-& Pick<OrganismProps, "scene" | "generation" | "color">;
-
 class Autotroph extends Organism {
   interval: number;
   maxIntervals: any;
   static defaultColor: number;
-  public static create({ texture, ...args }: AutotrophProps) {
-    const organism = new Autotroph({ shape: texture, ...args});
+  public static create({ texture }: { texture: TextureAutotroph }) {
+    const organism = new Autotroph({ shape: texture });
 
     const reproduction = new Reproduction(organism);
 
@@ -32,7 +28,7 @@ class Autotroph extends Organism {
     return organism;
   }
 
-  constructor({ shape, ...args }: Omit<OrganismProps, 'x' | 'y'>) {
+  constructor({ shape, ...args }: OrganismProps) {
     super({ shape, ...args });
 
     this.interval = 0;
@@ -52,12 +48,12 @@ class Autotroph extends Organism {
   }
 
   duplicate() {
-    const { scene } = this.shape;
+    const { scene } = Physics;
 
-    const texture = TextureAutotroph.create({ scene });
-    const organism = Autotroph.create({ texture, scene })
+    const texture = TextureAutotroph.create();
+    const organism = Autotroph.create({ texture })
 
-    scene.organisms.add(organism);
+    scene!.organisms.add(organism);
 
     return organism;
   }
@@ -67,7 +63,7 @@ class Autotroph extends Organism {
   }
 
   die() {
-    this.scene.remove(this);
+    Physics.scene!.remove(this);
     this.disappear();
     super.die();
   }

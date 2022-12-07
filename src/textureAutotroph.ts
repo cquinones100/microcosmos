@@ -1,25 +1,24 @@
 import { Graphics, Matrix, MSAA_QUALITY, Renderer, RenderTexture, Sprite } from "pixi.js"
 import { Coords } from "./organisms/autotroph";
-import Scene from "./scene";
+import Texture from "./texture";
+import Physics from "./utils/physics/physics";
 
 const WIDTH = 10;
 
 type TextureOrganismProps = {
   renderTexture: RenderTexture;
-  scene: Scene;
   width: number;
   height: number;
 } & Partial<Coords>;
 
-class TextureAutotroph {
+class TextureAutotroph extends Texture {
   static renderTexture: RenderTexture;
   static templateShape: Graphics;
 
-  public static create({ scene, x, y }: { scene: Scene } & Partial<Coords>) {
-    const { app } = scene;
-
+  public static create() {
     const templateShape = new Graphics()
-      .beginFill(0xffffff)
+      .beginFill(0xf1b04c)
+      .lineStyle({ width: 1, color: 0xFFFFFF, alignment: 0 })
       .drawRect(0, 0, WIDTH, WIDTH);
 
     const { width, height } = templateShape;
@@ -33,6 +32,7 @@ class TextureAutotroph {
     });
 
     const { renderTexture } = this;
+    const { app } = Physics.scene!;
 
     // With the existing renderer, render texture
     // make sure to apply a transform Matrix
@@ -47,34 +47,7 @@ class TextureAutotroph {
     // Discard the original Graphics
     templateShape.destroy(true);
 
-    return new TextureAutotroph({ scene, width, height, renderTexture, x, y });
-  }
-
-  renderTexture: RenderTexture;
-  shape: Sprite;
-  scene: Scene;
-
-  constructor({ renderTexture, scene, x, y }: TextureOrganismProps) {
-    this.shape = new Sprite(renderTexture);
-    this.renderTexture = renderTexture;
-    this.scene = scene;
-    this.shape.position.x = x === undefined ? this.scene.app.screen.width / 2 : x;
-    this.shape.position.y = y === undefined ? this.scene.app.screen.height / 2 : y;
-
-    this.shape.position.x -= WIDTH / 2;
-    this.shape.position.y -= WIDTH / 2;
-    this.scene.container.addChild(this.shape);
-  }
-
-  getPosition() {
-    return this.shape.position;
-  }
-
-  getGlobalPosition() {
-    return this.shape.getGlobalPosition();
-  }
-  getDimensions() {
-    return { width: this.shape.width, height: this.shape.height };
+    return new TextureAutotroph({ renderTexture });
   }
 }
 

@@ -16,7 +16,7 @@ class PersuesTarget implements IBehavior {
   constructor (organism: Organism) {
     this.organism = organism;
     this.target = undefined;
-    this.speed = 5;
+    this.speed = 500;
     this.energy = DEFAULT_ENERGY;
   }
 

@@ -1,19 +1,15 @@
 import { Graphics, Matrix, MSAA_QUALITY, Renderer, RenderTexture, Sprite } from "pixi.js"
 import { Coords } from "./organisms/autotroph";
 import Scene from "./scene";
+import Texture from "./texture";
+import Physics from "./utils/physics/physics";
 
-type TextureOrganismProps = {
-  shape: Sprite;
-  scene: Scene;
-  width: number;
-  height: number;
-} & Coords;
-
-class TextureOrganism {
+class TextureOrganism extends Texture {
   static renderTexture: RenderTexture;
   static templateShape: Graphics;
-  public static create({ scene, x, y }: { scene: Scene } & Coords) {
-    const { app } = scene;
+
+  public static create() {
+    const { app } = Physics.scene!;
 
     const templateShape = new Graphics()
       .beginFill(0xffffff)
@@ -45,32 +41,7 @@ class TextureOrganism {
     // Discard the original Graphics
     templateShape.destroy(true);
 
-    const shape = new Sprite(renderTexture);
-
-    shape.position.x = x;
-    shape.position.y = y;
-
-    return new TextureOrganism({ shape, scene, width, height, x, y });
-  }
-
-  shape: Sprite;
-  scene: Scene;
-
-  constructor({ shape, scene, x, y }: TextureOrganismProps) {
-    this.shape = shape;
-    this.scene = scene;
-    this.scene.container.addChild(this.shape);
-  }
-
-  getPosition() {
-    return this.shape.position;
-  }
-
-  getGlobalPosition() {
-    return this.shape.getGlobalPosition();
-  }
-  getDimensions() {
-    return { width: this.shape.width, height: this.shape.height };
+    return new TextureOrganism({ renderTexture });
   }
 }
 

@@ -16,7 +16,7 @@ class MovesRandomly implements IBehavior {
     this.organism = organism;
     this.interval = 0;
     this.maxIntervals = 5000;
-    this.speed = 10;
+    this.speed = 500;
     this.energy = DEFAULT_ENERGY;
 
     const movement = Movement.for(this.organism);
@@ -51,7 +51,7 @@ class MovesRandomly implements IBehavior {
 
       this.interval = 0;
     } else {
-      this.interval += this.organism.scene.timePassedMS;
+      this.interval += Physics.scene!.timePassed;
     }
   }
 

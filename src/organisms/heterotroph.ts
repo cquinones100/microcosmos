@@ -1,31 +1,30 @@
 import { OrganismProps } from "./organism";
 import TextureOrganism from "../textureOrganism";
-import { Coords } from "./autotroph";
 import Organism from "./organism";
 import PersuesTarget from "../behavior/persuesTarget";
 import DetectsTarget from "../behavior/detectsTarget";
 import MovesRandomly from "../behavior/movesRandomly";
 import ConsumesOrganisms from "../behavior/consumesOrganisms";
 import Reproduction from "../behavior/reproduction";
+import Physics from "../utils/physics/physics";
 
 type HeteroTrophProps = {
   texture: TextureOrganism;
 }
-& Pick<OrganismProps, "scene" | "generation" | "color">;
 
 class HeteroTroph extends Organism {
   public static create({ texture, ...args }: HeteroTrophProps) {
-    const organism = new HeteroTroph({ shape: texture, ...args});
+    const organism = new HeteroTroph({ shape: texture });
 
     const moves = new MovesRandomly(organism)
     const pursuit = new PersuesTarget(organism);
     const detection = new DetectsTarget(organism);
     const consumes = new ConsumesOrganisms(organism);
     const reproduction = new Reproduction(organism);
-    reproduction.maxInterval = 500;
 
     organism.behaviors.push(moves, pursuit, detection, consumes, reproduction);
 
+    reproduction.maxInterval = 500;
     organism.shape.shape.zIndex = 1;
     return organism;
   }
@@ -42,19 +41,15 @@ class HeteroTroph extends Organism {
     });
   }
 
-  animate() {
-    super.animate();
-  }
-
   consume(organism: Organism) {
-    this.scene.predators.add(this);
+    Physics.scene!.predators.add(this);
 
     if (organism.dead()) {
       if (!organism.consumed) {
         organism.consumed = true;
         this.setEnergy(this.energy + organism.maxEnergy * 0.5)
-        organism.scene.container.removeChild(organism.text);
-        this.scene.remove(organism);
+        Physics.scene!.container.removeChild(organism.text);
+        Physics.scene!.remove(organism);
       }
     } else {
       const energyFromPrey =
@@ -75,13 +70,16 @@ class HeteroTroph extends Organism {
 
   duplicate(): Organism {
     const { width, height } = this.shape.getDimensions();
-    const { scene } = this.shape;
+    const { scene } = Physics;
     const { x, y } = this.shape.shape.position;
 
-    const texture = TextureOrganism.create({ scene, x: x! - width, y: y! - height });
-    const organism = HeteroTroph.create({ texture, scene })
+    const texture = TextureOrganism.create();
+    const organism = HeteroTroph.create({ texture })
 
-    scene.organisms.add(organism);
+    organism.setPosition({ x: x! - width, y: y! - height })
+
+
+    scene!.organisms.add(organism);
 
     return organism;
   }
