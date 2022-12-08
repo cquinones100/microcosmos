@@ -1,5 +1,5 @@
 import { RenderTexture, Sprite } from "pixi.js";
-import { Coords } from "./organisms/autotroph";
+import { Coords } from "./physics/coordinates";
 import Physics from "./utils/physics/physics";
 
 class Texture {

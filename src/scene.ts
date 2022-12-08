@@ -5,11 +5,12 @@ import Organism from "./organisms/organism";
 import { Application, Container } from "pixi.js";
 import TextureOrganism from "./textureOrganism";
 import TextureAutotroph from "./textureAutotroph";
-import Autotroph, { Coords } from "./organisms/autotroph";
+import Autotroph from "./organisms/autotroph";
 import HeteroTroph from "./organisms/heterotroph";
 import Physics, { Point } from "./utils/physics/physics";
 import { create } from "./scenarios/default";
 import DetectsTarget from "./behavior/detectsTarget";
+import Coordinates, { Coords } from "./physics/coordinates";
 
 export const MUTATION_FACTOR = 1;
 
@@ -214,15 +215,15 @@ class Scene {
   }
 
   addObject(object: WorldObject) {
-    Physics.Coordinates.withinObject(object, (cell) => {
+    Coordinates.withinObject(object, (cell) => {
       cell.add(object)
     });
 
-    return Physics.Coordinates.snappedPosition(object);
+    return Coordinates.snappedPosition(object);
   }
 
   removeObject(object: WorldObject) {
-    Physics.Coordinates.withinObject(object, (cell) => {
+    Coordinates.withinObject(object, (cell) => {
       cell.delete(object)
     });
   }

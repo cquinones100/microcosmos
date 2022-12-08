@@ -2,6 +2,7 @@ import IBehavior from "../behavior";
 import { initializeDuplicateBehavior } from "../duplication";
 import Mutator from "../mutator";
 import Organism from "../organisms/organism";
+import Coordinates from "../physics/coordinates";
 import Physics, { Point } from "../utils/physics/physics";
 
 class Reproduction implements IBehavior {
@@ -92,7 +93,7 @@ class Reproduction implements IBehavior {
 
     for (let x = Math.floor(roundedX - width - (width / 2)); x < Math.floor(roundedX - (width / 2) - 1); x++) {
       for (let y = Math.floor(roundedY - (height / 2)); y < Math.floor(roundedY + (height / 2)); y++) {
-        const curr = Physics.Coordinates.coordinates[x]?.[y]
+        const curr = Coordinates.coordinates[x]?.[y]
 
         if (curr?.size > 0) {
           left = false;
@@ -107,7 +108,7 @@ class Reproduction implements IBehavior {
 
     for (let x = Math.floor(roundedX - (width / 2)); x < Math.floor(roundedX - (width / 2)); x++) {
       for (let y = Math.floor(roundedX - (height / 2)); y < Math.floor(roundedX + (height / 2)); y++) {
-        const curr = Physics.Coordinates.coordinates[x]?.[y]
+        const curr = Coordinates.coordinates[x]?.[y]
 
         if (curr?.size > 0) {
           up = false;
@@ -122,7 +123,7 @@ class Reproduction implements IBehavior {
 
     for (let x = Math.floor(roundedX + width + (width / 2)); x < Math.floor(roundedX + (width / 2) + 1); x++) {
       for (let y = Math.floor(roundedY - (height / 2)); y < Math.floor(roundedY + (height / 2)); y++) {
-        const curr = Physics.Coordinates.coordinates[x]?.[y]
+        const curr = Coordinates.coordinates[x]?.[y]
 
         if (curr?.size > 0) {
           right = false;
@@ -137,7 +138,7 @@ class Reproduction implements IBehavior {
 
     for (let x = Math.floor(roundedX - (width / 2)); x < Math.floor(roundedX - (width / 2)); x++) {
       for (let y = Math.floor(roundedX + (height / 2)); y < Math.floor(roundedX + height + (height / 2)); y++) {
-        const curr = Physics.Coordinates.coordinates[x]?.[y]
+        const curr = Coordinates.coordinates[x]?.[y]
 
         if (curr?.size > 0) {
           down = false;

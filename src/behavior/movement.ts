@@ -1,7 +1,7 @@
 import { DEFAULT_ENERGY, IBehavior } from "../behavior";
 import { initializeDuplicateBehavior } from "../duplication";
-import { Coords } from "../organisms/autotroph";
 import Organism from "../organisms/organism";
+import { Coords } from "../physics/coordinates";
 import Physics, { IVector } from "../utils/physics/physics";
 
 class Movement implements IBehavior {

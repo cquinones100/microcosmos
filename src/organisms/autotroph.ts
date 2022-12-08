@@ -5,11 +5,6 @@ import Reproduction from "../behavior/reproduction";
 import Physics from "../utils/physics/physics";
 import Interaction from "../utils/interaction";
 
-export type Coords = {
-  x: number;
-  y: number;
-};
-
 class Autotroph extends Organism {
   interval: number;
   maxIntervals: any;

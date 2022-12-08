@@ -1,6 +1,6 @@
 import WorldObject from "../../worldObject";
-import { Coords } from "../../organisms/autotroph";
 import Scene from "../../scene";
+import { Coords } from "../../physics/coordinates";
 
 export interface IDirected {
   xDirection: number;
@@ -166,30 +166,6 @@ class Vector implements IVector {
   }
 }
 
-class Coordinates {
-  public static coordinates: Set<WorldObject>[][] = [];
-
-  public static withinObject(object: WorldObject, cb: (cell: Set<WorldObject>) => void) {
-    const { x: centerX, y: centerY } = this.snappedPosition(object);
-    const { width, height } = object.getDimensions();
-
-    for (let x = Math.floor(centerX - (width / 2)); x <= Math.floor(centerX + (width / 2)); x++) {
-      for (let y = Math.floor(centerY - (height / 2)); y <= Math.floor(centerY + (height / 2)); y++) {
-        this.coordinates[x] ||= [];
-        this.coordinates[x][y] ||= new Set();
-
-        cb(this.coordinates[x][y]);
-      }
-    }
-  }
-
-  public static snappedPosition(object: WorldObject) {
-    const { x, y } = object.getPosition();
-
-    return { x: Math.floor(x), y: Math.floor(y) }
-  }
-}
-
 type Physics = {
   time: number;
   Collision: typeof Collision;
@@ -201,7 +177,6 @@ type Physics = {
   setScene: (scene: Scene) => void;
   scene: Scene | undefined,
   negatableRandom: (max: number) => number;
-  Coordinates: typeof Coordinates;
   timePassed: number;
   speed: (pixelsPerSecond: number) => number;
   setTime(timePassed: number): void;
@@ -241,7 +216,6 @@ const Physics: Physics = {
   timePassed: 0,
   time: 0,
   negatableRandom: (max: number) => Math.round(Math.random()) ? Math.random() * max : Math.random() * max * - 1,
-  Coordinates,
   speed(pixelsPerSecond: number) { return pixelsPerSecond / 60 * this.timePassed; },
   center() { return this.scene!.getDimensions() },
 }

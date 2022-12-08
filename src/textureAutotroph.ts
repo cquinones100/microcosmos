@@ -1,5 +1,5 @@
 import { Graphics, Matrix, MSAA_QUALITY, Renderer, RenderTexture, Sprite } from "pixi.js"
-import { Coords } from "./organisms/autotroph";
+import { Coords } from "./physics/coordinates";
 import Texture from "./texture";
 import Physics from "./utils/physics/physics";
 
