@@ -56,8 +56,6 @@ class Organism extends WorldObject {
     this.energy = this.maxEnergy;
     this.generation = generation || 0;
 
-    this.shape.shape.interactive = true
-
     this.text = new Text("", {
       fill: "white",
       fontWeight: "bold",

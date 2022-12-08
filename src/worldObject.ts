@@ -1,23 +1,25 @@
 import { Sprite } from "pixi.js";
 import Organism from "./organisms/organism";
-import TextureOrganism from "./textureOrganism";
+import Texture from "./texture";
 import Physics, { ICollidableObject } from "./utils/physics/physics";
 
 export type WorldObjectProps = {
-  shape: TextureOrganism;
+  shape: Texture;
   color?: number;
 }
 
 class WorldObject implements ICollidableObject {
   color?: number;
-  shape: TextureOrganism;
+  shape: Texture;
   x: number = 0;
   y: number = 0;
   otherShapes: Sprite[];
   defaultColor: number | undefined;
+  texture: Texture;
 
   constructor({ shape }: WorldObjectProps) {
     this.shape = shape;
+    this.texture = this.shape;
     this.otherShapes = [];
 
     const { x, y } = this.shape.getPosition();

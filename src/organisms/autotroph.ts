@@ -3,6 +3,7 @@ import { OrganismProps } from "../organisms/organism";
 import TextureAutotroph from "../textureAutotroph";
 import Reproduction from "../behavior/reproduction";
 import Physics from "../utils/physics/physics";
+import Interaction from "../utils/interaction";
 
 export type Coords = {
   x: number;
@@ -25,6 +26,7 @@ class Autotroph extends Organism {
 
     organism.shape.shape.zIndex = 0;
 
+
     return organism;
   }
 
@@ -35,6 +37,14 @@ class Autotroph extends Organism {
     this.maxIntervals = 100;
     this.defaultColor = 0x50B959;
     this.shape.shape.tint = this.defaultColor;
+
+    Interaction.hover(this, (event) => {
+      this.texture.setColor(0xFEFF9C);
+    });
+
+    Interaction.unHover(this, (event) => {
+      this.texture.setColor(this.defaultColor!);
+    });
   }
 
   updateEnergyText(): void {}

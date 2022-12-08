@@ -33,8 +33,6 @@ class Reproduction implements IBehavior {
     this.maxInterval = 100;
     this.energy = 0;
     this.minEnergy = this.organism.maxEnergy * 0.4
-
-    this.organism.shape.shape.interactive = true
   }
 
   duplicate(newOrganism: Organism): Reproduction {

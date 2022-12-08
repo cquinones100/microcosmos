@@ -36,6 +36,11 @@ class Texture {
     this.shape.position.x = x - width / 2;
     this.shape.position.y = y - height / 2;
   }
+
+  setColor(color: number) {
+    console.log(color);
+    this.shape.tint = color;
+  }
 }
 
 export default Texture;
