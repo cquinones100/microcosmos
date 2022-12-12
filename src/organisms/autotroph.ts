@@ -33,13 +33,8 @@ class Autotroph extends Organism {
     this.defaultColor = 0x50B959;
     this.shape.shape.tint = this.defaultColor;
 
-    Interaction.hover(this, (event) => {
-      this.texture.setColor(0xFEFF9C);
-    });
-
-    Interaction.unHover(this, (event) => {
-      this.texture.setColor(this.defaultColor!);
-    });
+    Interaction.hover(this, this.highlight.bind(this));
+    Interaction.unHover(this, this.unHighlight.bind(this));
   }
 
   updateEnergyText(): void {}
@@ -71,6 +66,14 @@ class Autotroph extends Organism {
     Physics.scene!.remove(this);
     this.disappear();
     super.die();
+  }
+
+  highlight() {
+    this.texture.setColor(0xFEFF9C);
+  }
+
+  unHighlight() {
+    this.texture.setColor(this.defaultColor!);
   }
 }
 

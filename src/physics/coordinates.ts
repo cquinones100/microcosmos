@@ -1,3 +1,5 @@
+import WorldObject from "../worldObject";
+
 export type Coords = {
   x: number;
   y: number;
@@ -13,7 +15,7 @@ export interface ICoordinateObject {
   getDimensions: () => Dimensions;
 }
 
-export class VirtualObject {
+export class VirtualObject implements ICoordinateObject {
   x: number;
   y: number;
   width: number;
@@ -25,12 +27,27 @@ export class VirtualObject {
     this.width = width;
     this.height = height;
   }
+
+  getPosition() {
+    const { x, y } = this;
+
+    return { x, y };
+  }
+
+  getDimensions() {
+    const { width, height } = this;
+
+    return { width, height };
+  }
 }
 
 class Coordinates {
   public static coordinates: Set<ICoordinateObject>[][] = [];
 
-  public static withinObject(object: ICoordinateObject, cb: (cell: Set<ICoordinateObject>) => void) {
+  public static withinObject(
+    object: ICoordinateObject,
+    cb: (cell: Set<ICoordinateObject>, x: number, y: number) => void
+  ) {
     const { x: centerX, y: centerY } = this.snappedPosition(object);
     const { width, height } = object.getDimensions();
 
@@ -39,7 +56,7 @@ class Coordinates {
         this.coordinates[x] ||= [];
         this.coordinates[x][y] ||= new Set();
 
-        cb(this.coordinates[x][y]);
+        cb(this.coordinates[x][y], x, y);
       }
     }
   }
@@ -50,13 +67,29 @@ class Coordinates {
     return { x: Math.floor(x), y: Math.floor(y) }
   }
 
-  public static spaceLeft(originalObject: ICoordinateObject) {
-    const { x: centerX, y: centerY } = this.snappedPosition(originalObject);
-    const { width, height } = originalObject.getDimensions();
+  public static canOccupy({ x, y, object }: Coords & { object: WorldObject }) {
+    const { width, height } = object.getDimensions();
 
-    const object = new VirtualObject({ x: centerX - (width * 1.5), y: centerY, width, height });
+    const virtualObject = new VirtualObject({ x, y, width, height });
 
-    // const texture = TextureAutotroph.create();
+    let allFree = true;
+
+    this.withinObject(virtualObject, (cell: Set<ICoordinateObject>, x: number, y: number) => {
+      if (cell.size > 0) {
+        allFree = false;
+      }
+    });
+
+    return allFree;
+  }
+
+  public static withinRange(
+    { x, y, width, height}: Coords & Dimensions,
+    cb: (cell: Set<ICoordinateObject>, x: number, y: number) => void
+  ) {
+    const virtualObject = new VirtualObject({ x, y, width, height });
+
+    this.withinObject(virtualObject, cb);
   }
 }
 

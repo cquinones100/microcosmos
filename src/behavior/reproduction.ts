@@ -1,9 +1,9 @@
 import IBehavior from "../behavior";
 import { initializeDuplicateBehavior } from "../duplication";
 import Mutator from "../mutator";
+import Autotroph from "../organisms/autotroph";
 import Organism from "../organisms/organism";
 import Coordinates from "../physics/coordinates";
-import Physics, { Point } from "../utils/physics/physics";
 
 class Reproduction implements IBehavior {
   debuggerTrack: boolean = false;
@@ -85,109 +85,72 @@ class Reproduction implements IBehavior {
     const { x: objX, y: objY } = this.organism.getPosition();
     const { width, height } = this.organism.getDimensions();
 
-    const roundedX = Math.floor(objX);
-    const roundedY = Math.floor(objY);
+    if (this.organism instanceof Autotroph) this.organism.highlight();
 
-    // try left
-    let left = true;
+    const newOrganism = this.organism.duplicate();
 
-    for (let x = Math.floor(roundedX - width - (width / 2)); x < Math.floor(roundedX - (width / 2) - 1); x++) {
-      for (let y = Math.floor(roundedY - (height / 2)); y < Math.floor(roundedY + (height / 2)); y++) {
-        const curr = Coordinates.coordinates[x]?.[y]
+    this.organism.behaviors
+      .forEach(behavior => behavior.duplicate(newOrganism));
 
-        if (curr?.size > 0) {
-          left = false;
-        }
-        
-        break;
-      }
+    this.organism.energy = this.organism.energy / 2;
+    newOrganism.energy = this.organism.energy / 2;
+
+    newOrganism.behaviors.forEach(Mutator.conditionallyMutate);
+    newOrganism.generation = this.organism.generation + 1;
+
+    const callbacks = [];
+
+    const left = Coordinates.canOccupy({
+      x: objX - width - 1,
+      y: objY,
+      object: this.organism
+    });
+
+    const up = Coordinates.canOccupy({
+      x: objX,
+      y: objY - height - 1,
+      object: this.organism
+    });
+
+    const right = Coordinates.canOccupy({
+      x: objX + width + 2,
+      y: objY,
+      object: this.organism
+    });
+
+    const down = Coordinates.canOccupy({
+      x: objX,
+      y: objY + height + 2,
+      object: this.organism
+    });
+
+    if (left) {
+      callbacks.push(() => {
+        newOrganism.setPosition({ x: objX - width - 1, y: objY });
+      })
     }
 
-    // try up
-    let up = true;
-
-    for (let x = Math.floor(roundedX - (width / 2)); x < Math.floor(roundedX - (width / 2)); x++) {
-      for (let y = Math.floor(roundedX - (height / 2)); y < Math.floor(roundedX + (height / 2)); y++) {
-        const curr = Coordinates.coordinates[x]?.[y]
-
-        if (curr?.size > 0) {
-          up = false;
-        }
-        
-        break;
-      }
+    if (up) {
+      callbacks.push(() => {
+        newOrganism.setPosition({ x: objX, y: objY - height - 1 });
+      })
     }
 
-    // try right
-    let right = true;
-
-    for (let x = Math.floor(roundedX + width + (width / 2)); x < Math.floor(roundedX + (width / 2) + 1); x++) {
-      for (let y = Math.floor(roundedY - (height / 2)); y < Math.floor(roundedY + (height / 2)); y++) {
-        const curr = Coordinates.coordinates[x]?.[y]
-
-        if (curr?.size > 0) {
-          right = false;
-        }
-        
-        break;
-      }
+    if (right) {
+      callbacks.push(() => {
+        newOrganism.setPosition({ x: objX + width + 2, y: objY });
+      })
     }
 
-    // try down
-    let down = true;
-
-    for (let x = Math.floor(roundedX - (width / 2)); x < Math.floor(roundedX - (width / 2)); x++) {
-      for (let y = Math.floor(roundedX + (height / 2)); y < Math.floor(roundedX + height + (height / 2)); y++) {
-        const curr = Coordinates.coordinates[x]?.[y]
-
-        if (curr?.size > 0) {
-          down = false;
-        }
-        
-        break;
-      }
+    if (down) {
+      callbacks.push(() => {
+        newOrganism.setPosition({ x: objX, y: objY + height + 2 });
+      })
     }
 
-    if (left || up || right || down) {
-      const newOrganism = this.organism.duplicate();
+    callbacks[Math.floor(Math.random() * callbacks.length)]?.();
 
-      this.organism.behaviors
-        .forEach(behavior => behavior.duplicate(newOrganism));
-
-      this.organism.energy = this.organism.energy / 2;
-      newOrganism.energy = this.organism.energy / 2;
-
-      newOrganism.behaviors.forEach(Mutator.conditionallyMutate);
-      newOrganism.generation = this.organism.generation + 1;
-
-      const callbacks = [];
-
-      if (left) {
-        callbacks.push(() => {
-          newOrganism.setPosition({ x: Math.floor(roundedX - width), y: roundedY });
-        })
-      }
-
-      if (up) {
-        callbacks.push(() => {
-          newOrganism.setPosition({ x: Math.floor(roundedX), y: roundedY - height });
-        })
-      }
-
-      if (right) {
-        callbacks.push(() => {
-          newOrganism.setPosition({ x: Math.floor(roundedX + width), y: roundedY });
-        })
-      }
-
-      if (down) {
-        callbacks.push(() => {
-          newOrganism.setPosition({ x: Math.floor(roundedX), y: roundedY + height });
-        })
-      }
-
-      callbacks[Math.floor(Math.random() * callbacks.length)]?.();
-    }
+    if (newOrganism instanceof Autotroph) newOrganism.highlight();
   }
 }
 
