@@ -85,7 +85,7 @@ class PersuesTarget implements IBehavior {
 
     const { x, y } = this.organism.getPosition();
 
-    return detection.targets.sort((a: ICollidableObject, b: ICollidableObject) => {
+    return Array.from(detection.targets).sort((a: ICollidableObject, b: ICollidableObject) => {
       const { x: targetAX, y: targetAY } = a.getPosition();
       const { x: targetBX, y: targetBY } = b.getPosition();
 

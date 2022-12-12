@@ -2,6 +2,7 @@ import { Graphics, Matrix, MSAA_QUALITY, Renderer, RenderTexture, Sprite } from 
 import { DEFAULT_ENERGY, IBehavior } from "../behavior";
 import { initializeDuplicateBehavior } from "../duplication";
 import Organism from "../organisms/organism";
+import Coordinates, { ICoordinateObject } from "../physics/coordinates";
 import Physics from "../utils/physics/physics";
 
 class DetectsTarget implements IBehavior {
@@ -9,7 +10,7 @@ class DetectsTarget implements IBehavior {
   radius: number;
   target: Organism | undefined;
   shape: any;
-  targets: Organism[] = [];
+  targets: Set<Organism> = new Set();
   energy: number;
 
   static showRadius = false;
@@ -91,19 +92,17 @@ class DetectsTarget implements IBehavior {
 
     this.shape.position = { x: x - this.radius + width / 2, y: y - this.radius + height / 2 };
 
-    this.targets = [];
+    this.targets = new Set();
 
-    for (let organism of Physics.scene!.organisms) {
-      if (organism !== this.organism) {
-        const { x: targetX, y: targetY } = organism.getPosition();
-
-        const vector = Physics.Vector.getVector({ x, y, targetX, targetY });
-
-        if (vector.getLengthSquared() < this.radius * this.radius) {
-          this.targets.push(organism);
-        }
-      }
-    }
+    Physics.scene!.measure('detection', () => {
+      Coordinates.withinRange({ x, y, width: this.radius, height: this.radius }, (cell: Set<ICoordinateObject>) => {
+        cell.forEach((obj: ICoordinateObject) => {
+          if (obj instanceof Organism && obj !== this.organism) {
+            this.targets.add(obj);
+          }
+        });
+      });
+    })
   }
 }
 

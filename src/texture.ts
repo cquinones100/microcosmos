@@ -38,7 +38,6 @@ class Texture {
   }
 
   setColor(color: number) {
-    console.log(color);
     this.shape.tint = color;
   }
 }

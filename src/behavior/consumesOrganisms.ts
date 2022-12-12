@@ -23,13 +23,15 @@ class ConsumesOrganisms implements IBehavior {
   call() {
     const detection = this.getDetection();
 
-    detection.targets.forEach(target => {
+    for (let target of detection.targets) {
       if (this.organism.canEat(target)) {
         if (Physics.Collision.collides(this.organism, target)) {
           if (this.organism.canEat(target)) this.organism.consume(target);
+
+          break;
         }
       }
-    });
+    }
   }
 
   private getDetection() {

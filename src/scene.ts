@@ -119,7 +119,6 @@ class Scene {
             });
             
             Object.keys(this.measurements).forEach(measurement => {
-
               if (this.measurements[measurement] > 5) {
                 console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
               }
