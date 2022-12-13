@@ -41,18 +41,20 @@ class MovesRandomly implements IBehavior {
   }
 
   call() {
-    const movement = Movement.for(this.organism);
+    Physics.scene!.measure('moves randomly', () => {
+      const movement = Movement.for(this.organism);
 
-    if (
-      this.interval > this.maxIntervals
-      || Physics.Collision.collides(this.organism, new Point(movement.x, movement.y))
-    ) {
-      this.move();
+      if (
+        this.interval > this.maxIntervals
+        || Physics.Collision.collides(this.organism, new Point(movement.x, movement.y))
+      ) {
+        this.move();
 
-      this.interval = 0;
-    } else {
-      this.interval += Physics.scene!.timePassed;
-    }
+        this.interval = 0;
+      } else {
+        this.interval += Physics.scene!.timePassed;
+      }
+    });
   }
 
   move() {

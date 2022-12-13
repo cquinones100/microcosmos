@@ -8,7 +8,7 @@ import TextureAutotroph from "./textureAutotroph";
 import Autotroph from "./organisms/autotroph";
 import HeteroTroph from "./organisms/heterotroph";
 import Physics, { Point } from "./utils/physics/physics";
-import { create } from "./scenarios/default";
+import { create } from "./scenarios/performance";
 import DetectsTarget from "./behavior/detectsTarget";
 import Coordinates, { Coords } from "./physics/coordinates";
 

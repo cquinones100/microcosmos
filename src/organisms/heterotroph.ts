@@ -17,14 +17,16 @@ class HeteroTroph extends Organism {
     const organism = new HeteroTroph({ shape: texture });
 
     const moves = new MovesRandomly(organism)
-    const pursuit = new PersuesTarget(organism);
+    organism.behaviors.push(moves);
+
+    // const pursuit = new PersuesTarget(organism);
     const detection = new DetectsTarget(organism);
-    const consumes = new ConsumesOrganisms(organism);
-    const reproduction = new Reproduction(organism);
+    organism.behaviors.push(detection);
+    // const consumes = new ConsumesOrganisms(organism);
+    // const reproduction = new Reproduction(organism);
 
-    organism.behaviors.push(moves, pursuit, detection, consumes, reproduction);
 
-    reproduction.maxInterval = 500;
+    // reproduction.maxInterval = 500;
     organism.shape.shape.zIndex = 1;
     return organism;
   }

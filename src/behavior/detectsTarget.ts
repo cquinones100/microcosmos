@@ -95,13 +95,19 @@ class DetectsTarget implements IBehavior {
     this.targets = new Set();
 
     Physics.scene!.measure('detection', () => {
-      Coordinates.withinRange({ x, y, width: this.radius, height: this.radius }, (cell: Set<ICoordinateObject>) => {
-        cell.forEach((obj: ICoordinateObject) => {
-          if (obj instanceof Organism && obj !== this.organism) {
-            this.targets.add(obj);
+      this.shape.position = { x: x - this.radius + width / 2, y: y - this.radius + height / 2 };
+
+      for (let organism of Physics.scene!.organisms) {
+        if (organism !== this.organism) {
+          const { x: targetX, y: targetY } = organism.getPosition();
+
+          const vector = Physics.Vector.getVector({ x, y, targetX, targetY });
+
+          if (vector.getLengthSquared() < this.radius * this.radius) {
+            this.targets.add(organism);
           }
-        });
-      });
+        }
+      }
     })
   }
 }

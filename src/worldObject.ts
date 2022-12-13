@@ -30,36 +30,34 @@ class WorldObject implements ICollidableObject {
   }
 
   setPosition({ x, y }: { x: number, y: number }) {
-    const { scene } = Physics;
-    const { width: sceneWidth, height: sceneHeight } = scene!.getDimensions();
+    Physics.scene!.measure('setPosition', () => {
+      const { scene } = Physics;
+      const { width: sceneWidth, height: sceneHeight } = scene!.getDimensions();
 
-    let newX = x;
-    let newY = y;
+      let newX = x;
+      let newY = y;
 
-    if (newX > sceneWidth) {
-      newX = 0;
-    }
+      if (newX > sceneWidth) {
+        newX = 0;
+      }
 
-    if (newY > sceneHeight) {
-      newY = 0;
-    }
+      if (newY > sceneHeight) {
+        newY = 0;
+      }
 
-    if (newX < 0) {
-      newX = sceneWidth;
-    }
+      if (newX < 0) {
+        newX = sceneWidth;
+      }
 
-    if (newY < 0) {
-      newY = sceneHeight;
-    }
+      if (newY < 0) {
+        newY = sceneHeight;
+      }
 
-    Physics.scene!.removeObject(this);
-    this.shape.setPosition({ x: newX, y: newY });
+      this.shape.setPosition({ x: newX, y: newY });
 
-    const { x: sceneX, y: sceneY } = Physics.scene!.addObject(this);
-
-    this.shape.setPosition({ x: sceneX, y: sceneY });
-    this.x = sceneX;
-    this.y = sceneY;
+      this.x = newX;
+      this.y = newY;
+    });
   }
 
   canEat(organism: Organism) {
