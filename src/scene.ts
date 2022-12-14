@@ -7,7 +7,7 @@ import TextureOrganism from "./textureOrganism";
 import TextureAutotroph from "./textureAutotroph";
 import Autotroph from "./organisms/autotroph";
 import HeteroTroph from "./organisms/heterotroph";
-import Physics, { Point } from "./utils/physics/physics";
+import Physics, { ICollidableObject, Point } from "./utils/physics/physics";
 import { create } from "./scenarios/performance";
 import DetectsTarget from "./behavior/detectsTarget";
 import Coordinates, { Coords } from "./physics/coordinates";
@@ -114,6 +114,8 @@ class Scene {
 
         app.ticker.stop();
         return new Promise<void>((resolve, reject) => {
+            this.prepareBroadPhaseDetection();
+
             this.organisms.forEach(organism => { 
               organism.animate();
             });
@@ -139,6 +141,54 @@ class Scene {
 
     app.ticker.add(redraw);
     app.ticker.start();
+  }
+  prepareBroadPhaseDetection() {
+    const sortedOrganisms= Array.from(this.organisms).sort((a, b) => {
+      const { x: aX } = a.getPosition();
+      const { x: bX } = b.getPosition();
+
+      if (aX < bX) {
+        return -1;
+      }
+
+      if (aX > bX) {
+        return 1;
+      }
+
+      return 0;
+    });
+
+    const intervals: ICollidableObject[][] = [[sortedOrganisms[0]]];
+
+    for (let i = 1; i < sortedOrganisms.length; i++) {
+      const currentInterval = intervals[intervals.length - 1];
+      const curr = sortedOrganisms[i];
+
+      const intersects = (curr: ICollidableObject, other: ICollidableObject) => {
+        const { x: currX } = curr.getPosition();
+        const { width: currWidth } = curr.getDimensions();
+
+        const { x: otherX } = other.getPosition();
+        const { width: otherWidth } = other.getDimensions();
+
+        return currX - (currWidth / 2) < otherX + 50;
+      }
+
+      if (currentInterval.some(other => intersects(curr, other))) {
+        intervals[intervals.length - 1].push(curr);
+      } else {
+        intervals.push([curr]);
+      }
+    }
+
+    console.log(intervals);
+
+
+    // set current interval to the first element
+
+    // iterate through the list
+      // for each element that intersects with any element in the interval on the axis, record an active interval
+      // if element does not intersect, createa a new interval
   }
 
   createHeterotroph(

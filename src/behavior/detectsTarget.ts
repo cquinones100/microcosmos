@@ -2,7 +2,6 @@ import { Graphics, Matrix, MSAA_QUALITY, Renderer, RenderTexture, Sprite } from 
 import { DEFAULT_ENERGY, IBehavior } from "../behavior";
 import { initializeDuplicateBehavior } from "../duplication";
 import Organism from "../organisms/organism";
-import Coordinates, { ICoordinateObject } from "../physics/coordinates";
 import Physics from "../utils/physics/physics";
 
 class DetectsTarget implements IBehavior {
