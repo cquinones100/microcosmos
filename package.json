@@ -24,7 +24,8 @@
     "worker-loader": "^3.0.8"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx watch-http-server -p 3000 & npx tsc --watch & npx webpack --watch"
   },
   "author": "",
   "license": "ISC"
