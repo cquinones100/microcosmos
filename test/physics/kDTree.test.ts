@@ -38,3 +38,68 @@ describe('.fromObjects', () => {
     })
   });
 })
+
+describe('#levels', () => {
+  it('returns the levels for a single node', () => {
+    const objects: IPositionalObject[] = [
+      {
+        getPosition: () => ({ x: 2, y: 3 }),
+      },
+    ];
+
+    const tree = KDTree.fromObjects(objects);
+
+    expect(tree.levels().map(level => level.map(obj => obj.getPosition())))
+      .toEqual([
+        [objects[0].getPosition()],
+      ]);
+  });
+
+  it('returns the levels for a basic two level tree', () => {
+    const objects: IPositionalObject[] = [
+      {
+        getPosition: () => ({ x: 2, y: 3 }),
+      },
+      {
+        getPosition: () => ({ x: 1, y: 3 }),
+      },
+      {
+        getPosition: () => ({ x: 3, y: 3 }),
+      },
+    ];
+
+    const tree = KDTree.fromObjects(objects);
+
+    expect(tree.levels().map(level => level.map(obj => obj.getPosition())))
+      .toEqual([
+        [objects[0].getPosition()],
+        [objects[1].getPosition(), objects[2].getPosition()],
+      ]);
+  });
+
+  it('returns the levels for an unbalanced tree', () => {
+    const objects: IPositionalObject[] = [
+      {
+        getPosition: () => ({ x: 2, y: 3 }),
+      },
+      {
+        getPosition: () => ({ x: 1, y: 3 }),
+      },
+      {
+        getPosition: () => ({ x: 3, y: 3 }),
+      },
+      {
+        getPosition: () => ({ x: 3, y: 4 }),
+      },
+    ];
+
+    const tree = KDTree.fromObjects(objects);
+
+    expect(tree.levels().map(level => level.map(obj => obj.getPosition())))
+      .toEqual([
+        [objects[0].getPosition()],
+        [objects[1].getPosition(), objects[2].getPosition()],
+        [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, objects[3].getPosition()],
+      ]);
+  });
+});
