@@ -10,6 +10,7 @@ interface IKDTree {
   object: IPositionalObject;
   left: Leaf;
   right: Leaf;
+  value: string;
 }
 
 class KDTree implements IKDTree {
@@ -67,11 +68,15 @@ class KDTree implements IKDTree {
   object: IPositionalObject;
   left: Leaf;
   right: Leaf;
+  value: string;
 
   constructor(object: IPositionalObject, left: Leaf = null, right: Leaf = null) {
     this.object = object;
     this.left = left;
     this.right = right;
+    const { x, y } = object.getPosition();
+
+    this.value = `|${x}, ${y}|`;
   }
 
   levels() {
@@ -101,7 +106,43 @@ class KDTree implements IKDTree {
       levels.pop();
     }
 
-    return levels.map(level => level.map(({ object }) => object));
+    return levels;
+  }
+
+  print() {
+    const levels = this.levels();
+
+    let string = '';
+
+    const maxSpacing = levels
+      .reduce((acc: number, level) => {
+        return Math.max(acc, ...level.map((tree) => tree.value.length))
+      }, 0);
+
+    const maxLeaves = 2 ** levels.length;
+    let previousLevelPlacement = 0;
+    let levelPlacement = Math.floor((maxLeaves / 2)) - 1;
+
+    levels.forEach((level, levelIndex) => {
+      string += ' '.repeat(levelPlacement * maxSpacing);
+
+      level.forEach((tree, treeIndex) => {
+        string += tree.value;
+
+        if (treeIndex < level.length - 1) {
+         string += ' '.repeat(previousLevelPlacement * maxSpacing);
+        }
+      });
+
+      if (levelIndex < levels.length - 1) {
+        string += "\n";
+      }
+
+      previousLevelPlacement = levelPlacement;
+      levelPlacement = Math.floor(levelPlacement / 2);
+    });
+
+    return string;
   }
 };
 
@@ -109,6 +150,7 @@ class BlankTree implements IKDTree {
   object: IPositionalObject;
   left: null;
   right: null;
+  value: string;
 
   constructor() {
     this.object = {
@@ -118,6 +160,7 @@ class BlankTree implements IKDTree {
     };
     this.left = null;
     this.right = null;
+    this.value = `|${0}, ${0}|`;
   }
 }
 
