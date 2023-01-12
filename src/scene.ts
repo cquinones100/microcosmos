@@ -11,6 +11,7 @@ import Physics, { Point } from "./utils/physics/physics";
 import { create } from "./scenarios/default";
 import DetectsTarget from "./behavior/detectsTarget";
 import Coordinates, { Coords } from "./physics/coordinates";
+import KDTree from './physics/kDTree';
 
 export const MUTATION_FACTOR = 1;
 
@@ -29,6 +30,7 @@ class Scene {
   container: PIXI.Container<PIXI.DisplayObject>;
   stop: boolean;
   workerPool: Worker[];
+  tree: KDTree | null;
 
   constructor() {
     this.organisms = new Set<Organism>();
@@ -55,6 +57,7 @@ class Scene {
       new Worker(new URL('./utils/collisions.worker.ts', import.meta.url)),
       new Worker(new URL('./utils/collisions.worker.ts', import.meta.url)),
     ];
+    this.tree = null;
 
     Physics.setScene(this);
   }
@@ -114,19 +117,23 @@ class Scene {
 
         app.ticker.stop();
         return new Promise<void>((resolve, reject) => {
-            this.organisms.forEach(organism => { 
-              organism.animate();
-            });
-            
-            Object.keys(this.measurements).forEach(measurement => {
-              if (this.measurements[measurement] > 5) {
-                console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
-              }
-            });
+          this.measure('build tree', () => {
+            this.tree = KDTree.fromObjects(Array.from(this.organisms));
+          })
 
-            resolve();
+          this.organisms.forEach(organism => {
+            organism.animate();
           });
-        };
+
+          Object.keys(this.measurements).forEach(measurement => {
+            if (this.measurements[measurement]) {
+              console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
+            }
+          });
+
+          resolve();
+        });
+      };
 
       if (!this.stop) {
         sync().then(() => {
