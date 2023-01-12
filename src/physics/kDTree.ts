@@ -3,21 +3,19 @@ import Physics from '../utils/physics/physics';
 
 export interface IPositionalObject {
   getPosition: () => Coords;
-};
+}
 
-type Leaf = KDTree | null;
-
-interface IKDTree {
-  object: IPositionalObject;
-  left: Leaf;
-  right: Leaf;
+interface IKDTree<T extends IPositionalObject = IPositionalObject> {
+  object: T;
+  left: KDTree<T> | null;
+  right: KDTree<T> | null;
   value: string;
   getPosition: () => Coords;
 }
 
-class KDTree implements IKDTree {
-  public static fromObjects(objects: IPositionalObject[]) {
-    const recurseTree = (tree: KDTree, object: IPositionalObject, dimension = 0) => {
+class KDTree<T extends IPositionalObject = IPositionalObject> implements IKDTree<T> {
+  public static fromObjects<T extends IPositionalObject>(objects: T[]) {
+    const recurseTree = (tree: KDTree<T>, object: T, dimension = 0) => {
       const { x: treeX, y: treeY } = tree.object.getPosition();
       const { x, y } = object.getPosition();
 
@@ -52,7 +50,7 @@ class KDTree implements IKDTree {
       }
     }
 
-    const root = new KDTree(objects[0]);
+    const root = new KDTree<T>(objects[0]);
 
     for (let i = 1; i < objects.length; i++) {
       recurseTree(root, objects[i]);
@@ -61,22 +59,36 @@ class KDTree implements IKDTree {
     return root;
   }
 
-  public static closestTo(
-    object: IPositionalObject,
-    objects: IPositionalObject[]
-  ) {
-    const filteredObjects = objects.filter(obj => obj !== object);
+  public static closestTo<T extends IPositionalObject>(
+    object: T,
+    objects: T[],
+    tree: null
+  ): { distance: number, node: KDTree<T> | null };
 
-    const root = this.fromObjects([object, ...filteredObjects]);
+  public static closestTo<T extends IPositionalObject>(
+    object: T,
+    objects: null,
+    tree: KDTree<T>
+  ): { distance: number, node: KDTree<T> | null };
 
-    let closest: { distance: number, node: IKDTree | null } =
+  public static closestTo<T extends IPositionalObject>(
+    object: T,
+    objects: T[] | null = null,
+    tree: KDTree<T> | null = null
+  ):  { distance: number, node: KDTree<T> | null } {
+    let root: KDTree<T> | null = null;
+
+    if (tree) root = tree;
+    if (objects) root = this.fromObjects<T>(objects);
+
+    let closest: { distance: number, node: KDTree<T> | null } =
       { distance: Infinity, node: null };
 
     const { x: targetX, y: targetY } = object.getPosition();
     const point = [targetX, targetY];
 
     const findNearestNeighbor = (
-      node: IKDTree | null,
+      node: KDTree<T> | null,
       depth: number = 0,
     ) => {
       if (!node) return;
@@ -103,15 +115,14 @@ class KDTree implements IKDTree {
 
     findNearestNeighbor(root);
 
-    return closest.node;
+    return closest;
   }
-
-  object: IPositionalObject;
-  left: Leaf;
-  right: Leaf;
+  object: T;
+  left: IKDTree<T>['left'];
+  right: IKDTree<T>['right'];
   value: string;
 
-  constructor(object: IPositionalObject, left: Leaf = null, right: Leaf = null) {
+  constructor(object: T, left: IKDTree<T>['left'] = null, right: IKDTree<T>['right'] = null) {
     this.object = object;
     this.left = left;
     this.right = right;
@@ -189,7 +200,13 @@ class KDTree implements IKDTree {
 
     return string;
   }
-};
+
+  closestTo<T extends IPositionalObject>(object: T):
+    { distance: number, node: KDTree<T> | null } {
+    // @ts-ignore
+    return KDTree.closestTo(object, null, this);
+  }
+}
 
 class BlankTree implements IKDTree {
   object: IPositionalObject;

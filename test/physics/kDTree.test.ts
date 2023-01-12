@@ -283,7 +283,7 @@ describe('.closestTo', () => {
       },
     ];
 
-    expect(KDTree.closestTo(objects[0], objects)?.getPosition())
+    expect(KDTree.closestTo(objects[0], objects, null)?.node?.getPosition())
       .toEqual(objects[2].getPosition());
   });
 
@@ -301,7 +301,7 @@ describe('.closestTo', () => {
         },
       ];
 
-      expect(KDTree.closestTo(objects[0], objects));
+      expect(KDTree.closestTo(objects[0], objects, null));
     });
   })
 });
