@@ -32,7 +32,7 @@ class DetectsTarget implements IBehavior {
   constructor(organism: Organism) {
     this.energy = DEFAULT_ENERGY
     this.organism = organism;
-    this.radius = 100;
+    this.radius = 1000;
     const { x, y } = this.organism.getPosition();
 
     const templateShape = new Graphics()

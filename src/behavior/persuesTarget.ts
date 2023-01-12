@@ -41,7 +41,7 @@ class PersuesTarget implements IBehavior {
   }
 
   call() {
-    if (this.target) {
+    if (this.target && this.organism.canEat(this.target)) {
       if (Physics.Collision.collides(this.organism, this.target)) {
         this.target = undefined;
 

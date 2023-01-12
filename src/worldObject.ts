@@ -52,14 +52,7 @@ class WorldObject implements ICollidableObject {
       newY = sceneHeight;
     }
 
-    Physics.scene!.removeObject(this);
     this.shape.setPosition({ x: newX, y: newY });
-
-    const { x: sceneX, y: sceneY } = Physics.scene!.addObject(this);
-
-    this.shape.setPosition({ x: sceneX, y: sceneY });
-    this.x = sceneX;
-    this.y = sceneY;
   }
 
   canEat(organism: Organism) {
