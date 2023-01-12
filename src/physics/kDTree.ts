@@ -1,4 +1,5 @@
-import { Coords } from "./coordinates";
+import { Coords } from './coordinates';
+import Physics from '../utils/physics/physics';
 
 export interface IPositionalObject {
   getPosition: () => Coords;
@@ -11,6 +12,7 @@ interface IKDTree {
   left: Leaf;
   right: Leaf;
   value: string;
+  getPosition: () => Coords;
 }
 
 class KDTree implements IKDTree {
@@ -59,10 +61,49 @@ class KDTree implements IKDTree {
     return root;
   }
 
-  public static closestTo(object: IPositionalObject, objects: IPositionalObject[]) {
+  public static closestTo(
+    object: IPositionalObject,
+    objects: IPositionalObject[]
+  ) {
     const filteredObjects = objects.filter(obj => obj !== object);
 
-    const tree = this.fromObjects([object, ...filteredObjects]);
+    const root = this.fromObjects([object, ...filteredObjects]);
+
+    let closest: { distance: number, node: IKDTree | null } =
+      { distance: Infinity, node: null };
+
+    const { x: targetX, y: targetY } = object.getPosition();
+    const point = [targetX, targetY];
+
+    const findNearestNeighbor = (
+      node: IKDTree | null,
+      depth: number = 0,
+    ) => {
+      if (!node) return;
+
+      const axis = depth % 2;
+
+      const { x, y } = node.getPosition();
+
+      const distance = Physics.Vector.getVector({
+        x,
+        y,
+        targetX,
+        targetY
+      }).getLength();
+
+      if (distance < closest.distance && node !== root) {
+        closest = { distance, node }
+      }
+
+      const nextNode = point[axis] < x ? node.left : node.right;
+
+      findNearestNeighbor(nextNode, depth + 1);
+    };
+
+    findNearestNeighbor(root);
+
+    return closest.node;
   }
 
   object: IPositionalObject;
@@ -77,6 +118,10 @@ class KDTree implements IKDTree {
     const { x, y } = object.getPosition();
 
     this.value = `|${x}, ${y}|`;
+  }
+
+  getPosition() {
+    return this.object.getPosition();
   }
 
   levels() {
@@ -130,12 +175,12 @@ class KDTree implements IKDTree {
         string += tree.value;
 
         if (treeIndex < level.length - 1) {
-         string += ' '.repeat(previousLevelPlacement * maxSpacing);
+          string += ' '.repeat(previousLevelPlacement * maxSpacing);
         }
       });
 
       if (levelIndex < levels.length - 1) {
-        string += "\n";
+        string += '\n';
       }
 
       previousLevelPlacement = levelPlacement;
@@ -162,6 +207,10 @@ class BlankTree implements IKDTree {
     this.right = null;
     this.value = `|${0}, ${0}|`;
   }
+
+  getPosition() {
+    return this.object.getPosition();
+  };
 }
 
 export default KDTree;

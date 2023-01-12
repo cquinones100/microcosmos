@@ -268,3 +268,40 @@ describe('#print', () => {
     expect(tree.print()).toEqual(string);
   });
 });
+
+describe('.closestTo', () => {
+  it('determines the closest object', () => {
+    const objects: IPositionalObject[] = [
+      {
+        getPosition: () => ({ x: 0, y: 1 }),
+      },
+      {
+        getPosition: () => ({ x: 3, y: 3 }),
+      },
+      {
+        getPosition: () => ({ x: 1, y: 2 }),
+      },
+    ];
+
+    expect(KDTree.closestTo(objects[0], objects)?.getPosition())
+      .toEqual(objects[2].getPosition());
+  });
+
+  describe('when the object is not the first in the list', () => {
+    it('determines the closest object', () => {
+      const objects: IPositionalObject[] = [
+        {
+          getPosition: () => ({ x: 1, y: 3 }),
+        },
+        {
+          getPosition: () => ({ x: 3, y: 3 }),
+        },
+        {
+          getPosition: () => ({ x: 0, y: 1 }),
+        },
+      ];
+
+      expect(KDTree.closestTo(objects[0], objects));
+    });
+  })
+});
