@@ -2,7 +2,6 @@ import { Graphics, Matrix, MSAA_QUALITY, Renderer, RenderTexture, Sprite } from 
 import { DEFAULT_ENERGY, IBehavior } from "../behavior";
 import { initializeDuplicateBehavior } from "../duplication";
 import Organism from "../organisms/organism";
-import Coordinates, { ICoordinateObject } from "../physics/coordinates";
 import Physics from "../utils/physics/physics";
 
 class DetectsTarget implements IBehavior {
@@ -95,13 +94,12 @@ class DetectsTarget implements IBehavior {
     this.targets = new Set();
 
     Physics.scene!.measure('detection', () => {
-      Coordinates.withinRange({ x, y, width: this.radius, height: this.radius }, (cell: Set<ICoordinateObject>) => {
-        cell.forEach((obj: ICoordinateObject) => {
-          if (obj instanceof Organism && obj !== this.organism) {
-            this.targets.add(obj);
-          }
-        });
-      });
+      const closest = Physics.scene!.tree
+        ?.closestTo(this.organism);
+
+      if (closest && closest.distance < this.radius && closest.node) {
+        this.targets.add(closest.node.object);
+      }
     })
   }
 }
