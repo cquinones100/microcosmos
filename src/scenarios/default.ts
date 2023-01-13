@@ -5,5 +5,7 @@ export const create = () => {
   const { width, height } = Physics.scene!.getDimensions();
 
   scene!.createHeterotroph({ x: width / 2, y: height / 2 });
-  const autotroph = scene!.createAutotroph(Physics.randomLocation());
+  for (let i = 0; i < 10; i++) {
+    const autotroph = scene!.createAutotroph(Physics.randomLocation());
+  }
 }
