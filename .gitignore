@@ -3,5 +3,6 @@ dist
 public/dist
 public/src
 public/*js
+public/test
 
 .idea/

@@ -11,6 +11,7 @@ import Physics, { Point } from "./utils/physics/physics";
 import { create } from "./scenarios/default";
 import DetectsTarget from "./behavior/detectsTarget";
 import Coordinates, { Coords } from "./physics/coordinates";
+import KDTree from './physics/kDTree';
 
 export const MUTATION_FACTOR = 1;
 
@@ -29,6 +30,7 @@ class Scene {
   container: PIXI.Container<PIXI.DisplayObject>;
   stop: boolean;
   workerPool: Worker[];
+  tree: KDTree | null;
 
   constructor() {
     this.organisms = new Set<Organism>();
@@ -55,6 +57,7 @@ class Scene {
       new Worker(new URL('./utils/collisions.worker.ts', import.meta.url)),
       new Worker(new URL('./utils/collisions.worker.ts', import.meta.url)),
     ];
+    this.tree = null;
 
     Physics.setScene(this);
   }
@@ -98,7 +101,7 @@ class Scene {
     this.app.stage.interactive = true;
     this.app.stage.hitArea = new PIXI.Rectangle(0, 0, app.screen.width, app.screen.height);
 
-    const texture = create();
+    create();
 
     this.app.stage.on('click', (event) => {
       const { width, height } = this.getDimensions();
@@ -106,35 +109,41 @@ class Scene {
       console.log(event.clientX, event.clientY);
     });
 
+    let currentTime = 0;
+    let nextTime = 1;
+
     const redraw = (timePassed: number) => {
+      if (this.stop) return;
+
       Object.keys(this.measurements).forEach(measurement => { this.measurements[measurement] = 0 });
 
-      const sync = () => {
-        Physics.setTime(timePassed);
+      Physics.setTime(timePassed);
 
-        app.ticker.stop();
-        return new Promise<void>((resolve, reject) => {
-            this.organisms.forEach(organism => { 
-              organism.animate();
-            });
-            
-            Object.keys(this.measurements).forEach(measurement => {
-              if (this.measurements[measurement] > 5) {
-                console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
-              }
-            });
+      this.measure('build tree', () => {
+        this.tree = KDTree.fromObjects(Array.from(this.organisms));
+      })
 
-            resolve();
-          });
-        };
+      this.organisms.forEach(organism => {
+        organism.animate();
+      });
 
-      if (!this.stop) {
-        sync().then(() => {
-          app.ticker.start();
+      Object.keys(this.measurements).forEach(measurement => {
+        if (this.measurements[measurement]) {
+          console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
+        }
+      });
 
-          stats.end();
-        });
-    }
+      currentTime = performance.now();
+
+      if (nextTime - currentTime / 1000 < .001) {
+        Physics.time = currentTime;
+        console.log('time', nextTime);
+        console.log('rawTime', Physics.time);
+
+        nextTime += 1;
+      }
+
+      stats.end();
     }
 
     app.ticker.add(redraw);

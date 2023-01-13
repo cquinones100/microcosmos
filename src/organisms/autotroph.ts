@@ -1,5 +1,5 @@
 import Organism from "./organism";
-import { OrganismProps } from "../organisms/organism";
+import { OrganismProps } from "./organism";
 import TextureAutotroph from "../textureAutotroph";
 import Reproduction from "../behavior/reproduction";
 import Physics from "../utils/physics/physics";

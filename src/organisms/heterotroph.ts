@@ -22,7 +22,11 @@ class HeteroTroph extends Organism {
     const consumes = new ConsumesOrganisms(organism);
     const reproduction = new Reproduction(organism);
 
-    organism.behaviors.push(moves, pursuit, detection, consumes, reproduction);
+    organism.behaviors.push(moves);
+    organism.behaviors.push(pursuit);
+    organism.behaviors.push(detection);
+    organism.behaviors.push(consumes);
+    organism.behaviors.push(reproduction);
 
     reproduction.maxInterval = 500;
     organism.shape.shape.zIndex = 1;

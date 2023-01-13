@@ -4,6 +4,7 @@ import Mutator from "../mutator";
 import Autotroph from "../organisms/autotroph";
 import Organism from "../organisms/organism";
 import Coordinates from "../physics/coordinates";
+import Physics from "../utils/physics/physics";
 
 class Reproduction implements IBehavior {
   debuggerTrack: boolean = false;
@@ -37,10 +38,12 @@ class Reproduction implements IBehavior {
   }
 
   duplicate(newOrganism: Organism): Reproduction {
-    return initializeDuplicateBehavior(this, new Reproduction(newOrganism), behavior => {
-      behavior.maxInterval = this.maxInterval;
-      behavior.maxCycles = this.maxCycles;
-      behavior.minEnergy = this.minEnergy;
+    return Physics.scene!.measure('duplication', () => {
+      return initializeDuplicateBehavior(this, new Reproduction(newOrganism), behavior => {
+        behavior.maxInterval = this.maxInterval;
+        behavior.maxCycles = this.maxCycles;
+        behavior.minEnergy = this.minEnergy;
+      });
     });
   };
 
