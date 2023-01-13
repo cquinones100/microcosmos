@@ -101,7 +101,7 @@ class Scene {
     this.app.stage.interactive = true;
     this.app.stage.hitArea = new PIXI.Rectangle(0, 0, app.screen.width, app.screen.height);
 
-    const texture = create();
+    create();
 
     this.app.stage.on('click', (event) => {
       const { width, height } = this.getDimensions();
@@ -109,39 +109,41 @@ class Scene {
       console.log(event.clientX, event.clientY);
     });
 
+    let currentTime = 0;
+    let nextTime = 1;
+
     const redraw = (timePassed: number) => {
+      if (this.stop) return;
+
       Object.keys(this.measurements).forEach(measurement => { this.measurements[measurement] = 0 });
 
-      const sync = () => {
-        Physics.setTime(timePassed);
+      Physics.setTime(timePassed);
 
-        app.ticker.stop();
-        return new Promise<void>((resolve, reject) => {
-          this.measure('build tree', () => {
-            this.tree = KDTree.fromObjects(Array.from(this.organisms));
-          })
+      this.measure('build tree', () => {
+        this.tree = KDTree.fromObjects(Array.from(this.organisms));
+      })
 
-          this.organisms.forEach(organism => {
-            organism.animate();
-          });
+      this.organisms.forEach(organism => {
+        organism.animate();
+      });
 
-          Object.keys(this.measurements).forEach(measurement => {
-            if (this.measurements[measurement]) {
-              console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
-            }
-          });
+      Object.keys(this.measurements).forEach(measurement => {
+        if (this.measurements[measurement]) {
+          console.log(`MEASUREMENT ${measurement}: ${this.measurements[measurement]}`);
+        }
+      });
 
-          resolve();
-        });
-      };
+      currentTime = performance.now();
 
-      if (!this.stop) {
-        sync().then(() => {
-          app.ticker.start();
+      if (nextTime - currentTime / 1000 < .001) {
+        Physics.time = currentTime;
+        console.log('time', nextTime);
+        console.log('rawTime', Physics.time);
 
-          stats.end();
-        });
-    }
+        nextTime += 1;
+      }
+
+      stats.end();
     }
 
     app.ticker.add(redraw);
