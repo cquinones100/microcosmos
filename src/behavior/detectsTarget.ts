@@ -1,4 +1,3 @@
-import { Graphics, Matrix, MSAA_QUALITY, Renderer, RenderTexture, Sprite } from "pixi.js";
 import { DEFAULT_ENERGY, IBehavior } from "../behavior";
 import { initializeDuplicateBehavior } from "../duplication";
 import Organism from "../organisms/organism";
@@ -32,37 +31,37 @@ class DetectsTarget implements IBehavior {
   constructor(organism: Organism) {
     this.energy = DEFAULT_ENERGY
     this.organism = organism;
-    this.radius = 1000;
-    const { x, y } = this.organism.getPosition();
+    this.radius = 300;
+    // const { x, y } = this.organism.getPosition();
 
-    const templateShape = new Graphics()
-      .lineStyle({ width: 1, color: 0xFFFFFF, alignment: 0 })
-      .drawCircle(0, 0, this.radius);
+    // const templateShape = new Graphics()
+    //   .lineStyle({ width: 1, color: 0xFFFFFF, alignment: 0 })
+    //   .drawCircle(0, 0, this.radius);
+    //
+    // const { width, height } = templateShape;
+    //
+    // const renderTexture = RenderTexture.create({
+    //   width,
+    //   height,
+    //   multisample: MSAA_QUALITY.HIGH,
+    //   resolution: window.devicePixelRatio
+    // });
 
-    const { width, height } = templateShape;
-
-    const renderTexture = RenderTexture.create({
-      width,
-      height,
-      multisample: MSAA_QUALITY.HIGH,
-      resolution: window.devicePixelRatio
-    });
-
-    const { app, container } = Physics.scene!;
+    // const { app, container } = Physics.scene!;
  
-    app.renderer.render(templateShape, {
-      renderTexture,
-      transform: new Matrix(1, 0, 0, 1, width / 2, height / 2)
-    });
+    // app.renderer.render(templateShape, {
+    //   renderTexture,
+    //   transform: new Matrix(1, 0, 0, 1, width / 2, height / 2)
+    // });
+    //
+    // (app.renderer as Renderer).framebuffer.blit();
+    //
+    // // Discard the original Graphics
+    // templateShape.destroy(true);
+    //
+    // this.shape = new Sprite(renderTexture);
 
-    (app.renderer as Renderer).framebuffer.blit();
-
-    // Discard the original Graphics
-    templateShape.destroy(true);
-
-    this.shape = new Sprite(renderTexture);
-
-    this.shape.zIndex = 1;
+    // this.shape.zIndex = 1;
   }
 
   duplicate(duplicateOrganism: Organism): DetectsTarget {
@@ -79,17 +78,17 @@ class DetectsTarget implements IBehavior {
   }
 
   call() {
-    if (DetectsTarget.showRadius) {
-      Physics.scene!.container.addChild(this.shape)
-      this.organism.otherShapes.push(this.shape);
-    } else {
-      Physics.scene!.container.removeChild(this.shape)
-    }
+    // if (DetectsTarget.showRadius) {
+    //   Physics.scene!.container.addChild(this.shape)
+    //   this.organism.otherShapes.push(this.shape);
+    // } else {
+    //   Physics.scene!.container.removeChild(this.shape)
+    // }
 
-    const { x, y } = this.organism.getPosition();
-    const { width, height } = this.organism.getDimensions();
+    // const { x, y } = this.organism.getPosition();
+    // const { width, height } = this.organism.getDimensions();
 
-    this.shape.position = { x: x - this.radius + width / 2, y: y - this.radius + height / 2 };
+    // this.shape.position = { x: x - this.radius + width / 2, y: y - this.radius + height / 2 };
 
     this.targets = new Set();
 
