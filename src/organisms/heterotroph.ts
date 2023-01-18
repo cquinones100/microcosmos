@@ -7,6 +7,7 @@ import MovesRandomly from "../behavior/movesRandomly";
 import ConsumesOrganisms from "../behavior/consumesOrganisms";
 import Reproduction from "../behavior/reproduction";
 import Physics from "../utils/physics/physics";
+import persuesTarget from "../behavior/persuesTarget";
 
 type HeteroTrophProps = {
   texture: TextureOrganism;
@@ -27,7 +28,6 @@ class HeteroTroph extends Organism {
     organism.behaviors.push(detection);
     organism.behaviors.push(consumes);
     organism.behaviors.push(reproduction);
-
     reproduction.maxInterval = 500;
     organism.shape.shape.zIndex = 1;
     return organism;
@@ -38,6 +38,11 @@ class HeteroTroph extends Organism {
   constructor({ ...args }: OrganismProps) {
     super({ ...args });
 
+
+
+    const pursuit = this.behaviors.find(behavior => (behavior typeof PersuesTarget));
+
+    pursuit?.on(() => this.energy < this.maxEnergy * 0.5);
     this.defaultColor = 0xEFA8B1;
     this.shape.shape.tint = this.defaultColor;
     this.shape.shape.on("click", () => {

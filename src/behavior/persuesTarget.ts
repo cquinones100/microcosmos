@@ -12,12 +12,18 @@ class PersuesTarget implements IBehavior {
   speed: number;
   detection: DetectsTarget | undefined;
   energy: number;
+  private onCb: () => boolean;
 
   constructor (organism: Organism) {
     this.organism = organism;
     this.target = undefined;
     this.speed = 500;
     this.energy = DEFAULT_ENERGY;
+    this.onCb = () => true;
+  }
+
+  on(onCb: () => boolean) {
+    this.onCb = onCb;
   }
 
   duplicate(duplicateOrganism: Organism): PersuesTarget {
@@ -41,6 +47,7 @@ class PersuesTarget implements IBehavior {
   }
 
   call() {
+    if (!this.onCb()) return;
     if (this.target && this.organism.canEat(this.target)) {
       if (Physics.Collision.collides(this.organism, this.target)) {
         this.target = undefined;
